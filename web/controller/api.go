@@ -25,7 +25,7 @@ func (a *APIController) initRouter(g *gin.RouterGroup) {
 	g.POST("/update/:id", a.updateInbound)
 	g.POST("/addClient/", a.addInboundClient)
 	g.POST("/:id/delClient/:clientId", a.delInboundClient)
-	g.POST("/updateClient/:index", a.updateInboundClient)
+	g.POST("/updateClient/:clientId", a.updateInboundClient)
 	g.POST("/:id/resetClientTraffic/:email", a.resetClientTraffic)
 	g.POST("/resetAllTraffics", a.resetAllTraffics)
 	g.POST("/resetAllClientTraffics/:id", a.resetAllClientTraffics)
