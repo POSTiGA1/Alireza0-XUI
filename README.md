@@ -54,7 +54,7 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
 | `POST` | `"/del/:id"`                       | Delete Inbound                              |
 | `POST` | `"/update/:id"`                    | Update Inbound                              |
 | `POST` | `"/addClient/"`                    | Add Client to inbound                       |
-| `POST` | `"/delClient/:email"`              | Delete Client                               |
+| `POST` | `"/:id/delClient/:clientId"`       | Delete Client by UID/Password as clientId   |
 | `POST` | `"/updateClient/:index"`           | Update Client                               |
 | `POST` | `"/:id/resetClientTraffic/:email"` | Reset Client's Traffic                      |
 | `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds              |
