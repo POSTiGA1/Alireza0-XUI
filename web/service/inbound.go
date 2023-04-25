@@ -643,8 +643,15 @@ func (s *InboundService) ResetClientTraffic(id int, clientEmail string) error {
 func (s *InboundService) ResetAllClientTraffics(id int) error {
 	db := database.GetDB()
 
+	whereText := "inbound_id "
+	if id == -1 {
+		whereText += " > ?"
+	} else {
+		whereText += " = ?"
+	}
+
 	result := db.Model(xray.ClientTraffic{}).
-		Where("inbound_id = ?", id).
+		Where(whereText, id).
 		Updates(map[string]interface{}{"enable": true, "up": 0, "down": 0})
 
 	err := result.Error
