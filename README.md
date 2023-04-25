@@ -55,10 +55,11 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
 | `POST` | `"/update/:id"`                    | Update Inbound                              |
 | `POST` | `"/addClient/"`                    | Add Client to inbound                       |
 | `POST` | `"/:id/delClient/:clientId"`       | Delete Client by UID/Password as clientId   |
-| `POST` | `"/updateClient/:index"`           | Update Client                               |
+| `POST` | `"/updateClient/:clientId"`        | Update Client by UID/Password as clientId   |
 | `POST` | `"/:id/resetClientTraffic/:email"` | Reset Client's Traffic                      |
 | `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds              |
-| `POST` | `"/resetAllClientTraffics/:id"`    | Reset traffics of all clients in an inbound |
+| `POST` | `"/resetAllClientTraffics/:id"`    | Reset inbound clients traffics (-1: all)    |
+| `POST` | `"/delDepletedClients/:id"`        | Delete inbound depleted clients (-1: all)   |
 
 # Environment Variables
 
