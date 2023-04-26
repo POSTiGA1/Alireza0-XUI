@@ -1,23 +1,15 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"strings"
 	"x-ui/config"
 	"x-ui/logger"
 	"x-ui/web/entity"
+
+	"github.com/gin-gonic/gin"
 )
-
-func getUriId(c *gin.Context) int64 {
-	s := struct {
-		Id int64 `uri:"id"`
-	}{}
-
-	_ = c.BindUri(&s)
-	return s.Id
-}
 
 func getRemoteIp(c *gin.Context) string {
 	value := c.GetHeader("X-Forwarded-For")
@@ -85,10 +77,8 @@ func getContext(h gin.H) gin.H {
 	a := gin.H{
 		"cur_ver": config.GetVersion(),
 	}
-	if h != nil {
-		for key, value := range h {
-			a[key] = value
-		}
+	for key, value := range h {
+		a[key] = value
 	}
 	return a
 }
