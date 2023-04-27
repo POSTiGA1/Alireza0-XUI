@@ -851,6 +851,8 @@ func (s *InboundService) SearchInbounds(query string) ([]*model.Inbound, error) 
 
 func (s *InboundService) MigrationRequirements() {
 	db := database.GetDB()
+
+	// Fix inbounds based problems
 	var inbounds []*model.Inbound
 	err := db.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "trojan"}).Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -861,6 +863,7 @@ func (s *InboundService) MigrationRequirements() {
 		json.Unmarshal([]byte(inbounds[inbound_index].Settings), &settings)
 		clients, ok := settings["clients"].([]interface{})
 		if ok {
+			// Fix Clinet configuration problems
 			var newClients []interface{}
 			for client_index := range clients {
 				c := clients[client_index].(map[string]interface{})
@@ -886,6 +889,8 @@ func (s *InboundService) MigrationRequirements() {
 
 			inbounds[inbound_index].Settings = string(modifiedSettings)
 		}
+
+		// Add client traffic row for all clients which has email
 		modelClients, err := s.getClients(inbounds[inbound_index])
 		if err != nil {
 			return
@@ -901,4 +906,7 @@ func (s *InboundService) MigrationRequirements() {
 		}
 	}
 	db.Save(inbounds)
+
+	// Remove orphaned traffics
+	db.Where("inbound_id = 0").Delete(xray.ClientTraffic{})
 }
