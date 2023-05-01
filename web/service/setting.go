@@ -2,6 +2,7 @@ package service
 
 import (
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -325,4 +326,13 @@ func (s *SettingService) UpdateAllSetting(allSetting *entity.AllSetting) error {
 		}
 	}
 	return common.Combine(errs...)
+}
+
+func (s *SettingService) GetDefaultXrayConfig() (interface{}, error) {
+	var jsonData interface{}
+	err := json.Unmarshal([]byte(xrayTemplateConfig), &jsonData)
+	if err != nil {
+		return nil, err
+	}
+	return jsonData, nil
 }

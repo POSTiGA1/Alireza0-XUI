@@ -37,6 +37,7 @@ func (a *SettingController) initRouter(g *gin.RouterGroup) {
 	g.POST("/update", a.updateSetting)
 	g.POST("/updateUser", a.updateUser)
 	g.POST("/restartPanel", a.restartPanel)
+	g.GET("/getDefaultJsonConfig", a.getDefaultXrayConfig)
 }
 
 func (a *SettingController) getAllSetting(c *gin.Context) {
@@ -117,4 +118,13 @@ func (a *SettingController) updateUser(c *gin.Context) {
 func (a *SettingController) restartPanel(c *gin.Context) {
 	err := a.panelService.RestartPanel(time.Second * 3)
 	jsonMsg(c, I18n(c, "pages.setting.restartPanel"), err)
+}
+
+func (a *SettingController) getDefaultXrayConfig(c *gin.Context) {
+	defaultJsonConfig, err := a.settingService.GetDefaultXrayConfig()
+	if err != nil {
+		jsonMsg(c, I18n(c, "pages.setting.toasts.getSetting"), err)
+		return
+	}
+	jsonObj(c, defaultJsonConfig, nil)
 }

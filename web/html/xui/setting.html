@@ -113,6 +113,9 @@
                                     </a-collapse-panel>
                                 </a-collapse>
                                 <a-divider>{{ i18n "pages.setting.completeTemplate"}}</a-divider>
+                                <a-space direction="horizontal" style="padding: 0 20px">
+                                    <a-button type="primary" @click="resetXrayConfigToDefault">{{ i18n "pages.setting.resetDefaultConfig" }}</a-button>
+                                </a-space>
                                 <setting-list-item type="textarea" title='{{ i18n "pages.setting.xrayConfigTemplate"}}' desc='{{ i18n "pages.setting.xrayConfigTemplateDesc"}}' v-model="allSetting.xrayTemplateConfig"></setting-list-item>
                             </a-list>
                         </a-tab-pane>
@@ -201,7 +204,16 @@
                     await PromiseUtil.sleep(5000);
                     location.reload();
                 }
-            }
+            },
+            async resetXrayConfigToDefault() {
+                this.loading(true);
+                const msg = await HttpUtil.get("/xui/setting/getDefaultJsonConfig");
+                this.loading(false);
+                if (msg.success) {
+                    this.templateSettings = JSON.parse(JSON.stringify(msg.obj, null, 2));
+                    this.saveBtnDisable = true;
+                }
+            },
         },
         async mounted() {
             await this.getAllSetting();
