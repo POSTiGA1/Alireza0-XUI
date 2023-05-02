@@ -54,12 +54,17 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
 | `POST` | `"/del/:id"`                       | Delete Inbound                              |
 | `POST` | `"/update/:id"`                    | Update Inbound                              |
 | `POST` | `"/addClient/"`                    | Add Client to inbound                       |
-| `POST` | `"/:id/delClient/:clientId"`       | Delete Client by UID/Password as clientId   |
-| `POST` | `"/updateClient/:clientId"`        | Update Client by UID/Password as clientId   |
+| `POST` | `"/:id/delClient/:clientId"`       | Delete Client by clientId*                  |
+| `POST` | `"/updateClient/:clientId"`        | Update Client by clientId*                  |
 | `POST` | `"/getClientTraffics/:email"`      | Get Client's Traffic                        |
 | `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds              |
 | `POST` | `"/resetAllClientTraffics/:id"`    | Reset inbound clients traffics (-1: all)    |
 | `POST` | `"/delDepletedClients/:id"`        | Delete inbound depleted clients (-1: all)   |
+
+*- The field `clientId` should be filled by: 
+- `client.id` for VMESS and VLESS
+- `client.password` for TROJAN
+- `client.email` for Shadowsocks
 
 # Environment Variables
 

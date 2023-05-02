@@ -21,12 +21,12 @@ const SSMethods = {
     // AES_128_CFB: 'aes-128-cfb',
     // CHACHA20: 'chacha20',
     // CHACHA20_IETF: 'chacha20-ietf',
-    CHACHA20_POLY1305: 'chacha20-poly1305',
-    AES_256_GCM: 'aes-256-gcm',
-    AES_128_GCM: 'aes-128-gcm',
+    // CHACHA20_POLY1305: 'chacha20-poly1305',
+    // AES_256_GCM: 'aes-256-gcm',
+    // AES_128_GCM: 'aes-128-gcm',
     BLAKE3_AES_128_GCM: '2022-blake3-aes-128-gcm',
     BLAKE3_AES_256_GCM: '2022-blake3-aes-256-gcm',
-    BLAKE3_CHACHA20_POLY1305: '2022-blake3-chacha20-poly1305',
+    // BLAKE3_CHACHA20_POLY1305: '2022-blake3-chacha20-poly1305',
 };
 
 const TLS_FLOW_CONTROL = {
@@ -860,66 +860,6 @@ class Inbound extends XrayCommonClass {
         return this.network === "http";
     }
 
-    // VMess & VLess
-    get uuid() {
-        switch (this.protocol) {
-            case Protocols.VMESS:
-                return this.settings.vmesses[0].id;
-            case Protocols.VLESS:
-                return this.settings.vlesses[0].id;
-            default:
-                return "";
-        }
-    }
-
-    // VLess & Trojan
-    get flow() {
-        switch (this.protocol) {
-            case Protocols.VLESS:
-                return this.settings.vlesses[0].flow;
-            case Protocols.TROJAN:
-                return this.settings.trojans[0].flow;
-            default:
-                return "";
-        }
-    }
-
-    // VMess
-    get alterId() {
-        switch (this.protocol) {
-            case Protocols.VMESS:
-                return this.settings.vmesses[0].alterId;
-            default:
-                return "";
-        }
-    }
-
-    // Socks & HTTP
-    get username() {
-        switch (this.protocol) {
-            case Protocols.SOCKS:
-            case Protocols.HTTP:
-                return this.settings.accounts[0].user;
-            default:
-                return "";
-        }
-    }
-
-    // Trojan & Shadowsocks & Socks & HTTP
-    get password() {
-        switch (this.protocol) {
-            case Protocols.TROJAN:
-                return this.settings.trojans[0].password;
-            case Protocols.SHADOWSOCKS:
-                return this.settings.password;
-            case Protocols.SOCKS:
-            case Protocols.HTTP:
-                return this.settings.accounts[0].pass;
-            default:
-                return "";
-        }
-    }
-
     // Shadowsocks
     get method() {
         switch (this.protocol) {
@@ -993,10 +933,14 @@ class Inbound extends XrayCommonClass {
                 if(this.settings.vlesses[index].expiryTime > 0)
                     return this.settings.vlesses[index].expiryTime < new Date().getTime();
                 return false
-                case Protocols.TROJAN:
-                    if(this.settings.trojans[index].expiryTime > 0)
-                        return this.settings.trojans[index].expiryTime < new Date().getTime();
-                    return false
+            case Protocols.TROJAN:
+                if(this.settings.trojans[index].expiryTime > 0)
+                    return this.settings.trojans[index].expiryTime < new Date().getTime();
+                return false
+            case Protocols.SHADOWSOCKS:
+                if(this.settings.shadowsockses[index].expiryTime > 0)
+                    return this.settings.shadowsockses[index].expiryTime < new Date().getTime();
+                return false
             default:
                 return false;
         }
@@ -1007,7 +951,6 @@ class Inbound extends XrayCommonClass {
             case Protocols.VMESS:
             case Protocols.VLESS:
             case Protocols.TROJAN:
-            case Protocols.SHADOWSOCKS:
                 break;
             default:
                 return false;
@@ -1066,7 +1009,6 @@ class Inbound extends XrayCommonClass {
             case Protocols.VMESS:
             case Protocols.VLESS:
             case Protocols.TROJAN:
-            case Protocols.SHADOWSOCKS:
                 return true;
             default:
                 return false;
@@ -1272,18 +1214,19 @@ class Inbound extends XrayCommonClass {
         return url.toString();
     }
 
-    genSSLink(address='', remark='') {
+    genSSLink(address='', remark='', clientIndex = 0) {
         let settings = this.settings;
-        const server = this.stream.tls.server;
-        if (!ObjectUtil.isEmpty(server)) {
-            address = server;
-        }
-        if (settings.method == SSMethods.BLAKE3_AES_128_GCM || settings.method == SSMethods.BLAKE3_AES_256_GCM || settings.method == SSMethods.BLAKE3_CHACHA20_POLY1305) {
-            return `ss://${settings.method}:${settings.password}@${address}:${this.port}#${encodeURIComponent(remark)}`;
-        } else {
-            return 'ss://' + safeBase64(settings.method + ':' + settings.password + '@' + address + ':' + this.port)
-                + '#' + encodeURIComponent(remark);
-        }
+        const port = this.port;
+
+        return 'ss://' + safeBase64(settings.method + ':' + settings.password + ':' +settings.shadowsockses[clientIndex].password) + '@' + address + ':' + this.port + '#' + encodeURIComponent(remark);
+
+
+        // if (settings.method == SSMethods.BLAKE3_AES_128_GCM || settings.method == SSMethods.BLAKE3_AES_256_GCM || settings.method == SSMethods.BLAKE3_CHACHA20_POLY1305) {
+        //     return `ss://${settings.method}:${settings.password}@${address}:${this.port}#${encodeURIComponent(remark)}`;
+        // } else {
+        //     return 'ss://' + safeBase64(settings.method + ':' + settings.password + '@' + address + ':' + this.port)
+        //         + '#' + encodeURIComponent(remark);
+        // }
     }
 
     genTrojanLink(address = '', remark = '', clientIndex = 0) {
@@ -1397,7 +1340,11 @@ class Inbound extends XrayCommonClass {
                     remark = this.settings.vlesses[clientIndex].email
                 }
                 return this.genVLESSLink(address, remark, clientIndex);
-            case Protocols.SHADOWSOCKS: return this.genSSLink(address, remark);
+            case Protocols.SHADOWSOCKS: 
+                if (this.settings.shadowsockses[clientIndex].email != ""){
+                    remark = this.settings.shadowsockses[clientIndex].email
+                }
+                return this.genSSLink(address, remark, clientIndex);
             case Protocols.TROJAN:
                 if (this.settings.trojans[clientIndex].email != ""){
                     remark = this.settings.trojans[clientIndex].email
@@ -1854,13 +1801,15 @@ Inbound.TrojanSettings.Fallback = class extends XrayCommonClass {
 Inbound.ShadowsocksSettings = class extends Inbound.Settings {
     constructor(protocol,
                 method=SSMethods.BLAKE3_AES_256_GCM,
-                password=RandomUtil.randomSeq(44),
-                network='tcp,udp'
+                password=RandomUtil.randomShadowsocksPassword(),
+                network='tcp,udp',
+                shadowsockses=[new Inbound.ShadowsocksSettings.Shadowsocks()]
     ) {
         super(protocol);
         this.method = method;
         this.password = password;
         this.network = network;
+        this.shadowsockses = shadowsockses;
     }
 
     static fromJson(json={}) {
@@ -1869,6 +1818,7 @@ Inbound.ShadowsocksSettings = class extends Inbound.Settings {
             json.method,
             json.password,
             json.network,
+            json.clients.map(client => Inbound.ShadowsocksSettings.Shadowsocks.fromJson(client)),
         );
     }
 
@@ -1877,8 +1827,72 @@ Inbound.ShadowsocksSettings = class extends Inbound.Settings {
             method: this.method,
             password: this.password,
             network: this.network,
+            clients: Inbound.ShadowsocksSettings.toJsonArray(this.shadowsockses)
         };
     }
+};
+
+Inbound.ShadowsocksSettings.Shadowsocks = class extends XrayCommonClass {
+    constructor(password=RandomUtil.randomShadowsocksPassword(), email=RandomUtil.randomText(), totalGB=0, expiryTime=0, enable=true, tgId='', subId='') {
+        super();
+        this.password = password;
+        this.email = email;
+        this.totalGB = totalGB;
+        this.expiryTime = expiryTime;
+        this.enable = enable;
+        this.tgId = tgId;
+        this.subId = subId;
+    }
+
+    toJson() {
+        return {
+            password: this.password,
+            email: this.email,
+            totalGB: this.totalGB,
+            expiryTime: this.expiryTime,
+            enable: this.enable,
+            tgId: this.tgId,
+            subId: this.subId,
+        };
+    }
+
+    static fromJson(json = {}) {
+        return new Inbound.ShadowsocksSettings.Shadowsocks(
+            json.password,
+            json.email,
+            json.totalGB,
+            json.expiryTime,
+            json.enable,
+            json.tgId,
+            json.subId,
+        );
+    }
+
+    get _expiryTime() {
+        if (this.expiryTime === 0 || this.expiryTime === "") {
+            return null;
+        }
+        if (this.expiryTime < 0){
+            return this.expiryTime / -86400000;
+        }
+        return moment(this.expiryTime);
+    }
+
+    set _expiryTime(t) {
+        if (t == null || t === "") {
+            this.expiryTime = 0;
+        } else {
+            this.expiryTime = t.valueOf();
+        }
+    }
+    get _totalGB() {
+        return toFixed(this.totalGB / ONE_GB, 2);
+    }
+
+    set _totalGB(gb) {
+        this.totalGB = toFixed(gb * ONE_GB, 0);
+    }
+
 };
 
 Inbound.DokodemoSettings = class extends Inbound.Settings {

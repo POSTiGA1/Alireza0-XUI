@@ -28,8 +28,10 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr v-if="inbound.protocol === Protocols.TROJAN">
-            <td>password</td>
+        <tr v-if="inbound.protocol === Protocols.TROJAN || inbound.protocol === Protocols.SHADOWSOCKS">
+            <td>password
+                <a-icon v-if="inbound.protocol === Protocols.SHADOWSOCKS" @click="client.password = RandomUtil.randomShadowsocksPassword()" type="sync"> </a-icon>
+            </td>
             <td>
                 <a-form-item>
                     <a-input v-model.trim="client.password" style="width: 250px"></a-input>
