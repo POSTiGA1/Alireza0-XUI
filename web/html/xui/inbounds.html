@@ -98,7 +98,7 @@
                                               :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
                                         <a-select-option v-for="key in [5,10,30,60]" :value="key*1000">[[ key ]]s</a-select-option>
                                     </a-select>
-                                    <a-icon type="sync" :spin="isRefreshEnabled" @click="manualRefresh"></a-icon>
+                                    <a-icon type="sync" :spin="refreshing" @click="manualRefresh"></a-icon>
                                     <a-switch v-model="isRefreshEnabled" @change="toggleRefresh"></a-switch>
                                 </a-col>
                             </a-row>
@@ -323,6 +323,7 @@
             defaultKey: '',
             clientCount: {},
             isRefreshEnabled: localStorage.getItem("isRefreshEnabled") === "true" ? true : false,
+            refreshing: false,
             refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000,
         },
         methods: {
@@ -330,11 +331,13 @@
                 this.spinning = spinning;
             },
             async getDBInbounds() {
+                this.refreshing = true;
                 const msg = await HttpUtil.post('/xui/inbound/list');
                 if (!msg.success) {
                     return;
                 }
                 this.setInbounds(msg.obj);
+                this.refreshing = false;
             },
             async getDefaultSettings() {
                 const msg = await HttpUtil.post('/xui/setting/defaultSettings');
@@ -660,7 +663,7 @@
             },
             delClient(dbInboundId,client) {
                 dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
-                clientId = clientId = getClientId(dbInbound.protocol,client);;
+                clientId = this.getClientId(dbInbound.protocol,client);
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.deleteInbound"}}',
                     content: '{{ i18n "pages.inbounds.deleteInboundContent"}}',
@@ -704,7 +707,7 @@
                 clients = this.getClients(dbInbound.protocol, inbound.settings);
                 index = this.findIndexOfClient(clients, client);
                 clients[index].enable = !clients[index].enable;
-                clientId = getClientId(dbInbound.protocol,clients[index]);
+                clientId = this.getClientId(dbInbound.protocol,clients[index]);
                 await this.updateClient(clients[index],dbInboundId, clientId);
                 this.loading(false);
             },
@@ -821,7 +824,7 @@
                 localStorage.setItem("refreshInterval", this.refreshInterval);
             },
             async manualRefresh(){
-                if(!this.isRefreshEnabled){
+                if(!this.refreshing){
                     this.spinning = true;
                     await this.getDBInbounds();
                     this.spinning = false;
