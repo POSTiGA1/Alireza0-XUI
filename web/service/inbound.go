@@ -572,6 +572,7 @@ func (s *InboundService) DisableInvalidInbounds() (int64, error) {
 	count := result.RowsAffected
 	return count, err
 }
+
 func (s *InboundService) DisableInvalidClients() (int64, error) {
 	db := database.GetDB()
 	now := time.Now().Unix() * 1000
@@ -582,7 +583,8 @@ func (s *InboundService) DisableInvalidClients() (int64, error) {
 	count := result.RowsAffected
 	return count, err
 }
-func (s *InboundService) RemoveOrphanedTraffics() {
+
+func (s *InboundService) MigrationRemoveOrphanedTraffics() {
 	db := database.GetDB()
 	db.Exec(`
 		DELETE FROM client_traffics
@@ -593,6 +595,7 @@ func (s *InboundService) RemoveOrphanedTraffics() {
 		)
 	`)
 }
+
 func (s *InboundService) AddClientStat(inboundId int, client *model.Client) error {
 	db := database.GetDB()
 
@@ -611,6 +614,7 @@ func (s *InboundService) AddClientStat(inboundId int, client *model.Client) erro
 	}
 	return nil
 }
+
 func (s *InboundService) UpdateClientStat(email string, client *model.Client) error {
 	db := database.GetDB()
 
@@ -916,4 +920,9 @@ func (s *InboundService) MigrationRequirements() {
 
 	// Remove orphaned traffics
 	db.Where("inbound_id = 0").Delete(xray.ClientTraffic{})
+}
+
+func (s *InboundService) MigrateDB() {
+	s.MigrationRequirements()
+	s.MigrationRemoveOrphanedTraffics()
 }

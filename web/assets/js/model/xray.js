@@ -1009,6 +1009,7 @@ class Inbound extends XrayCommonClass {
             case Protocols.VMESS:
             case Protocols.VLESS:
             case Protocols.TROJAN:
+            case Protocols.SHADOWSOCKS:
                 return true;
             default:
                 return false;
@@ -1217,16 +1218,64 @@ class Inbound extends XrayCommonClass {
     genSSLink(address='', remark='', clientIndex = 0) {
         let settings = this.settings;
         const port = this.port;
+        const type = this.stream.network;
+        const params = new Map();
+        params.set("type", this.stream.network);
+        switch (type) {
+            case "tcp":
+                const tcp = this.stream.tcp;
+                if (tcp.type === 'http') {
+                    const request = tcp.request;
+                    params.set("path", request.path.join(','));
+                    const index = request.headers.findIndex(header => header.name.toLowerCase() === 'host');
+                    if (index >= 0) {
+                        const host = request.headers[index].value;
+                        params.set("host", host);
+                    }
+                    params.set("headerType", 'http');
+                }
+                break;
+            case "kcp":
+                const kcp = this.stream.kcp;
+                params.set("headerType", kcp.type);
+                params.set("seed", kcp.seed);
+                break;
+            case "ws":
+                const ws = this.stream.ws;
+                params.set("path", ws.path);
+                const index = ws.headers.findIndex(header => header.name.toLowerCase() === 'host');
+                if (index >= 0) {
+                    const host = ws.headers[index].value;
+                    params.set("host", host);
+                }
+                break;
+            case "http":
+                const http = this.stream.http;
+                params.set("path", http.path);
+                params.set("host", http.host);
+                break;
+            case "quic":
+                const quic = this.stream.quic;
+                params.set("quicSecurity", quic.security);
+                params.set("key", quic.key);
+                params.set("headerType", quic.type);
+                break;
+            case "grpc":
+                const grpc = this.stream.grpc;
+                params.set("serviceName", grpc.serviceName);
+                if(grpc.multiMode){
+                    params.set("mode", "multi");
+                }
+                break;
+        }
 
-        return 'ss://' + safeBase64(settings.method + ':' + settings.password + ':' +settings.shadowsockses[clientIndex].password) + '@' + address + ':' + this.port + '#' + encodeURIComponent(remark);
-
-
-        // if (settings.method == SSMethods.BLAKE3_AES_128_GCM || settings.method == SSMethods.BLAKE3_AES_256_GCM || settings.method == SSMethods.BLAKE3_CHACHA20_POLY1305) {
-        //     return `ss://${settings.method}:${settings.password}@${address}:${this.port}#${encodeURIComponent(remark)}`;
-        // } else {
-        //     return 'ss://' + safeBase64(settings.method + ':' + settings.password + '@' + address + ':' + this.port)
-        //         + '#' + encodeURIComponent(remark);
-        // }
+        let link = `ss://${safeBase64(settings.method + ':' + settings.password + ':' +settings.shadowsockses[clientIndex].password)}@${address}:${this.port}`;
+        const url = new URL(link);
+        for (const [key, value] of params) {
+            url.searchParams.set(key, value)
+        }
+        url.hash = encodeURIComponent(remark);
+        return url.toString();
     }
 
     genTrojanLink(address = '', remark = '', clientIndex = 0) {
@@ -1319,7 +1368,7 @@ class Inbound extends XrayCommonClass {
             }
         }
 
-        const link = `trojan://${settings.trojans[clientIndex].password}@${address}:${this.port}#${encodeURIComponent(remark)}`;
+        const link = `trojan://${settings.trojans[clientIndex].password}@${address}:${this.port}`;
         const url = new URL(link);
         for (const [key, value] of params) {
             url.searchParams.set(key, value)

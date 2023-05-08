@@ -511,6 +511,8 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 	if inbound.Protocol != model.Shadowsocks {
 		return ""
 	}
+	var stream map[string]interface{}
+	json.Unmarshal([]byte(inbound.StreamSettings), &stream)
 	clients, _ := s.inboundService.getClients(inbound)
 
 	var settings map[string]interface{}
@@ -524,8 +526,65 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 			break
 		}
 	}
+	streamNetwork := stream["network"].(string)
+	params := make(map[string]string)
+	params["type"] = streamNetwork
+
+	switch streamNetwork {
+	case "tcp":
+		tcp, _ := stream["tcpSettings"].(map[string]interface{})
+		header, _ := tcp["header"].(map[string]interface{})
+		typeStr, _ := header["type"].(string)
+		if typeStr == "http" {
+			request := header["request"].(map[string]interface{})
+			requestPath, _ := request["path"].([]interface{})
+			params["path"] = requestPath[0].(string)
+			headers, _ := request["headers"].(map[string]interface{})
+			params["host"] = searchHost(headers)
+			params["headerType"] = "http"
+		}
+	case "kcp":
+		kcp, _ := stream["kcpSettings"].(map[string]interface{})
+		header, _ := kcp["header"].(map[string]interface{})
+		params["headerType"] = header["type"].(string)
+		params["seed"] = kcp["seed"].(string)
+	case "ws":
+		ws, _ := stream["wsSettings"].(map[string]interface{})
+		params["path"] = ws["path"].(string)
+		headers, _ := ws["headers"].(map[string]interface{})
+		params["host"] = searchHost(headers)
+	case "http":
+		http, _ := stream["httpSettings"].(map[string]interface{})
+		params["path"] = http["path"].(string)
+		params["host"] = searchHost(http)
+	case "quic":
+		quic, _ := stream["quicSettings"].(map[string]interface{})
+		params["quicSecurity"] = quic["security"].(string)
+		params["key"] = quic["key"].(string)
+		header := quic["header"].(map[string]interface{})
+		params["headerType"] = header["type"].(string)
+	case "grpc":
+		grpc, _ := stream["grpcSettings"].(map[string]interface{})
+		params["serviceName"] = grpc["serviceName"].(string)
+		if grpc["multiMode"].(bool) {
+			params["mode"] = "multi"
+		}
+	}
+
 	encPart := fmt.Sprintf("%s:%s:%s", method, inboundPassword, clients[clientIndex].Password)
-	return fmt.Sprintf("ss://%s@%s:%d#%s", base64.StdEncoding.EncodeToString([]byte(encPart)), address, inbound.Port, clients[clientIndex].Email)
+	link := fmt.Sprintf("ss://%s@%s:%d", base64.StdEncoding.EncodeToString([]byte(encPart)), address, inbound.Port)
+	url, _ := url.Parse(link)
+	q := url.Query()
+
+	for k, v := range params {
+		q.Add(k, v)
+	}
+
+	// Set the new query values on the URL
+	url.RawQuery = q.Encode()
+
+	url.Fragment = clients[clientIndex].Email
+	return url.String()
 }
 
 func searchKey(data interface{}, key string) (interface{}, bool) {

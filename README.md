@@ -40,28 +40,30 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
 - Support https access panel (self-provided domain name + ssl certificate)
 - Support one-click SSL certificate application and automatic renewal
 - For more advanced configuration items, please refer to the panel
+- Support export/import database from panel
 
 ## API routes
 
 - `/login` with `PUSH` user data: `{username: '', password: ''}` for login
 - `/xui/API/inbounds` base for following actions:
 
-| Method | Path                               | Action                                      |
-| :----: | ---------------------------------  | ------------------------------------------- |
-| `GET`  | `"/"`                              | Get all inbounds                            |
-| `GET`  | `"/get/:id"`                       | Get inbound with inbound.id                 |
-| `POST` | `"/add"`                           | Add inbound                                 |
-| `POST` | `"/del/:id"`                       | Delete Inbound                              |
-| `POST` | `"/update/:id"`                    | Update Inbound                              |
-| `POST` | `"/addClient/"`                    | Add Client to inbound                       |
-| `POST` | `"/:id/delClient/:clientId"`       | Delete Client by clientId*                  |
-| `POST` | `"/updateClient/:clientId"`        | Update Client by clientId*                  |
-| `POST` | `"/getClientTraffics/:email"`      | Get Client's Traffic                        |
-| `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds              |
-| `POST` | `"/resetAllClientTraffics/:id"`    | Reset inbound clients traffics (-1: all)    |
-| `POST` | `"/delDepletedClients/:id"`        | Delete inbound depleted clients (-1: all)   |
+| Method | Path                            | Action                                    |
+| :----: | ------------------------------- | ----------------------------------------- |
+| `GET`  | `"/"`                           | Get all inbounds                          |
+| `GET`  | `"/get/:id"`                    | Get inbound with inbound.id               |
+| `POST` | `"/add"`                        | Add inbound                               |
+| `POST` | `"/del/:id"`                    | Delete Inbound                            |
+| `POST` | `"/update/:id"`                 | Update Inbound                            |
+| `POST` | `"/addClient/"`                 | Add Client to inbound                     |
+| `POST` | `"/:id/delClient/:clientId"`    | Delete Client by clientId\*               |
+| `POST` | `"/updateClient/:clientId"`     | Update Client by clientId\*               |
+| `POST` | `"/getClientTraffics/:email"`   | Get Client's Traffic                      |
+| `POST` | `"/resetAllTraffics"`           | Reset traffics of all inbounds            |
+| `POST` | `"/resetAllClientTraffics/:id"` | Reset inbound clients traffics (-1: all)  |
+| `POST` | `"/delDepletedClients/:id"`     | Delete inbound depleted clients (-1: all) |
 
-*- The field `clientId` should be filled by: 
+\*- The field `clientId` should be filled by:
+
 - `client.id` for VMESS and VLESS
 - `client.password` for TROJAN
 - `client.email` for Shadowsocks
@@ -94,7 +96,9 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.s
 ```
 
 ## Install custom version
+
 To install your desired version you can add the version to the end of install command. Example for ver `0.5.2`:
+
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.sh) 0.5.2
 ```

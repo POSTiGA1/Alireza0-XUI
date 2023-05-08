@@ -98,7 +98,7 @@
                                               :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
                                         <a-select-option v-for="key in [5,10,30,60]" :value="key*1000">[[ key ]]s</a-select-option>
                                     </a-select>
-                                    <a-icon type="sync" :spin="refreshing" @click="manualRefresh"></a-icon>
+                                    <a-icon type="sync" :spin="refreshing" @click="manualRefresh" style="margin: 0 5px;"></a-icon>
                                     <a-switch v-model="isRefreshEnabled" @change="toggleRefresh"></a-switch>
                                 </a-col>
                             </a-row>
@@ -162,7 +162,7 @@
                             </template>
                             <template slot="protocol" slot-scope="text, dbInbound">
                                 <a-tag style="margin:0;" color="blue">[[ dbInbound.protocol ]]</a-tag>
-                                <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan">
+                                <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan || dbInbound.isSS">
                                     <a-tag style="margin:0;" color="green">[[ dbInbound.toInbound().stream.network ]]</a-tag>
                                     <a-tag style="margin:0;" v-if="dbInbound.toInbound().stream.isTls" color="cyan">tls</a-tag>
                                     <a-tag style="margin:0;" v-if="dbInbound.toInbound().stream.isReality" color="cyan">reality</a-tag>
@@ -337,7 +337,9 @@
                     return;
                 }
                 this.setInbounds(msg.obj);
-                this.refreshing = false;
+                setTimeout(() => {
+                    this.refreshing = false;
+                }, 500);
             },
             async getDefaultSettings() {
                 const msg = await HttpUtil.post('/xui/setting/defaultSettings');
