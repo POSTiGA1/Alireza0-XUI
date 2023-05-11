@@ -216,6 +216,9 @@ func (t *Tgbot) SendAnswer(chatId int64, msg string, isAdmin bool) {
 }
 
 func (t *Tgbot) SendMsgToTgbot(tgid int64, msg string) {
+	if !isRunning {
+		return
+	}
 	var allMessages []string
 	limit := 2000
 	// paging message if it is big

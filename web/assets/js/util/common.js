@@ -56,7 +56,7 @@ function toFixed(num, n) {
     return Math.round(num * n) / n;
 }
 
-function debounce (fn, delay) {
+function debounce(fn, delay) {
     var timeoutID = null
     return function () {
       clearTimeout(timeoutID)
@@ -66,4 +66,19 @@ function debounce (fn, delay) {
         fn.apply(that, args)
       }, delay)
     }
-  }
+}
+
+function usageColor(data, threshold, total) {
+    switch (true) {
+        case data === null:
+            return 'blue';
+        case total <= 0:
+            return 'blue';
+        case data < total - threshold:
+            return 'cyan';
+        case data < total:
+            return 'orange';
+        default:
+            return 'red';
+    }
+}
