@@ -1,7 +1,7 @@
 {{define "inboundModal"}}
 <a-modal id="inbound-modal" v-model="inModal.visible" :title="inModal.title" @ok="inModal.ok"
          :confirm-loading="inModal.confirmLoading" :closable="true" :mask-closable="false"
-         :class="siderDrawer.isDarkTheme ? darkClass : ''"
+         :class="themeSwitcher.darkCardClass"
          :ok-text="inModal.okText" cancel-text='{{ i18n "close" }}'>
     {{template "form/inbound"}}
 </a-modal>
@@ -100,9 +100,9 @@
                     this.inModal.inbound.reality = false;
                 }
             },
-            setDefaultCertData(){
-                inModal.inbound.stream.tls.certs[0].certFile = app.defaultCert;
-                inModal.inbound.stream.tls.certs[0].keyFile = app.defaultKey;
+            setDefaultCertData(index){
+                inModal.inbound.stream.tls.certs[index].certFile = app.defaultCert;
+                inModal.inbound.stream.tls.certs[index].keyFile = app.defaultKey;
             },
             async getNewX25519Cert(){
                 inModal.loading(true);

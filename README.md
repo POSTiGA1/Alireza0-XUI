@@ -8,7 +8,7 @@
 
 > **Disclaimer: This project is only for personal learning and communication, please do not use it for illegal purposes, please do not use it in a production environment**
 
-xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
+xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese,Russian)**
 
 | Features                             |      Enable?       |
 | ------------------------------------ | :----------------: |
@@ -24,70 +24,6 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese)**
 | Calculate expire date on first usage | :heavy_check_mark: |
 
 **If you think this project is helpful to you, you may wish to give a** :star2:
-
-# Features
-
-- System Status Monitoring
-- Search within all inbounds and clients
-- Support Dark/Light theme UI
-- Support multi-user multi-protocol, web page visualization operation
-- Supported protocols: vmess, vless, trojan, shadowsocks, dokodemo-door, socks, http
-- Support for configuring more transport configurations
-- Traffic statistics, limit traffic, limit expiration time
-- Customizable xray configuration templates
-- Support subscription ( multi ) link
-- Detect users which are expiring or exceed traffic limit soon
-- Support https access panel (self-provided domain name + ssl certificate)
-- Support one-click SSL certificate application and automatic renewal
-- For more advanced configuration items, please refer to the panel
-- Support export/import database from panel
-
-## API routes
-
-- `/login` with `PUSH` user data: `{username: '', password: ''}` for login
-- `/xui/API/inbounds` base for following actions:
-
-| Method | Path                            | Action                                    |
-| :----: | ------------------------------- | ----------------------------------------- |
-| `GET`  | `"/"`                           | Get all inbounds                          |
-| `GET`  | `"/get/:id"`                    | Get inbound with inbound.id               |
-| `POST` | `"/add"`                        | Add inbound                               |
-| `POST` | `"/del/:id"`                    | Delete Inbound                            |
-| `POST` | `"/update/:id"`                 | Update Inbound                            |
-| `POST` | `"/addClient/"`                 | Add Client to inbound                     |
-| `POST` | `"/:id/delClient/:clientId"`    | Delete Client by clientId\*               |
-| `POST` | `"/updateClient/:clientId"`     | Update Client by clientId\*               |
-| `POST` | `"/getClientTraffics/:email"`   | Get Client's Traffic                      |
-| `POST` | `"/resetAllTraffics"`           | Reset traffics of all inbounds            |
-| `POST` | `"/resetAllClientTraffics/:id"` | Reset inbound clients traffics (-1: all)  |
-| `POST` | `"/delDepletedClients/:id"`     | Delete inbound depleted clients (-1: all) |
-
-\*- The field `clientId` should be filled by:
-
-- `client.id` for VMESS and VLESS
-- `client.password` for TROJAN
-- `client.email` for Shadowsocks
-
-# Environment Variables
-
-| Variable       |                      Type                      | Default       |
-| -------------- | :--------------------------------------------: | :------------ |
-| XUI_LOG_LEVEL  | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`      |
-| XUI_DEBUG      |                   `boolean`                    | `false`       |
-| XUI_BIN_FOLDER |                    `string`                    | `"bin"`       |
-| XUI_DB_FOLDER  |                    `string`                    | `"/etc/x-ui"` |
-
-# Screenshot from Inbouds page
-
-![inbounds](./media/inbounds.png)
-![Dark inbounds](./media/inbounds-dark.png)
-
-## suggestion system
-
-- CentOS 8+
-- Ubuntu 20+
-- Debian 10+
-- Fedora 36+
 
 # Install & Upgrade to latest version
 
@@ -149,6 +85,70 @@ docker run -itd \
 ```shell
 docker build -t x-ui .
 ```
+
+# Features
+
+- System Status Monitoring
+- Search within all inbounds and clients
+- Support Dark/Light theme UI
+- Support multi-user multi-protocol, web page visualization operation
+- Supported protocols: vmess, vless, trojan, shadowsocks, dokodemo-door, socks, http
+- Support for configuring more transport configurations
+- Traffic statistics, limit traffic, limit expiration time
+- Customizable xray configuration templates
+- Support subscription ( multi ) link
+- Detect users which are expiring or exceed traffic limit soon
+- Support https access panel (self-provided domain name + ssl certificate)
+- Support one-click SSL certificate application and automatic renewal
+- For more advanced configuration items, please refer to the panel
+- Support export/import database from panel
+
+## suggestion system
+
+- CentOS 8+
+- Ubuntu 20+
+- Debian 10+
+- Fedora 36+
+
+## API routes
+
+- `/login` with `PUSH` user data: `{username: '', password: ''}` for login
+- `/xui/API/inbounds` base for following actions:
+
+| Method | Path                            | Action                                    |
+| :----: | ------------------------------- | ----------------------------------------- |
+| `GET`  | `"/"`                           | Get all inbounds                          |
+| `GET`  | `"/get/:id"`                    | Get inbound with inbound.id               |
+| `POST` | `"/add"`                        | Add inbound                               |
+| `POST` | `"/del/:id"`                    | Delete Inbound                            |
+| `POST` | `"/update/:id"`                 | Update Inbound                            |
+| `POST` | `"/addClient/"`                 | Add Client to inbound                     |
+| `POST` | `"/:id/delClient/:clientId"`    | Delete Client by clientId\*               |
+| `POST` | `"/updateClient/:clientId"`     | Update Client by clientId\*               |
+| `POST` | `"/getClientTraffics/:email"`   | Get Client's Traffic                      |
+| `POST` | `"/resetAllTraffics"`           | Reset traffics of all inbounds            |
+| `POST` | `"/resetAllClientTraffics/:id"` | Reset inbound clients traffics (-1: all)  |
+| `POST` | `"/delDepletedClients/:id"`     | Delete inbound depleted clients (-1: all) |
+
+\*- The field `clientId` should be filled by:
+
+- `client.id` for VMESS and VLESS
+- `client.password` for TROJAN
+- `client.email` for Shadowsocks
+
+# Environment Variables
+
+| Variable       |                      Type                      | Default       |
+| -------------- | :--------------------------------------------: | :------------ |
+| XUI_LOG_LEVEL  | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`      |
+| XUI_DEBUG      |                   `boolean`                    | `false`       |
+| XUI_BIN_FOLDER |                    `string`                    | `"bin"`       |
+| XUI_DB_FOLDER  |                    `string`                    | `"/etc/x-ui"` |
+
+# Screenshot from Inbouds page
+
+![inbounds](./media/inbounds.png)
+![Dark inbounds](./media/inbounds-dark.png)
 
 ## SSL certificate application
 

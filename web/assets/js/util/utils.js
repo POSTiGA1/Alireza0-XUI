@@ -68,13 +68,11 @@ class HttpUtil {
 }
 
 class PromiseUtil {
-
     static async sleep(timeout) {
         await new Promise(resolve => {
             setTimeout(resolve, timeout)
         });
     }
-
 }
 
 const seq = [
@@ -90,7 +88,6 @@ const seq = [
 ];
 
 class RandomUtil {
-
     static randomIntRange(min, max) {
         return parseInt(Math.random() * (max - min) + min, 10);
     }
@@ -140,14 +137,14 @@ class RandomUtil {
     static randomText() {
         var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
         var string = '';
-        var len = 6 + Math.floor(Math.random() * 5)
-        for(var ii=0; ii<len; ii++){
+        var len = 6 + Math.floor(Math.random() * 5);
+        for (var ii = 0; ii < len; ii++) {
             string += chars[Math.floor(Math.random() * chars.length)];
         }
         return string;
     }
 
-    static randomShadowsocksPassword(){
+    static randomShadowsocksPassword() {
         let array = new Uint8Array(32);
         window.crypto.getRandomValues(array);
         return btoa(String.fromCharCode.apply(null, array));
@@ -155,7 +152,6 @@ class RandomUtil {
 }
 
 class ObjectUtil {
-
     static getPropIgnoreCase(obj, prop) {
         for (const name in obj) {
             if (!obj.hasOwnProperty(name)) {
@@ -303,5 +299,4 @@ class ObjectUtil {
         }
         return true;
     }
-
 }

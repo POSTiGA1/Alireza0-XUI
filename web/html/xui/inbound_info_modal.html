@@ -3,7 +3,7 @@
     v-model="infoModal.visible" title='{{ i18n "pages.inbounds.details"}}'
     :closable="true"
     :mask-closable="true"
-    :class="siderDrawer.isDarkTheme ? darkClass : ''"
+    :class="themeSwitcher.darkCardClass"
     :footer="null"
     width="600px"
     >
@@ -81,7 +81,7 @@
                 <th>{{ i18n "pages.inbounds.expireDate" }}</th>
         <tr>
             <td>
-                <a-tag v-if="infoModal.clientStats" :color="green">
+                <a-tag v-if="infoModal.clientStats" color="green">
                     [[ sizeFormat(infoModal.clientStats['up']) ]] / 
                     [[ sizeFormat(infoModal.clientStats['down']) ]]
                     ([[ sizeFormat(infoModal.clientStats['up'] + infoModal.clientStats['down']) ]])
@@ -105,7 +105,10 @@
     <table v-if="infoModal.clientSettings.subId + infoModal.clientSettings.tgId" style="margin-bottom: 10px;">
         <tr v-if="infoModal.clientSettings.subId">
             <td>Subscription link</td>
-            <td><a :href="[[ subBase + infoModal.clientSettings.subId ]]" target="_blank">[[ subBase + infoModal.clientSettings.subId ]]</a></td>
+            <td>
+                <a :href="[[ subBase + infoModal.clientSettings.subId ]]" target="_blank">[[ subBase + infoModal.clientSettings.subId ]]</a>
+                <a-icon id="copy-sub-link" type="snippets" @click="copyToClipboard('copy-sub-link', subBase + infoModal.clientSettings.subId)"></a-icon>
+            </td>
         </tr>
         <tr v-if="infoModal.clientSettings.tgId">
             <td>Telegram Username</td>
@@ -176,7 +179,9 @@
     <div v-if="dbInbound.hasLink()">
         <a-divider>URL</a-divider>
         <p>[[ infoModal.link ]]</p>
-        <button class="ant-btn ant-btn-primary" id="copy-url-link"><a-icon type="snippets"></a-icon>{{ i18n "copy" }}</button>
+        <button class="ant-btn ant-btn-primary" id="copy-url-link" @click="copyToClipboard('copy-url-link', infoModal.link)">
+            <a-icon type="snippets"></a-icon>{{ i18n "copy" }}
+        </button>
     </div>
 </a-modal>
 <script>
@@ -203,14 +208,6 @@
             this.isExpired = this.inbound.isExpiry(index);
             this.clientStats = this.settings.clients ? this.dbInbound.clientStats.find(row => row.email === this.clientSettings.email) : [];
             this.visible = true;
-            infoModalApp.$nextTick(() => {
-                if (this.clipboard === null) {
-                    this.clipboard = new ClipboardJS('#copy-url-link', {
-                        text: () => this.link,
-                    });
-                    this.clipboard.on('success', () => app.$message.success('{{ i18n "copied" }}'));
-                }
-            });
         },
         close() {
             infoModal.visible = false;
@@ -248,7 +245,7 @@
             },
         },
         methods: {
-            copyTextToClipboard(elmentId,content) {
+            copyToClipboard(elmentId,content) {
                 this.infoModal.clipboard = new ClipboardJS('#' + elmentId, {
                         text: () => content,
                     });

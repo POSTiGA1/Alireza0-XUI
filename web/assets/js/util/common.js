@@ -57,28 +57,60 @@ function toFixed(num, n) {
 }
 
 function debounce(fn, delay) {
-    var timeoutID = null
+    var timeoutID = null;
     return function () {
-      clearTimeout(timeoutID)
-      var args = arguments
-      var that = this
-      timeoutID = setTimeout(function () {
-        fn.apply(that, args)
-      }, delay)
+        clearTimeout(timeoutID);
+        var args = arguments;
+        var that = this;
+        timeoutID = setTimeout(function () {
+            fn.apply(that, args);
+        }, delay);
+    };
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == " ") {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
     }
+    return "";
+}
+
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 function usageColor(data, threshold, total) {
     switch (true) {
         case data === null:
-            return 'blue';
+            return "blue";
         case total <= 0:
-            return 'blue';
+            return "blue";
         case data < total - threshold:
-            return 'cyan';
+            return "cyan";
         case data < total:
-            return 'orange';
+            return "orange";
         default:
-            return 'red';
+            return "red";
     }
+}
+
+function doAllItemsExist(array1, array2) {
+    for (let i = 0; i < array1.length; i++) {
+        if (!array2.includes(array1[i])) {
+            return false;
+        }
+    }
+    return true;
 }

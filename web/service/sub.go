@@ -38,7 +38,7 @@ func (s *SubService) GetSubs(subId string, host string) ([]string, string, error
 			continue
 		}
 		for _, client := range clients {
-			if client.SubID == subId {
+			if client.Enable && client.SubID == subId {
 				link := s.getLink(inbound, client.Email)
 				result = append(result, link)
 				clientTraffics = append(clientTraffics, s.getClientTraffics(inbound.ClientStats, client.Email))
@@ -73,7 +73,7 @@ func (s *SubService) GetSubs(subId string, host string) ([]string, string, error
 func (s *SubService) getInboundsBySubId(subId string) ([]*model.Inbound, error) {
 	db := database.GetDB()
 	var inbounds []*model.Inbound
-	err := db.Model(model.Inbound{}).Preload("ClientStats").Where("settings like ?", fmt.Sprintf(`%%"subId": "%s"%%`, subId)).Find(&inbounds).Error
+	err := db.Model(model.Inbound{}).Preload("ClientStats").Where("settings like ? and enable = ?", fmt.Sprintf(`%%"subId": "%s"%%`, subId), true).Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
@@ -107,9 +107,10 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 	if inbound.Protocol != model.VMess {
 		return ""
 	}
+	remark := fmt.Sprintf("%s-%s", inbound.Remark, email)
 	obj := map[string]interface{}{
 		"v":    "2",
-		"ps":   email,
+		"ps":   remark,
 		"add":  s.address,
 		"port": inbound.Port,
 		"type": "none",
@@ -353,7 +354,8 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 	// Set the new query values on the URL
 	url.RawQuery = q.Encode()
 
-	url.Fragment = email
+	remark := fmt.Sprintf("%s-%s", inbound.Remark, email)
+	url.Fragment = remark
 	return url.String()
 }
 
@@ -502,7 +504,8 @@ func (s *SubService) genTrojanLink(inbound *model.Inbound, email string) string 
 	// Set the new query values on the URL
 	url.RawQuery = q.Encode()
 
-	url.Fragment = email
+	remark := fmt.Sprintf("%s-%s", inbound.Remark, email)
+	url.Fragment = remark
 	return url.String()
 }
 
@@ -583,7 +586,8 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 	// Set the new query values on the URL
 	url.RawQuery = q.Encode()
 
-	url.Fragment = clients[clientIndex].Email
+	remark := fmt.Sprintf("%s-%s", inbound.Remark, clients[clientIndex].Email)
+	url.Fragment = remark
 	return url.String()
 }
 

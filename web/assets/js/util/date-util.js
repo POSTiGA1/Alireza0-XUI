@@ -1,67 +1,67 @@
-const oneMinute = 1000 * 60; // 一分钟的毫秒数
-const oneHour = oneMinute * 60; // 一小时的毫秒数
-const oneDay = oneHour * 24; // 一天的毫秒数
-const oneWeek = oneDay * 7; // 一星期的毫秒数
-const oneMonth = oneDay * 30; // 一个月的毫秒数
+const oneMinute = 1000 * 60; // 一The millise times of minutes
+const oneHour = oneMinute * 60; // 一Hours of millise times
+const oneDay = oneHour * 24; // 一Day's milliseconds
+const oneWeek = oneDay * 7; // 一Number of millise times on week
+const oneMonth = oneDay * 30; // 一Number of millise times a month
 
 /**
- * 按天数减少
+ * Decrease by day
  *
- * @param days 要减少的天数
+ * @param days A few days to reduce
  */
 Date.prototype.minusDays = function (days) {
     return this.minusMillis(oneDay * days);
 };
 
 /**
- * 按天数增加
+ * Increase by day
  *
- * @param days 要增加的天数
+ * @param days The number of days to be increased
  */
 Date.prototype.plusDays = function (days) {
     return this.plusMillis(oneDay * days);
 };
 
 /**
- * 按小时减少
+ * Reduced
  *
- * @param hours 要减少的小时数
+ * @param hours The number of hours to be reduced
  */
 Date.prototype.minusHours = function (hours) {
     return this.minusMillis(oneHour * hours);
 };
 
 /**
- * 按小时增加
+ * Increase
  *
- * @param hours 要增加的小时数
+ * @param hours Increase the number of hours
  */
 Date.prototype.plusHours = function (hours) {
     return this.plusMillis(oneHour * hours);
 };
 
 /**
- * 按分钟减少
+ * Decrease by minute
  *
- * @param minutes 要减少的分钟数
+ * @param minutes The number of minutes to be reduced
  */
 Date.prototype.minusMinutes = function (minutes) {
     return this.minusMillis(oneMinute * minutes);
 };
 
 /**
- * 按分钟增加
+ * Increase
  *
- * @param minutes 要增加的分钟数
+ * @param minutes The number of minutes to be increased
  */
 Date.prototype.plusMinutes = function (minutes) {
     return this.plusMillis(oneMinute * minutes);
 };
 
 /**
- * 按毫秒减少
+ * Decrease by millisecond
  *
- * @param millis 要减少的毫秒数
+ * @param millis Number of milliligues to be reduced
  */
 Date.prototype.minusMillis = function(millis) {
     let time = this.getTime() - millis;
@@ -71,9 +71,9 @@ Date.prototype.minusMillis = function(millis) {
 };
 
 /**
- * 按毫秒增加
+ * Add in milliseconds
  *
- * @param millis 要增加的毫秒数
+ * @param millis To increase the millimeter number
  */
 Date.prototype.plusMillis = function(millis) {
     let time = this.getTime() + millis;
@@ -83,7 +83,7 @@ Date.prototype.plusMillis = function(millis) {
 };
 
 /**
- * 设置时间为当天的 00:00:00.000
+ * Setting time is the day 00:00:00.000
  */
 Date.prototype.setMinTime = function () {
     this.setHours(0);
@@ -94,7 +94,7 @@ Date.prototype.setMinTime = function () {
 };
 
 /**
- * 设置时间为当天的 23:59:59.999
+ * Setting time is the day 23:59:59.999
  */
 Date.prototype.setMaxTime = function () {
     this.setHours(23);
@@ -105,14 +105,14 @@ Date.prototype.setMaxTime = function () {
 };
 
 /**
- * 格式化日期
+ * Formatting date
  */
 Date.prototype.formatDate = function () {
     return this.getFullYear() + "-" + addZero(this.getMonth() + 1) + "-" + addZero(this.getDate());
 };
 
 /**
- * 格式化时间
+ * Formatting time
  */
 Date.prototype.formatTime = function () {
     return addZero(this.getHours()) + ":" + addZero(this.getMinutes()) + ":" + addZero(this.getSeconds());
@@ -121,21 +121,20 @@ Date.prototype.formatTime = function () {
 /**
  * 格式化日期加时间
  *
- * @param split 日期和时间之间的分隔符，默认是一个空格
+ * @param split Division between date and time, the default is a space
  */
 Date.prototype.formatDateTime = function (split = ' ') {
     return this.formatDate() + split + this.formatTime();
 };
 
 class DateUtil {
-
-    // 字符串转 Date 对象
+    // String string to date object
     static parseDate(str) {
         return new Date(str.replace(/-/g, '/'));
     }
 
     static formatMillis(millis) {
-        return moment(millis).format('YYYY-M-D H:m:s')
+        return moment(millis).format('YYYY-M-D H:m:s');
     }
 
     static firstDayOfMonth() {

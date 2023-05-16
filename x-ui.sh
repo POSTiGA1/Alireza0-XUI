@@ -520,7 +520,7 @@ show_menu() {
   ${green}14.${plain} Cancel x-ui Autostart
 ————————————————
   ${green}15.${plain} 一A key installation bbr (latest kernel)
-  ${green}16.${plain} 一Apply for an SSL certificate with one click(acme script)
+  ${green}16.${plain} 一Apply for a SSL certificate with one click(acme script)
  "
     show_status
     echo && read -p "Please enter your selection [0-16]: " num

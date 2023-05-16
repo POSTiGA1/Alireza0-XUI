@@ -25,7 +25,7 @@
             <td>CipherSuites</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="inbound.stream.tls.cipherSuites" style="width: 250px" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                    <a-select v-model="inbound.stream.tls.cipherSuites" style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option value="">auto</a-select-option>
                         <a-select-option v-for="key in TLS_CIPHER_OPTION" :value="key">[[ key ]]</a-select-option>
                     </a-select>
@@ -36,7 +36,7 @@
             <td>MinVersion</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="inbound.stream.tls.minVersion" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                    <a-select v-model="inbound.stream.tls.minVersion" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option v-for="key in TLS_VERSION_OPTION" :value="key">[[ key ]]</a-select-option>
                     </a-select>
                 </a-form-item>
@@ -46,7 +46,7 @@
             <td>MaxVersion</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="inbound.stream.tls.maxVersion" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                    <a-select v-model="inbound.stream.tls.maxVersion" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option v-for="key in TLS_VERSION_OPTION" :value="key">[[ key ]]</a-select-option>
                     </a-select>
                 </a-form-item>
@@ -57,7 +57,7 @@
             <td>
                 <a-form-item>
                     <a-select v-model="inbound.stream.tls.settings.fingerprint"
-                              style="width: 250px" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                              style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option value=''>None</a-select-option>
                         <a-select-option v-for="key in UTLS_FINGERPRINT" :value="key">[[ key ]]</a-select-option>
                     </a-select>
@@ -90,57 +90,61 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                <a-form-item label="{{ i18n "certificate" }}">
-                    <a-radio-group v-model="inbound.stream.tls.certs[0].useFile" button-style="solid">
-                        <a-radio-button :value="true">{{ i18n "pages.inbounds.certificatePath" }}</a-radio-button>
-                        <a-radio-button :value="false">{{ i18n "pages.inbounds.certificateContent" }}</a-radio-button>
-                    </a-radio-group>
-                </a-form-item>
-            </td>
-        </tr>
-        <template v-if="inbound.stream.tls.certs[0].useFile">
-        <tr>
-            <td>{{ i18n "pages.inbounds.publicKeyPath" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input v-model.trim="inbound.stream.tls.certs[0].certFile" style="width:250px;"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
-        <tr>
-            <td>{{ i18n "pages.inbounds.keyPath" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input v-model.trim="inbound.stream.tls.certs[0].keyFile" style="width:250px;"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <a-button type="primary" icon="import" @click="setDefaultCertData">{{ i18n "pages.inbounds.setDefaultCert" }}</a-button>
-            </td>
-        </tr>
-    </template>
-    <template v-else>
-        <tr>
-            <td>{{ i18n "pages.inbounds.publicKeyContent" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input type="textarea" :rows="3" style="width:250px;" v-model="inbound.stream.tls.certs[0].cert"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
-        <tr>
-            <td>{{ i18n "pages.inbounds.keyContent" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input type="textarea" :rows="3" style="width:250px;" v-model="inbound.stream.tls.certs[0].key"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
+        <template v-for="cert,index in inbound.stream.tls.certs">
+            <tr>
+                <td colspan="2">
+                    <a-form-item label='{{ i18n "certificate" }}'>
+                        <a-radio-group v-model="cert.useFile" button-style="solid">
+                            <a-radio-button :value="true">{{ i18n "pages.inbounds.certificatePath" }}</a-radio-button>
+                            <a-radio-button :value="false">{{ i18n "pages.inbounds.certificateContent" }}</a-radio-button>
+                            <a-button type="primary" size="small" @click="inbound.stream.tls.addCert()" style="margin: 0 10px">+</a-button>
+                            <a-button v-if="inbound.stream.tls.certs.length>1" type="primary" size="small" @click="inbound.stream.tls.removeCert(index)">-</a-button>        
+                        </a-radio-group>
+                    </a-form-item>
+                </td>
+            </tr>
+            <template v-if="cert.useFile">
+            <tr>
+                <td>{{ i18n "pages.inbounds.publicKeyPath" }}</td>
+                <td>
+                    <a-form-item>
+                        <a-input v-model.trim="cert.certFile" style="width:250px;"></a-input>
+                    </a-form-item>
+                </td>
+            </tr>
+            <tr>
+                <td>{{ i18n "pages.inbounds.keyPath" }}</td>
+                <td>
+                    <a-form-item>
+                        <a-input v-model.trim="cert.keyFile" style="width:250px;"></a-input>
+                    </a-form-item>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <a-button type="primary" icon="import" @click="setDefaultCertData(index)">{{ i18n "pages.inbounds.setDefaultCert" }}</a-button>
+                </td>
+            </tr>
+        </template>
+        <template v-else>
+            <tr>
+                <td>{{ i18n "pages.inbounds.publicKeyContent" }}</td>
+                <td>
+                    <a-form-item>
+                        <a-input type="textarea" :rows="3" style="width:250px;" v-model="cert.cert"></a-input>
+                    </a-form-item>
+                </td>
+            </tr>
+            <tr>
+                <td>{{ i18n "pages.inbounds.keyContent" }}</td>
+                <td>
+                    <a-form-item>
+                        <a-input type="textarea" :rows="3" style="width:250px;" v-model="cert.key"></a-input>
+                    </a-form-item>
+                </td>
+            </tr>
+        </template>
     </template>
     </table>
 </a-form>
@@ -175,9 +179,9 @@
         <tr>
             <td>uTLS</td>
             <td>
-                <a-form-item >
+                <a-form-item>
                     <a-select v-model="inbound.stream.reality.settings.fingerprint"
-                              style="width: 250px" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                              style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option v-for="key in UTLS_FINGERPRINT" :value="key">[[ key ]]</a-select-option>
                     </a-select>
                 </a-form-item>

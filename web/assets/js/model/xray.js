@@ -478,8 +478,8 @@ class TlsStreamSettings extends XrayCommonClass {
         this.settings = settings;
     }
 
-    addCert(cert) {
-        this.certs.push(cert);
+    addCert() {
+        this.certs.push(new TlsStreamSettings.Cert());
     }
 
     removeCert(index) {

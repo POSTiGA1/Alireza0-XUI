@@ -14,10 +14,10 @@
         </tr>
         <tr>
             <td>
-                <span>{{ i18n "pages.inbounds.Email" }}</span>
+                <span>{{ i18n "pages.inbounds.email" }}</span>
                 <a-tooltip>
                     <template slot="title">
-                        <span>{{ i18n "pages.inbounds.EmailDesc" }}</span>
+                        <span>{{ i18n "pages.inbounds.emailDesc" }}</span>
                     </template>
                     <a-icon type="sync" @click="getNewEmail(client)"></a-icon>
                 </a-tooltip>
@@ -39,7 +39,7 @@
             </td>
         </tr>
         <tr v-if="inbound.protocol === Protocols.VMESS || inbound.protocol === Protocols.VLESS">
-            <td>ID</td>
+            <td>ID <a-icon @click="client.id = RandomUtil.randomUUID()" type="sync"></a-icon></td>
             <td>
                 <a-form-item>
                     <a-input v-model.trim="client.id" style="width: 250px"></a-input>
@@ -55,7 +55,7 @@
             </td>
         </tr>
         <tr v-if="client.email">
-            <td>Subscription</td>
+            <td>Subscription <a-icon @click="client.subId = RandomUtil.randomText()" type="sync"></a-icon></td>
             <td>
                 <a-form-item>
                     <a-input v-model.trim="client.subId" style="width: 250px"></a-input>
@@ -74,7 +74,7 @@
             <td>Flow</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="client.flow" style="width: 250px" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                    <a-select v-model="client.flow" style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
                         <a-select-option value="" selected>{{ i18n "none" }}</a-select-option>
                         <a-select-option v-for="key in TLS_FLOW_CONTROL" :value="key">[[ key ]]</a-select-option>
                     </a-select>
@@ -83,7 +83,7 @@
         </tr>
         <tr>
             <td>
-                <span >{{ i18n "pages.inbounds.totalFlow" }}</span>(GB)
+                <span>{{ i18n "pages.inbounds.totalFlow" }}</span>(GB)
                 <a-tooltip>
                     <template slot="title">
                         0 <span>{{ i18n "pages.inbounds.meansNoLimit" }}</span>
@@ -129,7 +129,7 @@
         </tr>
         <tr v-else>
             <td>
-                <span >{{ i18n "pages.inbounds.expireDate" }}</span>
+                <span>{{ i18n "pages.inbounds.expireDate" }}</span>
                 <a-tooltip>
                     <template slot="title">
                         <span>{{ i18n "pages.inbounds.leaveBlankToNeverExpire" }}</span>
@@ -140,7 +140,7 @@
             <td>
                 <a-form-item>
                     <a-date-picker :show-time="{ format: 'HH:mm:ss' }" format="YYYY-MM-DD HH:mm:ss"
-                                   :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''"
+                                   :dropdown-class-name="themeSwitcher.darkCardClass"
                                    v-model="client._expiryTime" style="width: 250px;"></a-date-picker>
                     <a-tag color="red" v-if="isExpiry">Expired</a-tag>
                 </a-form-item>

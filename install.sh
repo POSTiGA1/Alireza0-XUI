@@ -79,7 +79,6 @@ install_base() {
 
 #This function will be called when user installed x-ui out of sercurity
 config_after_install() {
-    /usr/local/x-ui/x-ui migrate
     echo -e "${yellow}Install/update finished! For security it's recommended to modify panel settings ${plain}"
     read -p "Do you want to continue with the modification [y/n]? ": config_confirm
     if [[ "${config_confirm}" == "y" || "${config_confirm}" == "Y" ]]; then
@@ -110,6 +109,7 @@ config_after_install() {
             echo -e "${red} this is your upgrade,will keep old settings,if you forgot your login info,you can type x-ui and then type 7 to check${plain}"
         fi
     fi
+    /usr/local/x-ui/x-ui migrate
 }
 
 install_x-ui() {

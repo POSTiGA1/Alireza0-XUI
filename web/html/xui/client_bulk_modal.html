@@ -1,7 +1,7 @@
 {{define "clientsBulkModal"}}
 <a-modal id="client-bulk-modal" v-model="clientsBulkModal.visible" :title="clientsBulkModal.title" @ok="clientsBulkModal.ok"
          :confirm-loading="clientsBulkModal.confirmLoading" :closable="true" :mask-closable="false"
-         :class="siderDrawer.isDarkTheme ? darkClass : ''"
+         :class="themeSwitcher.darkCardClass"
          :ok-text="clientsBulkModal.okText" cancel-text='{{ i18n "close" }}'>
     <a-form layout="inline">
         <table width="100%" class="ant-table-tbody">
@@ -10,7 +10,7 @@
                 <td>
                     <a-form-item>
                         <a-select v-model="clientsBulkModal.emailMethod" buttonStyle="solid" style="width: 250px"
-                            :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                            :dropdown-class-name="themeSwitcher.darkCardClass">
                             <a-select-option :value="0">Random</a-select-option>
                             <a-select-option :value="1">Random+Prefix</a-select-option>
                             <a-select-option :value="2">Random+Prefix+Num</a-select-option>
@@ -64,7 +64,7 @@
                 <td>Flow</td>
                 <td>
                     <a-form-item>
-                        <a-select v-model="clientsBulkModal.flow" style="width: 250px" :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                        <a-select v-model="clientsBulkModal.flow" style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
                             <a-select-option value="" selected>{{ i18n "none" }}</a-select-option>
                             <a-select-option v-for="key in TLS_FLOW_CONTROL" :value="key">[[ key ]]</a-select-option>
                         </a-select>
@@ -89,7 +89,7 @@
             </tr>
             <tr>
                 <td>
-                    <span >{{ i18n "pages.inbounds.totalFlow" }}</span>(GB)
+                    <span>{{ i18n "pages.inbounds.totalFlow" }}</span>(GB)
                     <a-tooltip>
                         <template slot="title">
                             0 <span>{{ i18n "pages.inbounds.meansNoLimit" }}</span>
@@ -121,7 +121,7 @@
             </tr>
             <tr v-else>
                 <td>
-                    <span >{{ i18n "pages.inbounds.expireDate" }}</span>
+                    <span>{{ i18n "pages.inbounds.expireDate" }}</span>
                     <a-tooltip>
                         <template slot="title">
                             <span>{{ i18n "pages.inbounds.leaveBlankToNeverExpire" }}</span>
@@ -132,7 +132,7 @@
                 <td>
                     <a-form-item>
                         <a-date-picker :show-time="{ format: 'HH:mm:ss' }" format="YYYY-MM-DD HH:mm:ss"
-                                       :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''"
+                                       :dropdown-class-name="themeSwitcher.darkCardClass"
                                        v-model="clientsBulkModal.expiryTime" style="width: 250px;"></a-date-picker>
                     </a-form-item>
                 </td>

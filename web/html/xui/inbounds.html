@@ -12,10 +12,11 @@
         margin-top: 10px;
     }
 </style>
+
 <body>
 <a-layout id="app" v-cloak>
     {{ template "commonSider" . }}
-    <a-layout id="content-layout" :style="siderDrawer.isDarkTheme ? bgDarkStyle : ''">
+    <a-layout id="content-layout" :style="themeSwitcher.bgStyle">
         <a-layout-content>
             <a-spin :spinning="spinning" :delay="500" tip="loading">
                 <transition name="list" appear>
@@ -24,7 +25,7 @@
                     </a-tag>
                 </transition>
                 <transition name="list" appear>
-                    <a-card hoverable style="margin-bottom: 20px;" :class="siderDrawer.isDarkTheme ? darkClass : ''">
+                    <a-card hoverable style="margin-bottom: 20px;" :class="themeSwitcher.darkCardClass">
                         <a-row>
                             <a-col :xs="24" :sm="24" :lg="12">
                                 {{ i18n "pages.inbounds.totalDownUp" }}:
@@ -41,19 +42,19 @@
                             <a-col :xs="24" :sm="24" :lg="12">
                                 {{ i18n "clients" }}:
                                 <a-tag color="green">[[ total.clients ]]</a-tag>
-                                <a-popover title="{{ i18n "disabled" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                <a-popover title='{{ i18n "disabled" }}' :overlay-class-name="themeSwitcher.darkClass">
                                     <template slot="content">
                                         <p v-for="clientEmail in total.deactive">[[ clientEmail ]]</p>
                                     </template>
                                     <a-tag v-if="total.deactive.length">[[ total.deactive.length ]]</a-tag>
                                 </a-popover>
-                                <a-popover title="{{ i18n "depleted" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                <a-popover title='{{ i18n "depleted" }}' :overlay-class-name="themeSwitcher.darkClass">
                                     <template slot="content">
                                         <p v-for="clientEmail in total.depleted">[[ clientEmail ]]</p>
                                     </template>
                                     <a-tag color="red" v-if="total.depleted.length">[[ total.depleted.length ]]</a-tag>
                                 </a-popover>
-                                <a-popover title="{{ i18n "depletingSoon" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                <a-popover title='{{ i18n "depletingSoon" }}' :overlay-class-name="themeSwitcher.darkClass">
                                     <template slot="content">
                                         <p v-for="clientEmail in total.expiring">[[ clientEmail ]]</p>
                                     </template>
@@ -64,14 +65,14 @@
                     </a-card>
                 </transition>
                 <transition name="list" appear>
-                    <a-card hoverable :class="siderDrawer.isDarkTheme ? darkClass : ''">
+                    <a-card hoverable :class="themeSwitcher.darkCardClass">
                         <div slot="title">
                             <a-row>
                                 <a-col :xs="24" :sm="24" :lg="12">
                                     <a-button type="primary" icon="plus" @click="openAddInbound">{{ i18n "pages.inbounds.addInbound" }}</a-button>
                                     <a-dropdown :trigger="['click']">
                                         <a-button type="primary" icon="menu">{{ i18n "pages.inbounds.generalActions" }}</a-button>
-                                        <a-menu slot="overlay" @click="a => generalActions(a)" :theme="siderDrawer.theme">
+                                        <a-menu slot="overlay" @click="a => generalActions(a)" :theme="themeSwitcher.currentTheme">
                                             <a-menu-item key="export">
                                                 <a-icon type="export"></a-icon>
                                                 {{ i18n "pages.inbounds.export" }}
@@ -95,7 +96,7 @@
                                     <a-select v-model="refreshInterval"
                                               v-if="isRefreshEnabled"
                                               @change="changeRefreshInterval"
-                                              :dropdown-class-name="siderDrawer.isDarkTheme ? 'ant-card-dark' : ''">
+                                              :dropdown-class-name="themeSwitcher.darkCardClass">
                                         <a-select-option v-for="key in [5,10,30,60]" :value="key*1000">[[ key ]]s</a-select-option>
                                     </a-select>
                                     <a-icon type="sync" :spin="refreshing" @click="manualRefresh" style="margin: 0 5px;"></a-icon>
@@ -103,7 +104,7 @@
                                 </a-col>
                             </a-row>
                         </div>
-                        <a-input v-model.lazy="searchKey" placeholder="{{ i18n "search" }}" autofocus style="max-width: 300px"></a-input>
+                        <a-input v-model.lazy="searchKey" placeholder='{{ i18n "search" }}' autofocus style="max-width: 300px"></a-input>
                         <a-table :columns="columns" :row-key="dbInbound => dbInbound.id"
                                  :data-source="searchedInbounds"
                                  :loading="spinning" :scroll="{ x: 1300 }"
@@ -113,7 +114,7 @@
                             <template slot="action" slot-scope="text, dbInbound">
                                 <a-dropdown :trigger="['click']">
                                     <a-icon @click="e => e.preventDefault()" type="menu"></a-icon>
-                                    <a-menu slot="overlay" @click="a => clickAction(a, dbInbound)" :theme="siderDrawer.theme">
+                                    <a-menu slot="overlay" @click="a => clickAction(a, dbInbound)" :theme="themeSwitcher.currentTheme">
                                         <a-menu-item key="edit">
                                             <a-icon type="edit"></a-icon>
                                             {{ i18n "edit" }}
@@ -150,7 +151,7 @@
                                             <a-icon type="retweet"></a-icon> {{ i18n "pages.inbounds.resetTraffic" }}
                                         </a-menu-item>
                                         <a-menu-item key="clone">
-                                            <a-icon type="block"></a-icon> {{ i18n "pages.inbounds.Clone"}}
+                                            <a-icon type="block"></a-icon> {{ i18n "pages.inbounds.clone"}}
                                         </a-menu-item>
                                         <a-menu-item key="delete">
                                             <span style="color: #FF4D4F">
@@ -171,19 +172,19 @@
                             <template slot="clients" slot-scope="text, dbInbound">
                                 <template v-if="clientCount[dbInbound.id]">
                                     <a-tag style="margin:0;" color="green">[[ clientCount[dbInbound.id].clients ]]</a-tag>
-                                    <a-popover title="{{ i18n "disabled" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                    <a-popover title='{{ i18n "disabled" }}' :overlay-class-name="themeSwitcher.darkClass">
                                         <template slot="content">
                                             <p v-for="clientEmail in clientCount[dbInbound.id].deactive">[[ clientEmail ]]</p>
                                         </template>
                                         <a-tag style="margin:0; padding: 0 2px;" v-if="clientCount[dbInbound.id].deactive.length">[[ clientCount[dbInbound.id].deactive.length ]]</a-tag>
                                     </a-popover>
-                                    <a-popover title="{{ i18n "depleted" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                    <a-popover title='{{ i18n "depleted" }}' :overlay-class-name="themeSwitcher.darkClass">
                                         <template slot="content">
                                             <p v-for="clientEmail in clientCount[dbInbound.id].depleted">[[ clientEmail ]]</p>
                                         </template>
                                         <a-tag style="margin:0; padding: 0 2px;" color="red" v-if="clientCount[dbInbound.id].depleted.length">[[ clientCount[dbInbound.id].depleted.length ]]</a-tag>
                                     </a-popover>
-                                    <a-popover title="{{ i18n "depletingSoon" }}" :overlay-class-name="siderDrawer.isDarkTheme ? 'ant-dark' : ''">
+                                    <a-popover title='{{ i18n "depletingSoon" }}' :overlay-class-name="themeSwitcher.darkClass">
                                         <template slot="content">
                                             <p v-for="clientEmail in clientCount[dbInbound.id].expiring">[[ clientEmail ]]</p>
                                         </template>
@@ -215,20 +216,20 @@
                             </template>
                             <template slot="expandedRowRender" slot-scope="record">
                                 <a-table
-                                v-if="(record.protocol === Protocols.VLESS) || (record.protocol === Protocols.VMESS)"
-                                :row-key="client => client.id"
-                                :columns="innerColumns"
-                                :data-source="getInboundClients(record)"
-                                :pagination="false"
+                                    v-if="(record.protocol === Protocols.VLESS) || (record.protocol === Protocols.VMESS)"
+                                    :row-key="client => client.id"
+                                    :columns="innerColumns"
+                                    :data-source="getInboundClients(record)"
+                                    :pagination="false"
                                 >
                                     {{template "client_table"}}
                                 </a-table>
                                 <a-table
-                                v-else-if="record.protocol === Protocols.TROJAN || record.protocol === Protocols.SHADOWSOCKS"
-                                :row-key="client => client.id"
-                                :columns="innerTrojanColumns"
-                                :data-source="getInboundClients(record)"
-                                :pagination="false"
+                                    v-else-if="record.protocol === Protocols.TROJAN || record.protocol === Protocols.SHADOWSOCKS"
+                                    :row-key="client => client.id"
+                                    :columns="innerTrojanColumns"
+                                    :data-source="getInboundClients(record)"
+                                    :pagination="false"
                                 >
                                     {{template "client_table"}}
                                 </a-table>
@@ -241,6 +242,7 @@
     </a-layout>
 </a-layout>
 {{template "js" .}}
+{{template "component/themeSwitcher" .}}
 <script>
     const columns = [{
         title: '{{ i18n "pages.inbounds.operate" }}',
@@ -312,6 +314,7 @@
         el: '#app',
         data: {
             siderDrawer,
+            themeSwitcher,
             spinning: false,
             inbounds: [],
             dbInbounds: [],
@@ -327,7 +330,7 @@
             refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000,
         },
         methods: {
-            loading(spinning=true) {
+            loading(spinning = true) {
                 this.spinning = spinning;
             },
             async getDBInbounds() {
@@ -359,29 +362,29 @@
                     to_inbound = dbInbound.toInbound()
                     this.inbounds.push(to_inbound);
                     this.dbInbounds.push(dbInbound);
-                    if([Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN].includes(inbound.protocol) ){
-                        this.clientCount[inbound.id] = this.getClientCounts(inbound,to_inbound);
+                    if ([Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN].includes(inbound.protocol)) {
+                        this.clientCount[inbound.id] = this.getClientCounts(inbound, to_inbound);
                     }
                 }
                 this.searchInbounds(this.searchKey);
             },
-            getClientCounts(dbInbound,inbound){
-                let clientCount = 0,active = [], deactive = [], depleted = [], expiring = [];
+            getClientCounts(dbInbound, inbound) {
+                let clientCount = 0, active = [], deactive = [], depleted = [], expiring = [];
                 clients = this.getClients(dbInbound.protocol, inbound.settings);
                 clientStats = dbInbound.clientStats
                 now = new Date().getTime()
-                if(clients){
+                if (clients) {
                     clientCount = clients.length;
-                    if(dbInbound.enable){
+                    if (dbInbound.enable) {
                         clients.forEach(client => {
                             client.enable ? active.push(client.email) : deactive.push(client.email);
                         });
                         clientStats.forEach(client => {
-                            if(!client.enable) {
+                            if (!client.enable) {
                                 depleted.push(client.email);
                             } else {
-                                if ((client.expiryTime > 0 && (client.expiryTime-now < this.expireDiff)) ||
-                                (client.total > 0 && (client.total-(client.up+client.down) < this.trafficDiff ))) expiring.push(client.email);
+                                if ((client.expiryTime > 0 && (client.expiryTime - now < this.expireDiff)) ||
+                                    (client.total > 0 && (client.total - (client.up + client.down) < this.trafficDiff))) expiring.push(client.email);
                             }
                         });
                     } else {
@@ -407,10 +410,10 @@
                         if (ObjectUtil.deepSearch(inbound, key)) {
                             const newInbound = new DBInbound(inbound);
                             const inboundSettings = JSON.parse(inbound.settings);
-                            if (inboundSettings.hasOwnProperty('clients')){
+                            if (inboundSettings.hasOwnProperty('clients')) {
                                 const searchedSettings = { "clients": [] };
                                 inboundSettings.clients.forEach(client => {
-                                    if (ObjectUtil.deepSearch(client, key)){
+                                    if (ObjectUtil.deepSearch(client, key)) {
                                         searchedSettings.clients.push(client);
                                     }
                                 });
@@ -421,7 +424,7 @@
                     });
                 }
             },
-            generalActions(action){
+            generalActions(action) {
                 switch (action.key) {
                     case "export":
                         this.exportAllLinks();
@@ -477,7 +480,7 @@
             openAddInbound() {
                 inModal.show({
                     title: '{{ i18n "pages.inbounds.addInbound"}}',
-                    okText: '{{ i18n "pages.inbounds.addTo"}}',
+                    okText: '{{ i18n "pages.inbounds.create"}}',
                     cancelText: '{{ i18n "close" }}',
                     confirm: async (inbound, dbInbound) => {
                         inModal.loading();
@@ -492,7 +495,7 @@
                 const inbound = dbInbound.toInbound();
                 inModal.show({
                     title: '{{ i18n "pages.inbounds.modifyInbound"}}',
-                    okText: '{{ i18n "pages.inbounds.revise"}}',
+                    okText: '{{ i18n "pages.inbounds.update"}}',
                     cancelText: '{{ i18n "close" }}',
                     inbound: inbound,
                     dbInbound: dbInbound,
@@ -506,9 +509,9 @@
             },
 			openCloneInbound(dbInbound) {
                 this.$confirm({
-                    title: '{{ i18n "pages.inbounds.cloneInbound"}} ' + dbInbound.remark,
+                    title: '{{ i18n "pages.inbounds.cloneInbound"}} \"' + dbInbound.remark + '\"',
                     content: '{{ i18n "pages.inbounds.cloneInboundContent"}}',
-                    okText: '{{ i18n "pages.inbounds.revise"}}',
+                    okText: '{{ i18n "pages.inbounds.update"}}',
                     cancelText: '{{ i18n "cancel" }}',
                     onOk: () => {
                         const baseInbound = dbInbound.toInbound();
@@ -618,21 +621,21 @@
                     isEdit: true
                 });
             },
-            findIndexOfClient(clients,client) {
+            findIndexOfClient(clients, client) {
                 firstKey = Object.keys(client)[0];
                 return clients.findIndex(c => c[firstKey] === client[firstKey]);
             },
             async addClient(clients, dbInboundId) {
                 const data = {
                     id: dbInboundId,
-                    settings: '{"clients": [' + clients.toString() +']}',
+                    settings: '{"clients": [' + clients.toString() + ']}',
                 };
                 await this.submit(`/xui/inbound/addClient`, data);
             },
             async updateClient(client, dbInboundId, clientId) {
                 const data = {
                     id: dbInboundId,
-                    settings: '{"clients": [' + client.toString() +']}',
+                    settings: '{"clients": [' + client.toString() + ']}',
                 };
                 await this.submit(`/xui/inbound/updateClient/${clientId}`, data);
             },
@@ -641,7 +644,7 @@
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.resetTraffic"}}',
                     content: '{{ i18n "pages.inbounds.resetTrafficContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => {
@@ -656,26 +659,26 @@
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.deleteInbound"}}',
                     content: '{{ i18n "pages.inbounds.deleteInboundContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "delete"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => this.submit('/xui/inbound/del/' + dbInboundId),
                 });
             },
-            delClient(dbInboundId,client) {
+            delClient(dbInboundId, client) {
                 dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
-                clientId = this.getClientId(dbInbound.protocol,client);
+                clientId = this.getClientId(dbInbound.protocol, client);
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.deleteInbound"}}',
                     content: '{{ i18n "pages.inbounds.deleteInboundContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "delete"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => this.submit(`/xui/inbound/${dbInboundId}/delClient/${clientId}`),
                 });
             },
             getClients(protocol, clientSettings) {
-                switch(protocol){
+                switch (protocol) {
                     case Protocols.VMESS: return clientSettings.vmesses;
                     case Protocols.VLESS: return clientSettings.vlesses;
                     case Protocols.TROJAN: return clientSettings.trojans;
@@ -684,15 +687,16 @@
                 }
             },
             getClientId(protocol, client) {
-                switch(protocol){
+                switch (protocol) {
                     case Protocols.TROJAN: return client.password;
                     case Protocols.SHADOWSOCKS: return client.email;
                     default: return client.id;
                 }
             },
             showQrcode(dbInbound, clientIndex) {
+                const clientName = JSON.parse(dbInbound.settings).clients[clientIndex].email;
                 const link = dbInbound.genLink(clientIndex);
-                qrModal.show('{{ i18n "qrCode"}}', link, dbInbound);
+                qrModal.show('{{ i18n "qrCode"}}', link, dbInbound, '', clientName);
             },
             showInfo(dbInbound, index) {
                 infoModal.show(dbInbound, index);
@@ -708,8 +712,8 @@
                 clients = this.getClients(dbInbound.protocol, inbound.settings);
                 index = this.findIndexOfClient(clients, client);
                 clients[index].enable = !clients[index].enable;
-                clientId = this.getClientId(dbInbound.protocol,clients[index]);
-                await this.updateClient(clients[index],dbInboundId, clientId);
+                clientId = this.getClientId(dbInbound.protocol, clients[index]);
+                await this.updateClient(clients[index], dbInboundId, clientId);
                 this.loading(false);
             },
             async submit(url, data) {
@@ -719,31 +723,31 @@
                 }
             },
             getInboundClients(dbInbound) {
-                if(dbInbound.protocol == Protocols.VLESS) {
+                if (dbInbound.protocol == Protocols.VLESS) {
                     return dbInbound.toInbound().settings.vlesses;
-                } else if(dbInbound.protocol == Protocols.VMESS) {
+                } else if (dbInbound.protocol == Protocols.VMESS) {
                     return dbInbound.toInbound().settings.vmesses;
-                } else if(dbInbound.protocol == Protocols.TROJAN) {
+                } else if (dbInbound.protocol == Protocols.TROJAN) {
                     return dbInbound.toInbound().settings.trojans;
-                } else if(dbInbound.protocol == Protocols.SHADOWSOCKS) {
+                } else if (dbInbound.protocol == Protocols.SHADOWSOCKS) {
                     return dbInbound.toInbound().settings.shadowsockses;
                 }
             },
-            resetClientTraffic(client,dbInboundId) {
+            resetClientTraffic(client, dbInboundId) {
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.resetTraffic"}}',
                     content: '{{ i18n "pages.inbounds.resetTrafficContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
-                    onOk: () => this.submit('/xui/inbound/' + dbInboundId + '/resetClientTraffic/'+ client.email),
+                    onOk: () => this.submit('/xui/inbound/' + dbInboundId + '/resetClientTraffic/' + client.email),
                 })
             },
             resetAllTraffic() {
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.resetAllTrafficTitle"}}',
                     content: '{{ i18n "pages.inbounds.resetAllTrafficContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => this.submit('/xui/inbound/resetAllTraffics'),
@@ -751,9 +755,9 @@
             },
             resetAllClientTraffics(dbInboundId) {
                 this.$confirm({
-                    title: dbInboundId>0 ? '{{ i18n "pages.inbounds.resetInboundClientTrafficTitle"}}' : '{{ i18n "pages.inbounds.resetAllClientTrafficTitle"}}',
-                    content: dbInboundId>0 ? '{{ i18n "pages.inbounds.resetInboundClientTrafficContent"}}' : '{{ i18n "pages.inbounds.resetAllClientTrafficContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    title: dbInboundId > 0 ? '{{ i18n "pages.inbounds.resetInboundClientTrafficTitle"}}' : '{{ i18n "pages.inbounds.resetAllClientTrafficTitle"}}',
+                    content: dbInboundId > 0 ? '{{ i18n "pages.inbounds.resetInboundClientTrafficContent"}}' : '{{ i18n "pages.inbounds.resetAllClientTrafficContent"}}',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => this.submit('/xui/inbound/resetAllClientTraffics/' + dbInboundId),
@@ -763,7 +767,7 @@
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.delDepletedClientsTitle"}}',
                     content: '{{ i18n "pages.inbounds.delDepletedClientsContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: () => this.submit('/xui/inbound/delDepletedClients/' + dbInboundId),
@@ -773,17 +777,17 @@
                 return dbInbound.toInbound().isExpiry(index)
             },
             getUpStats(dbInbound, email) {
-                if(email.length == 0) return 0
+                if (email.length == 0) return 0
                 clientStats = dbInbound.clientStats.find(stats => stats.email === email)
                 return clientStats ? clientStats.up : 0
             },
             getDownStats(dbInbound, email) {
-                if(email.length == 0) return 0
+                if (email.length == 0) return 0
                 clientStats = dbInbound.clientStats.find(stats => stats.email === email)
                 return clientStats ? clientStats.down : 0
             },
             statsColor(dbInbound, email) {
-                if(email.length == 0) return 'blue';
+                if (email.length == 0) return 'blue';
                 clientStats = dbInbound.clientStats.find(stats => stats.email === email);
                 return usageColor(clientStats.down + clientStats.up, this.trafficDiff, clientStats.total);
             },
@@ -791,19 +795,19 @@
                 clientStats = dbInbound.clientStats ? dbInbound.clientStats.find(stats => stats.email === email) : null
                 return clientStats ? clientStats['enable'] : true
             },
-            isRemovable(dbInbound_id){
+            isRemovable(dbInbound_id) {
                 return this.getInboundClients(this.dbInbounds.find(row => row.id === dbInbound_id)).length > 1
             },
             inboundLinks(dbInboundId) {
                 dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
-                txtModal.show('{{ i18n "pages.inbounds.export"}}',dbInbound.genInboundLinks,dbInbound.remark);
+                txtModal.show('{{ i18n "pages.inbounds.export"}}', dbInbound.genInboundLinks, dbInbound.remark);
             },
 			exportAllLinks() {
                 let copyText = '';
                 for (const dbInbound of this.dbInbounds) {
                     copyText += dbInbound.genInboundLinks
                 }
-                txtModal.show('{{ i18n "pages.inbounds.export"}}',copyText,'All-Inbounds');
+                txtModal.show('{{ i18n "pages.inbounds.export"}}', copyText, 'All-Inbounds');
             },
             async startDataRefreshLoop() {
                 while (this.isRefreshEnabled) {
@@ -821,11 +825,11 @@
                     this.startDataRefreshLoop();
                 }
             },
-            changeRefreshInterval(){
+            changeRefreshInterval() {
                 localStorage.setItem("refreshInterval", this.refreshInterval);
             },
-            async manualRefresh(){
-                if(!this.refreshing){
+            async manualRefresh() {
+                if (!this.refreshing) {
                     this.spinning = true;
                     await this.getDBInbounds();
                     this.spinning = false;

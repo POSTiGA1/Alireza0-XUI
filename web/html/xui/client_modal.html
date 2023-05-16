@@ -1,7 +1,7 @@
 {{define "clientsModal"}}
 <a-modal id="client-modal" v-model="clientModal.visible" :title="clientModal.title" @ok="clientModal.ok"
          :confirm-loading="clientModal.confirmLoading" :closable="true" :mask-closable="false"
-         :class="siderDrawer.isDarkTheme ? darkClass : ''"
+         :class="themeSwitcher.darkCardClass"
          :ok-text="clientModal.okText" cancel-text='{{ i18n "close" }}'>
     {{template "form/client"}}
 </a-modal>
@@ -106,7 +106,7 @@
                 return true
             },
             get isExpiry() {
-                return this.clientModal.isEdit ? (this.client.expiryTime < new Date().getTime())  : false;
+                return this.clientModal.isEdit && this.client.expiryTime >0 ? (this.client.expiryTime < new Date().getTime())  : false;
             },
             get statsColor() {
                 return usageColor(clientStats.up + clientStats.down, app.trafficDiff, this.client.totalGB);
@@ -132,7 +132,7 @@
                 this.$confirm({
                     title: '{{ i18n "pages.inbounds.resetTraffic"}}',
                     content: '{{ i18n "pages.inbounds.resetTrafficContent"}}',
-                    class: siderDrawer.isDarkTheme ? darkClass : '',
+                    class: themeSwitcher.darkCardClass,
                     okText: '{{ i18n "reset"}}',
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: async () => {

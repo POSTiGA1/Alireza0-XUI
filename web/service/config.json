@@ -2,24 +2,19 @@
   "log": {
     "loglevel": "warning"
   },
- 
   "api": {
-    "services": [
-      "HandlerService",
-      "LoggerService",
-      "StatsService"
-    ],
-    "tag": "api"
+    "tag": "api",
+    "services": ["HandlerService", "LoggerService", "StatsService"]
   },
   "inbounds": [
     {
+      "tag": "api",
       "listen": "127.0.0.1",
       "port": 62789,
       "protocol": "dokodemo-door",
       "settings": {
         "address": "127.0.0.1"
-      },
-      "tag": "api"
+      }
     }
   ],
   "outbounds": [
@@ -28,16 +23,16 @@
       "settings": {}
     },
     {
+      "tag": "blocked",
       "protocol": "blackhole",
-      "settings": {},
-      "tag": "blocked"
+      "settings": {}
     }
   ],
   "policy": {
     "levels": {
       "0": {
-        "statsUserUplink": true,
-        "statsUserDownlink": true
+        "statsUserDownlink": true,
+        "statsUserUplink": true
       }
     },
     "system": {
@@ -46,27 +41,22 @@
     }
   },
   "routing": {
+    "domainStrategy": "IPIfNonMatch",
     "rules": [
       {
-        "inboundTag": [
-          "api"
-        ],
-        "outboundTag": "api",
-        "type": "field"
+        "type": "field",
+        "inboundTag": ["api"],
+        "outboundTag": "api"
       },
       {
-        "ip": [
-          "geoip:private"
-        ],
+        "type": "field",
         "outboundTag": "blocked",
-        "type": "field"
+        "ip": ["geoip:private"]
       },
       {
+        "type": "field",
         "outboundTag": "blocked",
-        "protocol": [
-          "bittorrent"
-        ],
-        "type": "field"
+        "protocol": ["bittorrent"]
       }
     ]
   },
