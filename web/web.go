@@ -239,11 +239,11 @@ func (s *Server) initI18n(engine *gin.Engine) error {
 		names := make([]string, 0)
 		keyLen := len(key)
 		for i := 0; i < keyLen-1; i++ {
-			if key[i:i+2] == "{{" { // 判断开头 "{{"
+			if key[i:i+2] == "{{" {
 				j := i + 2
 				isFind := false
 				for ; j < keyLen-1; j++ {
-					if key[j:j+2] == "}}" { // 结尾 "}}"
+					if key[j:j+2] == "}}" {
 						isFind = true
 						break
 					}
@@ -276,8 +276,6 @@ func (s *Server) initI18n(engine *gin.Engine) error {
 	engine.FuncMap["i18n"] = I18n
 
 	engine.Use(func(c *gin.Context) {
-		//accept := c.GetHeader("Accept-Language")
-
 		var lang string
 
 		if cookie, err := c.Request.Cookie("lang"); err == nil {

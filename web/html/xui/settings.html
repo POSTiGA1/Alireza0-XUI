@@ -19,10 +19,6 @@
     .ant-list-item {
         display: block;
     }
-
-    :not(.ant-card-dark)>.ant-tabs-top-bar {
-        background: white;
-    }
 </style>
 <body>
 <a-layout id="app" v-cloak>
@@ -35,7 +31,7 @@
                         <a-button type="primary" :disabled="saveBtnDisable" @click="updateAllSetting">{{ i18n "pages.settings.save" }}</a-button>
                         <a-button type="danger" :disabled="!saveBtnDisable" @click="restartPanel">{{ i18n "pages.settings.restartPanel" }}</a-button>
                     </a-space>
-                    <a-tabs default-active-key="1" :class="themeSwitcher.darkCardClass">
+                    <a-tabs default-active-key="1" :class="themeSwitcher.darkCardClass" :style="!themeSwitcher.isDarkTheme? 'background: white':''">
                         <a-tab-pane key="1" tab='{{ i18n "pages.settings.panelConfig"}}'>
                             <a-row :xs="24" :sm="24" :lg="12">
                                 <h2 style="color: inherit; font-weight: bold; font-size: 18px; padding: 20px 20px; text-align: center;">
@@ -217,6 +213,11 @@
                                                 <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualDirectIPs"}}' v-model="manualDirectIPs"></setting-list-item>
                                                 <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualDirectDomains"}}' v-model="manualDirectDomains"></setting-list-item>
                                             </a-collapse-panel>
+                                            <a-collapse-panel header='{{ i18n "pages.settings.resetDefaultConfig"}}'>
+                                                <a-space direction="horizontal" style="padding: 0 20px">
+                                                    <a-button type="primary" @click="resetXrayConfigToDefault">{{ i18n "pages.settings.resetDefaultConfig" }}</a-button>
+                                                </a-space>
+                                            </a-collapse-panel>
                                         </a-collapse>
                                     </a-tab-pane>
                                     <a-tab-pane key="tpl-2" tab='{{ i18n "pages.settings.templates.advancedTemplate"}}' style="padding-top: 20px;">
@@ -233,9 +234,6 @@
                                         </a-collapse>
                                     </a-tab-pane>
                                     <a-tab-pane key="tpl-3" tab='{{ i18n "pages.settings.templates.completeTemplate"}}' style="padding-top: 20px;">
-                                        <a-space direction="horizontal" style="padding: 0 20px">
-                                            <a-button type="primary" @click="resetXrayConfigToDefault">{{ i18n "pages.settings.resetDefaultConfig" }}</a-button>
-                                        </a-space>
                                         <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.xrayConfigTemplate"}}' desc='{{ i18n "pages.settings.templates.xrayConfigTemplateDesc"}}' v-model="allSetting.xrayTemplateConfig"></setting-list-item>
                                     </a-tab-pane>
                                 </a-tabs>
@@ -300,7 +298,6 @@
                 },
                 ips: {
                     local: ["geoip:private"],
-                    google: ["geoip:google"],
                     cn: ["geoip:cn"],
                     ir: ["geoip:ir"],
                     ru: ["geoip:ru"],
@@ -310,12 +307,10 @@
                         "geosite:category-ads-all",
                         "geosite:category-ads",
                         "geosite:google-ads",
-                        "geosite:spotify-ads"
+                        "geosite:spotify-ads",
+                        "ext:iran.dat:ads"
                     ],
-                    porn: ["geosite:category-porn"],
-                    openai: ["geosite:openai"],
                     google: ["geosite:google"],
-                    spotify: ["geosite:spotify"],
                     netflix: ["geosite:netflix"],
                     cn: [
                         "geosite:cn",
@@ -329,16 +324,15 @@
                         "regexp:.*\\.ir$",
                         "ext:iran.dat:ir",
                         "ext:iran.dat:other",
-                        "ext:iran.dat:ads",
                         "geosite:category-ir"
                     ]
                 },
                 familyProtectDNS: {
                     "servers": [
-                        "1.1.1.2",
-                        "1.0.0.2",
-                        "94.140.14.14",
-                        "94.140.15.15"
+                        "1.1.1.3",
+                        "1.0.0.3",
+                        "94.140.14.15",
+                        "94.140.15.16"
                     ],
                     "queryStrategy": "UseIPv4"
                 },
@@ -511,7 +505,7 @@
             freedomStrategy: {
                 get: function () {
                     if (!this.templateSettings) return "AsIs";
-                    freedomOutbound = this.templateSettings.outbounds.find((o) => o.tag === "direct");
+                    freedomOutbound = this.templateSettings.outbounds.find((o) => o.protocol === "freedom" && !o.tag);
                     if (!freedomOutbound) return "AsIs";
                     if (!freedomOutbound.settings || !freedomOutbound.settings.domainStrategy) return "AsIs";
                     return freedomOutbound.settings.domainStrategy;

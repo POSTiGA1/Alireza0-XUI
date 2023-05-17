@@ -134,10 +134,10 @@ class RandomUtil {
         });
     }
 
-    static randomText() {
+    static randomText(minLen = 6, varLen = 5) {
         var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
         var string = '';
-        var len = 6 + Math.floor(Math.random() * 5);
+        var len = minLen + Math.floor(Math.random() * varLen);
         for (var ii = 0; ii < len; ii++) {
             string += chars[Math.floor(Math.random() * chars.length)];
         }
