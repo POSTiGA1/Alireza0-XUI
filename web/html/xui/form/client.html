@@ -54,7 +54,7 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr v-if="client.email">
+        <tr v-if="client.email && app.subSettings.enable">
             <td>Subscription <a-icon @click="client.subId = RandomUtil.randomText(16,16)" type="sync"></a-icon></td>
             <td>
                 <a-form-item>
@@ -62,7 +62,7 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr v-if="client.email">
+        <tr v-if="client.email && app.tgBotEnable">
             <td>Telegram Username</td>
             <td>
                 <a-form-item>

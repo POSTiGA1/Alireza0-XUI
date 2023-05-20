@@ -51,7 +51,7 @@ func (s *InboundService) checkPortExist(port int, ignoreId int) (bool, error) {
 	return count > 0, nil
 }
 
-func (s *InboundService) getClients(inbound *model.Inbound) ([]model.Client, error) {
+func (s *InboundService) GetClients(inbound *model.Inbound) ([]model.Client, error) {
 	settings := map[string][]model.Client{}
 	json.Unmarshal([]byte(inbound.Settings), &settings)
 	if settings == nil {
@@ -110,7 +110,7 @@ func (s *InboundService) checkEmailsExistForClients(clients []model.Client) (str
 }
 
 func (s *InboundService) checkEmailExistForInbound(inbound *model.Inbound) (string, error) {
-	clients, err := s.getClients(inbound)
+	clients, err := s.GetClients(inbound)
 	if err != nil {
 		return "", err
 	}
@@ -150,7 +150,7 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, err
 		return inbound, common.NewError("Duplicate email:", existEmail)
 	}
 
-	clients, err := s.getClients(inbound)
+	clients, err := s.GetClients(inbound)
 	if err != nil {
 		return inbound, err
 	}
@@ -249,7 +249,7 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, 
 }
 
 func (s *InboundService) AddInboundClient(data *model.Inbound) error {
-	clients, err := s.getClients(data)
+	clients, err := s.GetClients(data)
 	if err != nil {
 		return err
 	}
@@ -352,7 +352,7 @@ func (s *InboundService) DelInboundClient(inboundId int, clientId string) error 
 }
 
 func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId string) error {
-	clients, err := s.getClients(data)
+	clients, err := s.GetClients(data)
 	if err != nil {
 		return err
 	}
@@ -370,7 +370,7 @@ func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId strin
 		return err
 	}
 
-	oldClients, err := s.getClients(oldInbound)
+	oldClients, err := s.GetClients(oldInbound)
 	if err != nil {
 		return err
 	}
@@ -774,7 +774,7 @@ func (s *InboundService) GetClientTrafficTgBot(tguname string) ([]*xray.ClientTr
 	}
 	var emails []string
 	for _, inbound := range inbounds {
-		clients, err := s.getClients(inbound)
+		clients, err := s.GetClients(inbound)
 		if err != nil {
 			logger.Error("Unable to get clients from inbound")
 		}
@@ -902,7 +902,7 @@ func (s *InboundService) MigrationRequirements() {
 		}
 
 		// Add client traffic row for all clients which has email
-		modelClients, err := s.getClients(inbounds[inbound_index])
+		modelClients, err := s.GetClients(inbounds[inbound_index])
 		if err != nil {
 			return
 		}

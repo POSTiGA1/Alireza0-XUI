@@ -35,18 +35,18 @@
                     </a-form-item>
                 </td>
             </tr>
-            <tr>
+            <tr v-if="client.email && app.subSettings.enable">
                 <td>Subscription <a-icon @click="client.subId = RandomUtil.randomText(16,16)" type="sync"></a-icon></td>
                 <td>
-                    <a-form-item v-if="client.email">
+                    <a-form-item>
                         <a-input v-model.trim="client.subId" style="width: 200px;"></a-input>
                     </a-form-item>
                 </td>
             </tr>
-            <tr>
+            <tr v-if="client.email && app.tgBotEnable">
                 <td>Telegram Username</td>
                 <td>
-                    <a-form-item v-if="client.email">
+                    <a-form-item>
                         <a-input v-model.trim="client.tgId" style="width: 200px;"></a-input>
                     </a-form-item>
                 </td>

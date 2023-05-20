@@ -104,6 +104,10 @@
                                 </a-col>
                             </a-row>
                         </div>
+                        <a-switch v-model="enableFilter"
+                            checked-children="{{ i18n "search" }}" un-checked-children="{{ i18n "filter" }}"
+                            @change="toggleFilter">
+                        </a-switch>
                         <a-input v-if="!enableFilter" v-model.lazy="searchKey" placeholder='{{ i18n "search" }}' autofocus style="max-width: 300px"></a-input>
                         <a-radio-group v-if="enableFilter" v-model="filterBy" @change="filterInbounds" button-style="solid">
                             <a-radio-button value="">{{ i18n "none" }}</a-radio-button>
@@ -111,10 +115,6 @@
                             <a-radio-button value="depleted">{{ i18n "depleted" }}</a-radio-button>
                             <a-radio-button value="expiring">{{ i18n "depletingSoon" }}</a-radio-button>
                         </a-radio-group>
-                        <a-switch v-model="enableFilter"
-                            checked-children="{{ i18n "search" }}" un-checked-children="{{ i18n "filter" }}"
-                            @change="toggleFilter">
-                        </a-switch>
                         <a-table :columns="columns" :row-key="dbInbound => dbInbound.id"
                                  :data-source="searchedInbounds"
                                  :loading="spinning" :scroll="{ x: 1300 }"
@@ -339,7 +339,15 @@
             clientCount: {},
             isRefreshEnabled: localStorage.getItem("isRefreshEnabled") === "true" ? true : false,
             refreshing: false,
-            refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000
+            refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000,
+            subSettings: {
+                enable : false,
+                port: 0,
+                path: '',
+                domain: '',
+                tls: false
+            },
+            tgBotEnable: false
         },
         methods: {
             loading(spinning = true) {
@@ -361,10 +369,20 @@
                 if (!msg.success) {
                     return;
                 }
-                this.expireDiff = msg.obj.expireDiff * 86400000;
-                this.trafficDiff = msg.obj.trafficDiff * 1073741824;
-                this.defaultCert = msg.obj.defaultCert;
-                this.defaultKey = msg.obj.defaultKey;
+                with(msg.obj){
+                    this.expireDiff = expireDiff * 86400000;
+                    this.trafficDiff = trafficDiff * 1073741824;
+                    this.defaultCert = defaultCert;
+                    this.defaultKey = defaultKey;
+                    this.tgBotEnable = tgBotEnable;
+                    this.subSettings = {
+                        enable : subEnable,
+                        port: subPort,
+                        path: subPath,
+                        domain: subDomain,
+                        tls: subTLS
+                    };
+                }
             },
             setInbounds(dbInbounds) {
                 this.inbounds.splice(0);
@@ -742,9 +760,7 @@
                 }
             },
             showQrcode(dbInbound, clientIndex) {
-                const clientName = JSON.parse(dbInbound.settings).clients[clientIndex].email;
-                const link = dbInbound.genLink(clientIndex);
-                qrModal.show('{{ i18n "qrCode"}}', link, dbInbound, '', clientName);
+                qrModal.show('{{ i18n "qrCode"}}', dbInbound, clientIndex);
             },
             showInfo(dbInbound, index) {
                 infoModal.show(dbInbound, index);

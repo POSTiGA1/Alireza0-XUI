@@ -92,6 +92,7 @@ docker build -t x-ui .
 - Search within all inbounds and clients
 - Support Dark/Light theme UI
 - Support multi-user multi-protocol, web page visualization operation
+- Support multi-domain configuration and multi-certificate inbounds
 - Supported protocols: vmess, vless, trojan, shadowsocks, dokodemo-door, socks, http
 - Support for configuring more transport configurations
 - Traffic statistics, limit traffic, limit expiration time
