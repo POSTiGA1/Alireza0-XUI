@@ -387,7 +387,7 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 		for index, d := range domains {
 			domain := d.(map[string]interface{})
 			url.Fragment = remark + "-" + domain["remark"].(string)
-			url.Host = domain["domain"].(string)
+			url.Host = fmt.Sprintf("%s:%d", domain["domain"].(string), port)
 			if index > 0 {
 				links += "\n"
 			}

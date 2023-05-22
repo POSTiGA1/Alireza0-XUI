@@ -105,8 +105,8 @@
                             </a-row>
                         </div>
                         <a-switch v-model="enableFilter"
-                            checked-children="{{ i18n "search" }}" un-checked-children="{{ i18n "filter" }}"
-                            @change="toggleFilter">
+                            checked-children='{{ i18n "search" }}' un-checked-children='{{ i18n "filter" }}'
+                            @change="toggleFilter" style="margin-right: 10px;">
                         </a-switch>
                         <a-input v-if="!enableFilter" v-model.lazy="searchKey" placeholder='{{ i18n "search" }}' autofocus style="max-width: 300px"></a-input>
                         <a-radio-group v-if="enableFilter" v-model="filterBy" @change="filterInbounds" button-style="solid">

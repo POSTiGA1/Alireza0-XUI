@@ -18,16 +18,14 @@ import (
 	"x-ui/util/common"
 	"x-ui/web/controller"
 	"x-ui/web/job"
+	"x-ui/web/locale"
 	"x-ui/web/network"
 	"x-ui/web/service"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"github.com/pelletier/go-toml/v2"
 	"github.com/robfig/cron/v3"
-	"golang.org/x/text/language"
 )
 
 //go:embed assets/*
@@ -179,13 +177,23 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 			c.Header("Cache-Control", "max-age=31536000")
 		}
 	})
-	err = s.initI18n(engine)
+
+	// init i18n
+	err = locale.InitLocalizer(i18nFS, &s.settingService)
 	if err != nil {
 		return nil, err
 	}
 
+	// Apply locale middleware for i18n
+	i18nWebFunc := func(key string, params ...string) string {
+		return locale.I18n(locale.Web, key, params...)
+	}
+	engine.FuncMap["i18n"] = i18nWebFunc
+	engine.Use(locale.LocalizerMiddleware())
+
+	// set static files and template
 	if config.IsDebug() {
-		// for develop
+		// for development
 		files, err := s.getHtmlFiles()
 		if err != nil {
 			return nil, err
@@ -193,12 +201,12 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 		engine.LoadHTMLFiles(files...)
 		engine.StaticFS(basePath+"assets", http.FS(os.DirFS("web/assets")))
 	} else {
-		// for prod
-		t, err := s.getHtmlTemplate(engine.FuncMap)
+		// for production
+		template, err := s.getHtmlTemplate(engine.FuncMap)
 		if err != nil {
 			return nil, err
 		}
-		engine.SetHTMLTemplate(t)
+		engine.SetHTMLTemplate(template)
 		engine.StaticFS(basePath+"assets", http.FS(&wrapAssetsFS{FS: assetsFS}))
 	}
 
@@ -210,85 +218,6 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	s.api = controller.NewAPIController(g)
 
 	return engine, nil
-}
-
-func (s *Server) initI18n(engine *gin.Engine) error {
-	bundle := i18n.NewBundle(language.SimplifiedChinese)
-	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	err := fs.WalkDir(i18nFS, "translation", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-		data, err := i18nFS.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		_, err = bundle.ParseMessageFileBytes(data, path)
-		return err
-	})
-	if err != nil {
-		return err
-	}
-
-	findI18nParamNames := func(key string) []string {
-		names := make([]string, 0)
-		keyLen := len(key)
-		for i := 0; i < keyLen-1; i++ {
-			if key[i:i+2] == "{{" {
-				j := i + 2
-				isFind := false
-				for ; j < keyLen-1; j++ {
-					if key[j:j+2] == "}}" {
-						isFind = true
-						break
-					}
-				}
-				if isFind {
-					names = append(names, key[i+3:j])
-				}
-			}
-		}
-		return names
-	}
-
-	var localizer *i18n.Localizer
-
-	I18n := func(key string, params ...string) (string, error) {
-		names := findI18nParamNames(key)
-		if len(names) != len(params) {
-			return "", common.NewError("find names:", names, "---------- params:", params, "---------- num not equal")
-		}
-		templateData := map[string]interface{}{}
-		for i := range names {
-			templateData[names[i]] = params[i]
-		}
-		return localizer.Localize(&i18n.LocalizeConfig{
-			MessageID:    key,
-			TemplateData: templateData,
-		})
-	}
-
-	engine.FuncMap["i18n"] = I18n
-
-	engine.Use(func(c *gin.Context) {
-		var lang string
-
-		if cookie, err := c.Request.Cookie("lang"); err == nil {
-			lang = cookie.Value
-		} else {
-			lang = c.GetHeader("Accept-Language")
-		}
-
-		localizer = i18n.NewLocalizer(bundle, lang)
-		c.Set("localizer", localizer)
-		c.Set("I18n", I18n)
-		c.Next()
-	})
-
-	return nil
 }
 
 func (s *Server) startTask() {
@@ -314,7 +243,7 @@ func (s *Server) startTask() {
 	if (err == nil) && (isTgbotenabled) {
 		runtime, err := s.settingService.GetTgbotRuntime()
 		if err != nil || runtime == "" {
-			logger.Errorf("Add NewStatsNotifyJob error[%s],Runtime[%s] invalid,wil run default", err, runtime)
+			logger.Errorf("Add NewStatsNotifyJob error[%s], Runtime[%s] invalid, will run default", err, runtime)
 			runtime = "@daily"
 		}
 		logger.Infof("Tg notify enabled,run at %s", runtime)
@@ -329,7 +258,6 @@ func (s *Server) startTask() {
 		if (err == nil) && (cpuThreshold > 0) {
 			s.cron.AddJob("@every 10s", job.NewCheckCpuJob())
 		}
-
 	} else {
 		s.cron.Remove(entry)
 	}
@@ -409,7 +337,7 @@ func (s *Server) Start() (err error) {
 	isTgbotenabled, err := s.settingService.GetTgbotenabled()
 	if (err == nil) && (isTgbotenabled) {
 		tgBot := s.tgbotService.NewTgbot()
-		tgBot.Start()
+		tgBot.Start(i18nFS)
 	}
 
 	return nil
@@ -421,7 +349,7 @@ func (s *Server) Stop() error {
 	if s.cron != nil {
 		s.cron.Stop()
 	}
-	if s.tgbotService.IsRunnging() {
+	if s.tgbotService.IsRunning() {
 		s.tgbotService.Stop()
 	}
 	var err1 error

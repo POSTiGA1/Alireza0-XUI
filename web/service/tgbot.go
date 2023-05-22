@@ -1,6 +1,7 @@
 package service
 
 import (
+	"embed"
 	"fmt"
 	"net"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"x-ui/database/model"
 	"x-ui/logger"
 	"x-ui/util/common"
+	"x-ui/web/locale"
 	"x-ui/xray"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -19,6 +21,7 @@ import (
 var bot *tgbotapi.BotAPI
 var adminIds []int64
 var isRunning bool
+var hostname string
 
 type LoginStatus byte
 
@@ -38,7 +41,17 @@ func (t *Tgbot) NewTgbot() *Tgbot {
 	return new(Tgbot)
 }
 
-func (t *Tgbot) Start() error {
+func (t *Tgbot) I18nBot(name string, params ...string) string {
+	return locale.I18n(locale.Bot, name, params...)
+}
+
+func (t *Tgbot) Start(i18nFS embed.FS) error {
+	err := locale.InitLocalizer(i18nFS, &t.settingService)
+	if err != nil {
+		return err
+	}
+
+	t.SetHostname()
 	tgBottoken, err := t.settingService.GetTgBotToken()
 	if err != nil || tgBottoken == "" {
 		logger.Warning("Get TgBotToken failed:", err)
@@ -77,8 +90,18 @@ func (t *Tgbot) Start() error {
 	return nil
 }
 
-func (t *Tgbot) IsRunnging() bool {
+func (t *Tgbot) IsRunning() bool {
 	return isRunning
+}
+
+func (t *Tgbot) SetHostname() {
+	host, err := os.Hostname()
+	if err != nil {
+		logger.Error("get hostname error:", err)
+		hostname = ""
+		return
+	}
+	hostname = host
 }
 
 func (t *Tgbot) Stop() {
@@ -115,16 +138,16 @@ func (t *Tgbot) answerCommand(message *tgbotapi.Message, chatId int64, isAdmin b
 	// Extract the command from the Message.
 	switch message.Command() {
 	case "help":
-		msg = "This bot is providing you some specefic data from the server.\n\n Please choose:"
+		msg += t.I18nBot("tgbot.commands.help")
+		msg += t.I18nBot("tgbot.commands.pleaseChoose")
 	case "start":
-		msg = "Hello <i>" + message.From.FirstName + "</i> 👋"
+		msg += t.I18nBot("tgbot.commands.start", "Firstname=="+message.From.FirstName)
 		if isAdmin {
-			hostname, _ := os.Hostname()
-			msg += "\nWelcome to <b>" + hostname + "</b> management bot"
+			msg += t.I18nBot("tgbot.commands.welcome", "Hostname=="+hostname)
 		}
-		msg += "\n\nI can do some magics for you, please choose:"
+		msg += "\n\n" + t.I18nBot("tgbot.commands.pleaseChoose")
 	case "status":
-		msg = "bot is ok ✅"
+		msg += t.I18nBot("tgbot.commands.status")
 	case "usage":
 		if len(message.CommandArguments()) > 1 {
 			if isAdmin {
@@ -133,16 +156,16 @@ func (t *Tgbot) answerCommand(message *tgbotapi.Message, chatId int64, isAdmin b
 				t.searchForClient(chatId, message.CommandArguments())
 			}
 		} else {
-			msg = "❗Please provide a text for search!"
+			msg += t.I18nBot("tgbot.commands.usage")
 		}
 	case "inbound":
 		if isAdmin {
 			t.searchInbound(chatId, message.CommandArguments())
 		} else {
-			msg = "❗ Unknown command"
+			msg += t.I18nBot("tgbot.commands.unknown")
 		}
 	default:
-		msg = "❗ Unknown command"
+		msg += t.I18nBot("tgbot.commands.unknown")
 	}
 	t.SendAnswer(chatId, msg, isAdmin)
 }
@@ -167,9 +190,9 @@ func (t *Tgbot) asnwerCallback(callbackQuery *tgbotapi.CallbackQuery, isAdmin bo
 	case "client_traffic":
 		t.getClientUsage(callbackQuery.From.ID, callbackQuery.From.UserName)
 	case "client_commands":
-		t.SendMsgToTgbot(callbackQuery.From.ID, "To search for statistics, just use folowing command:\r\n \r\n<code>/usage [UID|Password]</code>\r\n \r\nUse UID for vmess/vless and Password for Trojan.")
+		t.SendMsgToTgbot(callbackQuery.From.ID, t.I18nBot("tgbot.commands.helpClientCommands"))
 	case "commands":
-		t.SendMsgToTgbot(callbackQuery.From.ID, "Search for a client email:\r\n<code>/usage email</code>\r\n \r\nSearch for inbounds (with client stats):\r\n<code>/inbound [remark]</code>")
+		t.SendMsgToTgbot(callbackQuery.From.ID, t.I18nBot("tgbot.commands.helpAdminCommands"))
 	}
 }
 
@@ -183,48 +206,52 @@ func checkAdmin(tgId int64) bool {
 }
 
 func (t *Tgbot) SendAnswer(chatId int64, msg string, isAdmin bool) {
-	var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+	numericKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Server Usage", "get_usage"),
-			tgbotapi.NewInlineKeyboardButtonData("Get DB Backup", "get_backup"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.serverUsage"), "get_usage"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.dbBackup"), "get_backup"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Get Inbounds", "inbounds"),
-			tgbotapi.NewInlineKeyboardButtonData("Deplete soon", "deplete_soon"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.getInbounds"), "inbounds"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.depleteSoon"), "deplete_soon"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Commands", "commands"),
-		),
-	)
-	var numericKeyboardClient = tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Get Usage", "client_traffic"),
-			tgbotapi.NewInlineKeyboardButtonData("Commands", "client_commands"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.commands"), "commands"),
 		),
 	)
-	msgConfig := tgbotapi.NewMessage(chatId, msg)
-	msgConfig.ParseMode = "HTML"
+	numericKeyboardClient := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.clientUsage"), "client_traffic"),
+			tgbotapi.NewInlineKeyboardButtonData(t.I18nBot("tgbot.buttons.commands"), "client_commands"),
+		),
+	)
+
+	var keyboardMarkup tgbotapi.InlineKeyboardMarkup
 	if isAdmin {
-		msgConfig.ReplyMarkup = numericKeyboard
+		keyboardMarkup = numericKeyboard
 	} else {
-		msgConfig.ReplyMarkup = numericKeyboardClient
+		keyboardMarkup = numericKeyboardClient
 	}
-	_, err := bot.Send(msgConfig)
-	if err != nil {
-		logger.Warning("Error sending telegram message :", err)
-	}
+	t.SendMsgToTgbot(chatId, msg, keyboardMarkup)
 }
 
-func (t *Tgbot) SendMsgToTgbot(tgid int64, msg string) {
+func (t *Tgbot) SendMsgToTgbot(tgid int64, msg string, replyMarkup ...tgbotapi.InlineKeyboardMarkup) {
 	if !isRunning {
 		return
 	}
+	if msg == "" {
+		logger.Info("[tgbot] message is empty!")
+		return
+	}
+
 	var allMessages []string
 	limit := 2000
+
 	// paging message if it is big
 	if len(msg) > limit {
 		messages := strings.Split(msg, "\r\n \r\n")
 		lastIndex := -1
+
 		for _, message := range messages {
 			if (len(allMessages) == 0) || (len(allMessages[lastIndex])+len(message) > limit) {
 				allMessages = append(allMessages, message)
@@ -239,6 +266,9 @@ func (t *Tgbot) SendMsgToTgbot(tgid int64, msg string) {
 	for _, message := range allMessages {
 		info := tgbotapi.NewMessage(tgid, message)
 		info.ParseMode = "HTML"
+		if len(replyMarkup) > 0 {
+			info.ReplyMarkup = replyMarkup[0]
+		}
 		_, err := bot.Send(info)
 		if err != nil {
 			logger.Warning("Error sending telegram message :", err)
@@ -256,37 +286,44 @@ func (t *Tgbot) SendMsgToTgbotAdmins(msg string) {
 func (t *Tgbot) SendReport() {
 	runTime, err := t.settingService.GetTgbotRuntime()
 	if err == nil && len(runTime) > 0 {
-		t.SendMsgToTgbotAdmins("🕰 Scheduled reports: " + runTime + "\r\nDate-Time: " + time.Now().Format("2006-01-02 15:04:05"))
+		msg := ""
+		msg += t.I18nBot("tgbot.messages.report", "RunTime=="+runTime)
+		msg += t.I18nBot("tgbot.messages.datetime", "DateTime=="+time.Now().Format("2006-01-02 15:04:05"))
+		t.SendMsgToTgbotAdmins(msg)
 	}
+
 	info := t.getServerUsage()
 	t.SendMsgToTgbotAdmins(info)
+
 	exhausted := t.getExhausted()
 	t.SendMsgToTgbotAdmins(exhausted)
+
 	backupEnable, err := t.settingService.GetTgBotBackup()
 	if err == nil && backupEnable {
-		for _, adminId := range adminIds {
-			t.sendBackup(int64(adminId))
-		}
+		t.SendBackupToAdmins()
+	}
+}
+
+func (t *Tgbot) SendBackupToAdmins() {
+	if !t.IsRunning() {
+		return
+	}
+	for _, adminId := range adminIds {
+		t.sendBackup(int64(adminId))
 	}
 }
 
 func (t *Tgbot) getServerUsage() string {
-	var info string
-	//get hostname
-	name, err := os.Hostname()
-	if err != nil {
-		logger.Error("get hostname error:", err)
-		name = ""
-	}
-	info = fmt.Sprintf("💻 Hostname: %s\r\n", name)
-	info += fmt.Sprintf("🚀X-UI Version: %s\r\n", config.GetVersion())
-	//get ip address
-	var ip string
-	var ipv6 string
+	info, ipv4, ipv6 := "", "", ""
+	info += t.I18nBot("tgbot.messages.hostname", "Hostname=="+hostname)
+	info += t.I18nBot("tgbot.messages.version", "Version=="+config.GetVersion())
+
+	// get ip address
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		logger.Error("net.Interfaces failed, err:", err.Error())
-		info += "🌐 IP: Unknown\r\n \r\n"
+		logger.Error("net.Interfaces failed, err: ", err.Error())
+		info += t.I18nBot("tgbot.messages.ip", "IP=="+t.I18nBot("tgbot.unknown"))
+		info += " \r\n"
 	} else {
 		for i := 0; i < len(netInterfaces); i++ {
 			if (netInterfaces[i].Flags & net.FlagUp) != 0 {
@@ -295,7 +332,7 @@ func (t *Tgbot) getServerUsage() string {
 				for _, address := range addrs {
 					if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 						if ipnet.IP.To4() != nil {
-							ip += ipnet.IP.String() + " "
+							ipv4 += ipnet.IP.String() + " "
 						} else if ipnet.IP.To16() != nil && !ipnet.IP.IsLinkLocalUnicast() {
 							ipv6 += ipnet.IP.String() + " "
 						}
@@ -303,42 +340,45 @@ func (t *Tgbot) getServerUsage() string {
 				}
 			}
 		}
-		info += fmt.Sprintf("🌐IP: %s\r\n🌐IPv6: %s\r\n", ip, ipv6)
+
+		info += t.I18nBot("tgbot.messages.ipv4", "IPv4=="+ipv4)
+		info += t.I18nBot("tgbot.messages.ipv6", "IPv6=="+ipv6)
 	}
 
 	// get latest status of server
 	t.lastStatus = t.serverService.GetStatus(t.lastStatus)
-	info += fmt.Sprintf("🔌Server Uptime: %d days\r\n", int(t.lastStatus.Uptime/86400))
-	info += fmt.Sprintf("📈Server Load: %.1f, %.1f, %.1f\r\n", t.lastStatus.Loads[0], t.lastStatus.Loads[1], t.lastStatus.Loads[2])
-	info += fmt.Sprintf("📋Server Memory: %s/%s\r\n", common.FormatTraffic(int64(t.lastStatus.Mem.Current)), common.FormatTraffic(int64(t.lastStatus.Mem.Total)))
-	info += fmt.Sprintf("🔹TcpCount: %d\r\n", t.lastStatus.TcpCount)
-	info += fmt.Sprintf("🔸UdpCount: %d\r\n", t.lastStatus.UdpCount)
-	info += fmt.Sprintf("🚦Traffic: %s (↑%s,↓%s)\r\n", common.FormatTraffic(int64(t.lastStatus.NetTraffic.Sent+t.lastStatus.NetTraffic.Recv)), common.FormatTraffic(int64(t.lastStatus.NetTraffic.Sent)), common.FormatTraffic(int64(t.lastStatus.NetTraffic.Recv)))
-	info += fmt.Sprintf("ℹXray status: %s", t.lastStatus.Xray.State)
+	info += t.I18nBot("tgbot.messages.serverUpTime", "UpTime=="+strconv.FormatUint(t.lastStatus.Uptime/86400, 10), "Unit=="+t.I18nBot("tgbot.days"))
+	info += t.I18nBot("tgbot.messages.serverLoad", "Load1=="+strconv.FormatFloat(t.lastStatus.Loads[0], 'f', 2, 64), "Load2=="+strconv.FormatFloat(t.lastStatus.Loads[1], 'f', 2, 64), "Load3=="+strconv.FormatFloat(t.lastStatus.Loads[2], 'f', 2, 64))
+	info += t.I18nBot("tgbot.messages.serverMemory", "Current=="+common.FormatTraffic(int64(t.lastStatus.Mem.Current)), "Total=="+common.FormatTraffic(int64(t.lastStatus.Mem.Total)))
+	info += t.I18nBot("tgbot.messages.tcpCount", "Count=="+strconv.Itoa(t.lastStatus.TcpCount))
+	info += t.I18nBot("tgbot.messages.udpCount", "Count=="+strconv.Itoa(t.lastStatus.UdpCount))
+	info += t.I18nBot("tgbot.messages.traffic", "Total=="+common.FormatTraffic(int64(t.lastStatus.NetTraffic.Sent+t.lastStatus.NetTraffic.Recv)), "Upload=="+common.FormatTraffic(int64(t.lastStatus.NetTraffic.Sent)), "Download=="+common.FormatTraffic(int64(t.lastStatus.NetTraffic.Recv)))
+	info += t.I18nBot("tgbot.messages.xrayStatus", "State=="+fmt.Sprint(t.lastStatus.Xray.State))
 
 	return info
 }
 
 func (t *Tgbot) UserLoginNotify(username string, ip string, time string, status LoginStatus) {
+	if !t.IsRunning() {
+		return
+	}
+
 	if username == "" || ip == "" || time == "" {
 		logger.Warning("UserLoginNotify failed,invalid info")
 		return
 	}
-	var msg string
-	// Get hostname
-	name, err := os.Hostname()
-	if err != nil {
-		logger.Warning("get hostname error:", err)
-		return
-	}
+
+	msg := ""
 	if status == LoginSuccess {
-		msg = fmt.Sprintf("✅ Successfully logged-in to the panel\r\nHostname:%s\r\n", name)
+		msg += t.I18nBot("tgbot.messages.loginSuccess")
 	} else if status == LoginFail {
-		msg = fmt.Sprintf("❗ Login to the panel was unsuccessful\r\nHostname:%s\r\n", name)
+		msg += t.I18nBot("tgbot.messages.loginFailed")
 	}
-	msg += fmt.Sprintf("⏰ Time:%s\r\n", time)
-	msg += fmt.Sprintf("🆔 Username:%s\r\n", username)
-	msg += fmt.Sprintf("🌐 IP:%s\r\n", ip)
+	msg += t.I18nBot("tgbot.messages.hostname", "Hostname=="+hostname)
+	msg += t.I18nBot("tgbot.messages.username", "Username=="+username)
+	msg += t.I18nBot("tgbot.messages.ip", "IP=="+ip)
+	msg += t.I18nBot("tgbot.messages.time", "Time=="+time)
+
 	t.SendMsgToTgbotAdmins(msg)
 }
 
@@ -348,17 +388,19 @@ func (t *Tgbot) getInboundUsages() string {
 	inbouds, err := t.inboundService.GetAllInbounds()
 	if err != nil {
 		logger.Warning("GetAllInbounds run failed:", err)
-		info += "❌ Failed to get inbounds"
+		info += t.I18nBot("tgbot.answers.getInboundsFailed")
 	} else {
 		// NOTE:If there no any sessions here,need to notify here
 		// TODO:Sub-node push, automatic conversion format
 		for _, inbound := range inbouds {
-			info += fmt.Sprintf("📍Inbound:%s\r\nPort:%d\r\n", inbound.Remark, inbound.Port)
-			info += fmt.Sprintf("Traffic: %s (↑%s,↓%s)\r\n", common.FormatTraffic((inbound.Up + inbound.Down)), common.FormatTraffic(inbound.Up), common.FormatTraffic(inbound.Down))
+			info += t.I18nBot("tgbot.messages.inbound", "Remark=="+inbound.Remark)
+			info += t.I18nBot("tgbot.messages.port", "Port=="+strconv.Itoa(inbound.Port))
+			info += t.I18nBot("tgbot.messages.traffic", "Total=="+common.FormatTraffic((inbound.Up+inbound.Down)), "Upload=="+common.FormatTraffic(inbound.Up), "Download=="+common.FormatTraffic(inbound.Down))
+
 			if inbound.ExpiryTime == 0 {
-				info += "Expire date: ♾ Unlimited\r\n \r\n"
+				info += t.I18nBot("tgbot.messages.expire", "DateTime=="+t.I18nBot("tgbot.unlimited"))
 			} else {
-				info += fmt.Sprintf("Expire date:%s\r\n \r\n", time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
+				info += t.I18nBot("tgbot.messages.expire", "DateTime=="+time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
 			}
 		}
 	}
@@ -367,75 +409,92 @@ func (t *Tgbot) getInboundUsages() string {
 
 func (t *Tgbot) getClientUsage(chatId int64, tgUserName string) {
 	if len(tgUserName) == 0 {
-		msg := "Your configuration is not found!\nYou should configure your telegram username and ask Admin to add it to your configuration."
+		msg := t.I18nBot("tgbot.answers.askToAddUser")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
+
 	traffics, err := t.inboundService.GetClientTrafficTgBot(tgUserName)
 	if err != nil {
 		logger.Warning(err)
-		msg := "❌ Something went wrong!"
+		msg := t.I18nBot("tgbot.wentWrong")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
 	if len(traffics) == 0 {
-		msg := "Your configuration is not found!\nPlease ask your Admin to use your telegram username in your configuration(s).\n\nYour username: <b>@" + tgUserName + "</b>"
+		msg := t.I18nBot("tgbot.answers.askToAddUserName", "TgUserName=="+tgUserName)
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
+
 	for _, traffic := range traffics {
 		expiryTime := ""
 		if traffic.ExpiryTime == 0 {
-			expiryTime = "♾Unlimited"
+			expiryTime = t.I18nBot("tgbot.unlimited")
 		} else if traffic.ExpiryTime < 0 {
-			expiryTime = fmt.Sprintf("%d days", traffic.ExpiryTime/-86400000)
+			expiryTime = fmt.Sprintf("%d %s", traffic.ExpiryTime/-86400000, t.I18nBot("tgbot.days"))
 		} else {
 			expiryTime = time.Unix((traffic.ExpiryTime / 1000), 0).Format("2006-01-02 15:04:05")
 		}
+
 		total := ""
 		if traffic.Total == 0 {
-			total = "♾Unlimited"
+			total = t.I18nBot("tgbot.unlimited")
 		} else {
 			total = common.FormatTraffic((traffic.Total))
 		}
-		output := fmt.Sprintf("💡 Active: %t\r\n📧 Email: %s\r\n🔼 Upload↑: %s\r\n🔽 Download↓: %s\r\n🔄 Total: %s / %s\r\n📅 Expire in: %s\r\n",
-			traffic.Enable, traffic.Email, common.FormatTraffic(traffic.Up), common.FormatTraffic(traffic.Down), common.FormatTraffic((traffic.Up + traffic.Down)),
-			total, expiryTime)
+
+		output := ""
+		output += t.I18nBot("tgbot.messages.active", "Enable=="+strconv.FormatBool(traffic.Enable))
+		output += t.I18nBot("tgbot.messages.email", "Email=="+traffic.Email)
+		output += t.I18nBot("tgbot.messages.upload", "Upload=="+common.FormatTraffic(traffic.Up))
+		output += t.I18nBot("tgbot.messages.download", "Download=="+common.FormatTraffic(traffic.Down))
+		output += t.I18nBot("tgbot.messages.total", "UpDown=="+common.FormatTraffic((traffic.Up+traffic.Down)), "Total=="+total)
+		output += t.I18nBot("tgbot.messages.expireIn", "Time=="+expiryTime)
+
 		t.SendMsgToTgbot(chatId, output)
 	}
-	t.SendAnswer(chatId, "Please choose:", false)
+	t.SendAnswer(chatId, t.I18nBot("tgbot.commands.pleaseChoose"), false)
 }
 
 func (t *Tgbot) searchClient(chatId int64, email string) {
 	traffic, err := t.inboundService.GetClientTrafficByEmail(email)
 	if err != nil {
 		logger.Warning(err)
-		msg := "❌ Something went wrong!"
+		msg := t.I18nBot("tgbot.wentWrong")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
 	if traffic == nil {
-		msg := "No result!"
+		msg := t.I18nBot("tgbot.noResult")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
+
 	expiryTime := ""
 	if traffic.ExpiryTime == 0 {
-		expiryTime = "♾Unlimited"
+		expiryTime = t.I18nBot("tgbot.unlimited")
 	} else if traffic.ExpiryTime < 0 {
-		expiryTime = fmt.Sprintf("%d days", traffic.ExpiryTime/-86400000)
+		expiryTime = fmt.Sprintf("%d %s", traffic.ExpiryTime/-86400000, t.I18nBot("tgbot.days"))
 	} else {
 		expiryTime = time.Unix((traffic.ExpiryTime / 1000), 0).Format("2006-01-02 15:04:05")
 	}
+
 	total := ""
 	if traffic.Total == 0 {
-		total = "♾Unlimited"
+		total = t.I18nBot("tgbot.unlimited")
 	} else {
 		total = common.FormatTraffic((traffic.Total))
 	}
-	output := fmt.Sprintf("💡 Active: %t\r\n📧 Email: %s\r\n🔼 Upload↑: %s\r\n🔽 Download↓: %s\r\n🔄 Total: %s / %s\r\n📅 Expire in: %s\r\n",
-		traffic.Enable, traffic.Email, common.FormatTraffic(traffic.Up), common.FormatTraffic(traffic.Down), common.FormatTraffic((traffic.Up + traffic.Down)),
-		total, expiryTime)
+
+	output := ""
+	output += t.I18nBot("tgbot.messages.active", "Enable=="+strconv.FormatBool(traffic.Enable))
+	output += t.I18nBot("tgbot.messages.email", "Email=="+traffic.Email)
+	output += t.I18nBot("tgbot.messages.upload", "Upload=="+common.FormatTraffic(traffic.Up))
+	output += t.I18nBot("tgbot.messages.download", "Download=="+common.FormatTraffic(traffic.Down))
+	output += t.I18nBot("tgbot.messages.total", "UpDown=="+common.FormatTraffic((traffic.Up+traffic.Down)), "Total=="+total)
+	output += t.I18nBot("tgbot.messages.expireIn", "Time=="+expiryTime)
+
 	t.SendMsgToTgbot(chatId, output)
 }
 
@@ -443,38 +502,55 @@ func (t *Tgbot) searchInbound(chatId int64, remark string) {
 	inbouds, err := t.inboundService.SearchInbounds(remark)
 	if err != nil {
 		logger.Warning(err)
-		msg := "❌ Something went wrong!"
+		msg := t.I18nBot("tgbot.wentWrong")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
+
+	if len(inbouds) == 0 {
+		msg := t.I18nBot("tgbot.noInbounds")
+		t.SendMsgToTgbot(chatId, msg)
+		return
+	}
+
 	for _, inbound := range inbouds {
 		info := ""
-		info += fmt.Sprintf("📍Inbound:%s\r\nPort:%d\r\n", inbound.Remark, inbound.Port)
-		info += fmt.Sprintf("Traffic: %s (↑%s,↓%s)\r\n", common.FormatTraffic((inbound.Up + inbound.Down)), common.FormatTraffic(inbound.Up), common.FormatTraffic(inbound.Down))
+		info += t.I18nBot("tgbot.messages.inbound", "Remark=="+inbound.Remark)
+		info += t.I18nBot("tgbot.messages.port", "Port=="+strconv.Itoa(inbound.Port))
+		info += t.I18nBot("tgbot.messages.traffic", "Total=="+common.FormatTraffic((inbound.Up+inbound.Down)), "Upload=="+common.FormatTraffic(inbound.Up), "Download=="+common.FormatTraffic(inbound.Down))
+
 		if inbound.ExpiryTime == 0 {
-			info += "Expire date: ♾ Unlimited\r\n \r\n"
+			info += t.I18nBot("tgbot.messages.expire", "DateTime=="+t.I18nBot("tgbot.unlimited"))
 		} else {
-			info += fmt.Sprintf("Expire date:%s\r\n \r\n", time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
+			info += t.I18nBot("tgbot.messages.expire", "DateTime=="+time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
 		}
 		t.SendMsgToTgbot(chatId, info)
+
 		for _, traffic := range inbound.ClientStats {
 			expiryTime := ""
 			if traffic.ExpiryTime == 0 {
-				expiryTime = "♾Unlimited"
+				expiryTime = t.I18nBot("tgbot.unlimited")
 			} else if traffic.ExpiryTime < 0 {
-				expiryTime = fmt.Sprintf("%d days", traffic.ExpiryTime/-86400000)
+				expiryTime = fmt.Sprintf("%d %s", traffic.ExpiryTime/-86400000, t.I18nBot("tgbot.days"))
 			} else {
 				expiryTime = time.Unix((traffic.ExpiryTime / 1000), 0).Format("2006-01-02 15:04:05")
 			}
+
 			total := ""
 			if traffic.Total == 0 {
-				total = "♾Unlimited"
+				total = t.I18nBot("tgbot.unlimited")
 			} else {
 				total = common.FormatTraffic((traffic.Total))
 			}
-			output := fmt.Sprintf("💡 Active: %t\r\n📧 Email: %s\r\n🔼 Upload↑: %s\r\n🔽 Download↓: %s\r\n🔄 Total: %s / %s\r\n📅 Expire in: %s\r\n",
-				traffic.Enable, traffic.Email, common.FormatTraffic(traffic.Up), common.FormatTraffic(traffic.Down), common.FormatTraffic((traffic.Up + traffic.Down)),
-				total, expiryTime)
+
+			output := ""
+			output += t.I18nBot("tgbot.messages.active", "Enable=="+strconv.FormatBool(traffic.Enable))
+			output += t.I18nBot("tgbot.messages.email", "Email=="+traffic.Email)
+			output += t.I18nBot("tgbot.messages.upload", "Upload=="+common.FormatTraffic(traffic.Up))
+			output += t.I18nBot("tgbot.messages.download", "Download=="+common.FormatTraffic(traffic.Down))
+			output += t.I18nBot("tgbot.messages.total", "UpDown=="+common.FormatTraffic((traffic.Up+traffic.Down)), "Total=="+total)
+			output += t.I18nBot("tgbot.messages.expireIn", "Time=="+expiryTime)
+
 			t.SendMsgToTgbot(chatId, output)
 		}
 	}
@@ -484,32 +560,40 @@ func (t *Tgbot) searchForClient(chatId int64, query string) {
 	traffic, err := t.inboundService.SearchClientTraffic(query)
 	if err != nil {
 		logger.Warning(err)
-		msg := "❌ Something went wrong!"
+		msg := t.I18nBot("tgbot.wentWrong")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
 	if traffic == nil {
-		msg := "No result!"
+		msg := t.I18nBot("tgbot.noResult")
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}
+
 	expiryTime := ""
 	if traffic.ExpiryTime == 0 {
-		expiryTime = "♾Unlimited"
+		expiryTime = t.I18nBot("tgbot.unlimited")
 	} else if traffic.ExpiryTime < 0 {
-		expiryTime = fmt.Sprintf("%d days", traffic.ExpiryTime/-86400000)
+		expiryTime = fmt.Sprintf("%d %s", traffic.ExpiryTime/-86400000, t.I18nBot("tgbot.days"))
 	} else {
 		expiryTime = time.Unix((traffic.ExpiryTime / 1000), 0).Format("2006-01-02 15:04:05")
 	}
+
 	total := ""
 	if traffic.Total == 0 {
-		total = "♾Unlimited"
+		total = t.I18nBot("tgbot.unlimited")
 	} else {
 		total = common.FormatTraffic((traffic.Total))
 	}
-	output := fmt.Sprintf("💡 Active: %t\r\n📧 Email: %s\r\n🔼 Upload↑: %s\r\n🔽 Download↓: %s\r\n🔄 Total: %s / %s\r\n📅 Expire in: %s\r\n",
-		traffic.Enable, traffic.Email, common.FormatTraffic(traffic.Up), common.FormatTraffic(traffic.Down), common.FormatTraffic((traffic.Up + traffic.Down)),
-		total, expiryTime)
+
+	output := ""
+	output += t.I18nBot("tgbot.messages.active", "Enable=="+strconv.FormatBool(traffic.Enable))
+	output += t.I18nBot("tgbot.messages.email", "Email=="+traffic.Email)
+	output += t.I18nBot("tgbot.messages.upload", "Upload=="+common.FormatTraffic(traffic.Up))
+	output += t.I18nBot("tgbot.messages.download", "Download=="+common.FormatTraffic(traffic.Down))
+	output += t.I18nBot("tgbot.messages.total", "UpDown=="+common.FormatTraffic((traffic.Up+traffic.Down)), "Total=="+total)
+	output += t.I18nBot("tgbot.messages.expireIn", "Time=="+expiryTime)
+
 	t.SendMsgToTgbot(chatId, output)
 }
 
@@ -521,7 +605,7 @@ func (t *Tgbot) getExhausted() string {
 	var exhaustedClients []xray.ClientTraffic
 	var disabledInbounds []model.Inbound
 	var disabledClients []xray.ClientTraffic
-	output := ""
+
 	TrafficThreshold, err := t.settingService.GetTrafficDiff()
 	if err == nil && TrafficThreshold > 0 {
 		trDiff = int64(TrafficThreshold) * 1073741824
@@ -534,6 +618,7 @@ func (t *Tgbot) getExhausted() string {
 	if err != nil {
 		logger.Warning("Unable to load Inbounds", err)
 	}
+
 	for _, inbound := range inbounds {
 		if inbound.Enable {
 			if (inbound.ExpiryTime > 0 && (inbound.ExpiryTime-now < exDiff)) ||
@@ -556,39 +641,63 @@ func (t *Tgbot) getExhausted() string {
 			disabledInbounds = append(disabledInbounds, *inbound)
 		}
 	}
-	output += fmt.Sprintf("Exhausted Inbounds count:\r\n🛑 Disabled: %d\r\n🔜 Deplete soon: %d\r\n \r\n", len(disabledInbounds), len(exhaustedInbounds))
+
+	// Inbounds
+	output := ""
+	output += t.I18nBot("tgbot.messages.exhaustedCount", "Type=="+t.I18nBot("tgbot.inbounds"))
+	output += t.I18nBot("tgbot.messages.disabled", "Disabled=="+strconv.Itoa(len(disabledInbounds)))
+	output += t.I18nBot("tgbot.messages.depleteSoon", "Deplete=="+strconv.Itoa(len(exhaustedInbounds)))
+	output += "\r\n \r\n"
+
 	if len(exhaustedInbounds) > 0 {
-		output += "Exhausted Inbounds:\r\n"
+		output += t.I18nBot("tgbot.messages.exhaustedMsg", "Type=="+t.I18nBot("tgbot.inbounds"))
+
 		for _, inbound := range exhaustedInbounds {
-			output += fmt.Sprintf("📍Inbound:%s\r\nPort:%d\r\nTraffic: %s (↑%s,↓%s)\r\n", inbound.Remark, inbound.Port, common.FormatTraffic((inbound.Up + inbound.Down)), common.FormatTraffic(inbound.Up), common.FormatTraffic(inbound.Down))
+			output += t.I18nBot("tgbot.messages.inbound", "Remark=="+inbound.Remark)
+			output += t.I18nBot("tgbot.messages.port", "Port=="+strconv.Itoa(inbound.Port))
+			output += t.I18nBot("tgbot.messages.traffic", "Total=="+common.FormatTraffic((inbound.Up+inbound.Down)), "Upload=="+common.FormatTraffic(inbound.Up), "Download=="+common.FormatTraffic(inbound.Down))
 			if inbound.ExpiryTime == 0 {
-				output += "Expire date: ♾Unlimited\r\n \r\n"
+				output += t.I18nBot("tgbot.messages.expire", "DateTime=="+t.I18nBot("tgbot.unlimited"))
 			} else {
-				output += fmt.Sprintf("Expire date:%s\r\n \r\n", time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
+				output += t.I18nBot("tgbot.messages.expire", "DateTime=="+time.Unix((inbound.ExpiryTime/1000), 0).Format("2006-01-02 15:04:05"))
 			}
+			output += "\r\n \r\n"
 		}
 	}
-	output += fmt.Sprintf("Exhausted Clients count:\r\n🛑 Exhausted: %d\r\n🔜 Deplete soon: %d\r\n \r\n", len(disabledClients), len(exhaustedClients))
+
+	// Clients
+	output += t.I18nBot("tgbot.messages.exhaustedCount", "Type=="+t.I18nBot("tgbot.clients"))
+	output += t.I18nBot("tgbot.messages.disabled", "Disabled=="+strconv.Itoa(len(disabledClients)))
+	output += t.I18nBot("tgbot.messages.depleteSoon", "Deplete=="+strconv.Itoa(len(exhaustedClients)))
+	output += "\r\n \r\n"
+
 	if len(exhaustedClients) > 0 {
-		output += "Exhausted Clients:\r\n"
+		output += t.I18nBot("tgbot.messages.exhaustedMsg", "Type=="+t.I18nBot("tgbot.clients"))
+
 		for _, traffic := range exhaustedClients {
 			expiryTime := ""
 			if traffic.ExpiryTime == 0 {
-				expiryTime = "♾Unlimited"
+				expiryTime = t.I18nBot("tgbot.unlimited")
 			} else if traffic.ExpiryTime < 0 {
-				expiryTime += fmt.Sprintf("%d days", traffic.ExpiryTime/-86400000)
+				expiryTime += fmt.Sprintf("%d %s", traffic.ExpiryTime/-86400000, t.I18nBot("tgbot.days"))
 			} else {
 				expiryTime = time.Unix((traffic.ExpiryTime / 1000), 0).Format("2006-01-02 15:04:05")
 			}
+
 			total := ""
 			if traffic.Total == 0 {
-				total = "♾Unlimited"
+				total = t.I18nBot("tgbot.unlimited")
 			} else {
 				total = common.FormatTraffic((traffic.Total))
 			}
-			output += fmt.Sprintf("💡 Active: %t\r\n📧 Email: %s\r\n🔼 Upload↑: %s\r\n🔽 Download↓: %s\r\n🔄 Total: %s / %s\r\n📅 Expire date: %s\r\n \r\n",
-				traffic.Enable, traffic.Email, common.FormatTraffic(traffic.Up), common.FormatTraffic(traffic.Down), common.FormatTraffic((traffic.Up + traffic.Down)),
-				total, expiryTime)
+
+			output += t.I18nBot("tgbot.messages.active", "Enable=="+strconv.FormatBool(traffic.Enable))
+			output += t.I18nBot("tgbot.messages.email", "Email=="+traffic.Email)
+			output += t.I18nBot("tgbot.messages.upload", "Upload=="+common.FormatTraffic(traffic.Up))
+			output += t.I18nBot("tgbot.messages.download", "Download=="+common.FormatTraffic(traffic.Down))
+			output += t.I18nBot("tgbot.messages.total", "UpDown=="+common.FormatTraffic((traffic.Up+traffic.Down)), "Total=="+total)
+			output += t.I18nBot("tgbot.messages.expireIn", "Time=="+expiryTime)
+			output += "\r\n \r\n"
 		}
 	}
 
@@ -596,14 +705,20 @@ func (t *Tgbot) getExhausted() string {
 }
 
 func (t *Tgbot) sendBackup(chatId int64) {
-	sendingTime := time.Now().Format("2006-01-02 15:04:05")
-	t.SendMsgToTgbot(chatId, "Backup time: "+sendingTime)
+	if !t.IsRunning() {
+		return
+	}
+
+	output := t.I18nBot("tgbot.messages.backupTime", "Time=="+time.Now().Format("2006-01-02 15:04:05"))
+	t.SendMsgToTgbot(chatId, output)
+
 	file := tgbotapi.FilePath(config.GetDBPath())
 	msg := tgbotapi.NewDocument(chatId, file)
 	_, err := bot.Send(msg)
 	if err != nil {
 		logger.Warning("Error in uploading backup: ", err)
 	}
+
 	file = tgbotapi.FilePath(xray.GetConfigPath())
 	msg = tgbotapi.NewDocument(chatId, file)
 	_, err = bot.Send(msg)
