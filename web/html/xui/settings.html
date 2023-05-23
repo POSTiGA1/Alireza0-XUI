@@ -454,8 +454,8 @@
                     if (this.allSetting.webCertFile !== "") {
                         protocol = "https://";
                     }
-                    const { host, pathname } = window.location;
-                    window.location.replace(protocol + host + this.allSetting.webBasePath + pathname.slice(1));
+                    const { host } = window.location;
+                    window.location.replace(protocol + host + this.allSetting.webBasePath + "xui/settings");
                 }
             },
             async resetXrayConfigToDefault() {
