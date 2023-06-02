@@ -19,6 +19,7 @@ import (
 	"x-ui/web/controller"
 	"x-ui/web/job"
 	"x-ui/web/locale"
+	"x-ui/web/middleware"
 	"x-ui/web/network"
 	"x-ui/web/service"
 
@@ -154,6 +155,15 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	}
 
 	engine := gin.Default()
+
+	webDomain, err := s.settingService.GetWebDomain()
+	if err != nil {
+		return nil, err
+	}
+
+	if webDomain != "" {
+		engine.Use(middleware.DomainValidatorMiddleware(webDomain))
+	}
 
 	secret, err := s.settingService.GetSecret()
 	if err != nil {

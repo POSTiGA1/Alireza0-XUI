@@ -23,7 +23,6 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese,Russia
 | Subscription link + userInfo         | :heavy_check_mark: |
 | Calculate expire date on first usage | :heavy_check_mark: |
 
-
 **If you think this project is helpful to you, you may wish to give a** :star2:
 
 **Buy Me a Coffee :**
@@ -31,10 +30,9 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese,Russia
 - Tron USDT (TRC20): `TYTq73Gj6dJ67qe58JVPD9zpjW2cc9XgVz`
 - Tezos (XTZ): tz2Wnh2SsY1eezXrcLChu6idWpgdHzUFQcts
 
-
 # Install & Upgrade to latest version
 
-```
+```sh
 bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.sh)
 ```
 
@@ -42,21 +40,23 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.s
 
 To install your desired version you can add the version to the end of install command. Example for ver `0.5.2`:
 
-```
+```sh
 bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.sh) 0.5.2
 ```
 
 ## Manual install & upgrade
 
-1. First download the latest compressed package from https://github.com/alireza0/x-ui/releases , generally choose Architecture `amd64`
+1. First download the latest compressed package from https://github.com/alireza0/x-ui/releases, generally choose Architecture `amd64`
 2. Then upload the compressed package to the server's `/root/` directory and `root` rootlog in to the server with user
 
 > If your server cpu architecture is not `amd64` replace another architecture
 
-```
+```sh
+ARCH=$(uname -m)
+[[ "${ARCH}" == "s390x" ]] && XUI_ARCH="s390x" || [[ "${ARCH}" == "aarch64" || "${ARCH}" == "arm64" ]] && XUI_ARCH="arm64" || XUI_ARCH="amd64"
 cd /root/
 rm x-ui/ /usr/local/x-ui/ /usr/bin/x-ui -rf
-tar zxvf x-ui-linux-amd64.tar.gz
+tar zxvf x-ui-linux-${XUI_ARCH}.tar.gz
 chmod +x x-ui/x-ui x-ui/bin/xray-linux-* x-ui/x-ui.sh
 cp x-ui/x-ui.sh /usr/bin/x-ui
 cp -f x-ui/x-ui.service /etc/systemd/system/
@@ -207,13 +207,14 @@ Reference syntax:
 - CPU threshold notification
 - Threshold for Expiration time and Traffic to report in advance
 - Support client report menu if client's telegram username added to the user's configurations
-- Support telegram traffic report searched with UID (VMESS/VLESS) or Password (TROJAN) - anonymously
+- Support telegram traffic report searched with UUID (VMESS/VLESS) or Password (TROJAN) - anonymously
 - Menu based bot
 - Search client by email ( only admin )
 - Check all inbounds
 - Check server status
 - Check depleted users
 - Receive backup by request and in periodic reports
+- Multi language bot
 </details>
 
 # Common problem
@@ -226,7 +227,7 @@ First install the latest version of x-ui on the server where v2-ui is installed,
 
 > Please `Close v2-ui` and `restart x-ui`, otherwise the inbound of v2-ui will cause a `port conflict with the inbound of x-ui`
 
-```
+```sh
 x-ui v2-ui
 ```
 

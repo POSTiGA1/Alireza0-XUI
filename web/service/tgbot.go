@@ -64,13 +64,15 @@ func (t *Tgbot) Start(i18nFS embed.FS) error {
 		return err
 	}
 
-	for _, adminId := range strings.Split(tgBotid, ",") {
-		id, err := strconv.Atoi(adminId)
-		if err != nil {
-			logger.Warning("Failed to get IDs from GetTgBotChatId:", err)
-			return err
+	if tgBotid != "" {
+		for _, adminId := range strings.Split(tgBotid, ",") {
+			id, err := strconv.Atoi(adminId)
+			if err != nil {
+				logger.Warning("Failed to get IDs from GetTgBotChatId:", err)
+				return err
+			}
+			adminIds = append(adminIds, int64(id))
 		}
-		adminIds = append(adminIds, int64(id))
 	}
 
 	bot, err = tgbotapi.NewBotAPI(tgBottoken)
@@ -134,9 +136,12 @@ func (t *Tgbot) OnReceive() {
 }
 
 func (t *Tgbot) answerCommand(message *tgbotapi.Message, chatId int64, isAdmin bool) {
-	msg := ""
+	msg, onlyMessage := "", false
+
+	command, commandArgs := message.Command(), message.CommandArguments()
+
 	// Extract the command from the Message.
-	switch message.Command() {
+	switch command {
 	case "help":
 		msg += t.I18nBot("tgbot.commands.help")
 		msg += t.I18nBot("tgbot.commands.pleaseChoose")
@@ -147,25 +152,36 @@ func (t *Tgbot) answerCommand(message *tgbotapi.Message, chatId int64, isAdmin b
 		}
 		msg += "\n\n" + t.I18nBot("tgbot.commands.pleaseChoose")
 	case "status":
+		onlyMessage = true
 		msg += t.I18nBot("tgbot.commands.status")
+	case "id":
+		onlyMessage = true
+		msg += t.I18nBot("tgbot.commands.getID", "ID=="+strconv.FormatInt(message.From.ID, 10))
 	case "usage":
-		if len(message.CommandArguments()) > 1 {
+		onlyMessage = true
+		if len(commandArgs) > 1 {
 			if isAdmin {
-				t.searchClient(chatId, message.CommandArguments())
+				t.searchClient(chatId, commandArgs)
 			} else {
-				t.searchForClient(chatId, message.CommandArguments())
+				t.searchForClient(chatId, commandArgs)
 			}
 		} else {
 			msg += t.I18nBot("tgbot.commands.usage")
 		}
 	case "inbound":
+		onlyMessage = true
 		if isAdmin {
-			t.searchInbound(chatId, message.CommandArguments())
+			t.searchInbound(chatId, commandArgs)
 		} else {
 			msg += t.I18nBot("tgbot.commands.unknown")
 		}
 	default:
 		msg += t.I18nBot("tgbot.commands.unknown")
+	}
+
+	if onlyMessage {
+		t.SendMsgToTgbot(chatId, msg)
+		return
 	}
 	t.SendAnswer(chatId, msg, isAdmin)
 }
@@ -239,6 +255,7 @@ func (t *Tgbot) SendMsgToTgbot(tgid int64, msg string, replyMarkup ...tgbotapi.I
 	if !isRunning {
 		return
 	}
+
 	if msg == "" {
 		logger.Info("[tgbot] message is empty!")
 		return

@@ -160,7 +160,7 @@
 "email" = "Email"
 "emailDesc" = "Please provide a unique email address."
 "setDefaultCert" = "Set cert from panel"
-"telegramDesc" = "use Telegram ID without @ or chat IDs ( you can get it here @userinfobot )"
+"telegramDesc" = "use Telegram ID without @ or chat IDs ( you can get it here @userinfobot or use '/id' command in bot )"
 "subscriptionDesc" = "you can find your sub link on Details, also you can use the same name for several configurations"
 
 [pages.client]
@@ -212,6 +212,8 @@
 "TGBotSettings" = "Telegram Bot Settings"
 "panelListeningIP" = "Panel Listening IP"
 "panelListeningIPDesc" = "Leave blank by default to monitor all IPs."
+"panelListeningDomain" = "Panel Listening Domain"
+"panelListeningDomainDesc" = "Leave blank by default to monitor all domains and IPs"
 "panelPort" = "Panel Port"
 "panelPortDesc" = "Port number for serving the panel."
 "publicKeyPath" = "Panel Certificate Public Key File Path"
@@ -229,7 +231,7 @@
 "telegramToken" = "Telegram Token"
 "telegramTokenDesc" = "The Token you have got from @BotFather"
 "telegramChatId" = "Telegram Admin ChatIDs"
-"telegramChatIdDesc" = "Multi chatIDs separated by comma."
+"telegramChatIdDesc" = "Multiple Chat IDs separated by comma. use @userinfobot or use '/id' command in bot to get your Chat IDs."
 "telegramNotifyTime" = "Telegram bot notification time"
 "telegramNotifyTimeDesc" = "Use Crontab timing format."
 "tgNotifyBackup" = "Database Backup"
@@ -360,6 +362,7 @@
 "welcome" = "🤖 Welcome to <b>{{ .Hostname }}</b> management bot.\r\n"
 "status" = "✅ Bot is ok!"
 "usage" = "❗ Please provide a text to search!"
+"getID" = "🆔 Your ID: <code>{{ .ID }}</code>"
 "helpAdminCommands" = "Search for a client email:\r\n<code>/usage [Email]</code>\r\n \r\nSearch for inbounds (with client stats):\r\n<code>/inbound [Remark]</code>"
 "helpClientCommands" = "To search for statistics, just use folowing command:\r\n \r\n<code>/usage [UUID|Password]</code>\r\n \r\nUse UUID for vmess/vless and Password for Trojan."
 

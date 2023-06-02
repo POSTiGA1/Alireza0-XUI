@@ -63,6 +63,7 @@ func (a *InboundController) getInbounds(c *gin.Context) {
 	}
 	jsonObj(c, inbounds, nil)
 }
+
 func (a *InboundController) getInbound(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
