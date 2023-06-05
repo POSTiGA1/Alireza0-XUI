@@ -119,7 +119,7 @@ Date.prototype.formatTime = function () {
 };
 
 /**
- * 格式化日期加时间
+ * Formatting date plus time
  *
  * @param split Division between date and time, the default is a space
  */

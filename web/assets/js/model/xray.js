@@ -592,7 +592,7 @@ class RealityStreamSettings extends XrayCommonClass {
         dest = 'microsoft.com:443',
         serverNames = 'microsoft.com,www.microsoft.com',
         privateKey = '', minClient = '', maxClient = '',
-        maxTimediff = 0, shortIds = [],
+        maxTimediff = 0, shortIds = RandomUtil.randomShortId(),
         settings= new RealityStreamSettings.Settings()) {
         super();
         this.show = show;

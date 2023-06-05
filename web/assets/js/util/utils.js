@@ -149,6 +149,17 @@ class RandomUtil {
         window.crypto.getRandomValues(array);
         return btoa(String.fromCharCode.apply(null, array));
     }
+
+    static randomShortId() {
+        let shortIds = ['','','',''];
+        for (var ii = 0; ii < 4; ii++) {
+            for (var jj = 0; jj < this.randomInt(8); jj++){
+                let randomNum = this.randomInt(256);
+                shortIds[ii] += ('0' + randomNum.toString(16)).slice(-2)
+            }
+        }
+        return shortIds;
+    }
 }
 
 class ObjectUtil {
