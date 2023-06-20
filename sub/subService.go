@@ -236,7 +236,6 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 		}
 	}
 	obj["id"] = clients[clientIndex].ID
-	obj["aid"] = clients[clientIndex].AlterIds
 
 	if len(domains) > 0 {
 		links := ""
@@ -558,10 +557,6 @@ func (s *SubService) genTrojanLink(inbound *model.Inbound, email string) string 
 					address = sname
 				}
 			}
-		}
-
-		if streamNetwork == "tcp" && len(clients[clientIndex].Flow) > 0 {
-			params["flow"] = clients[clientIndex].Flow
 		}
 	}
 

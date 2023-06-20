@@ -83,6 +83,7 @@ const SNIFFING_OPTION = {
     HTTP:    "http",
     TLS:     "tls",
     QUIC:    "quic",
+    FAKEDNS: "fakedns"
 };
 
 Object.freeze(Protocols);
@@ -754,7 +755,7 @@ class StreamSettings extends XrayCommonClass {
 }
 
 class Sniffing extends XrayCommonClass {
-    constructor(enabled=true, destOverride=['http', 'tls', 'quic']) {
+    constructor(enabled=true, destOverride=['http', 'tls', 'quic', 'fakedns']) {
         super();
         this.enabled = enabled;
         this.destOverride = destOverride;
@@ -764,7 +765,7 @@ class Sniffing extends XrayCommonClass {
         let destOverride = ObjectUtil.clone(json.destOverride);
         if (!ObjectUtil.isEmpty(destOverride) && !ObjectUtil.isArrEmpty(destOverride)) {
             if (ObjectUtil.isEmpty(destOverride[0])) {
-                destOverride = ['http', 'tls', 'quic'];
+                destOverride = ['http', 'tls', 'quic', 'fakedns'];
             }
         }
         return new Sniffing(
@@ -1054,7 +1055,6 @@ class Inbound extends XrayCommonClass {
             add: address,
             port: this.port,
             id: this.settings.vmesses[clientIndex].id,
-            aid: this.settings.vmesses[clientIndex].alterId,
             net: this.stream.network,
             type: 'none',
             tls: this.stream.security,
@@ -1369,9 +1369,6 @@ class Inbound extends XrayCommonClass {
             if (!ObjectUtil.isEmpty(this.stream.reality.settings.spiderX)) {
                 params.set("spx", this.stream.reality.settings.spiderX);
             }
-            if (this.stream.network === 'tcp' && !ObjectUtil.isEmpty(this.settings.trojans[clientIndex].flow)) {
-                params.set("flow", this.settings.trojans[clientIndex].flow);
-            }
         }
 
         const link = `trojan://${settings.trojans[clientIndex].password}@${address}:${this.port}`;
@@ -1529,10 +1526,9 @@ Inbound.VmessSettings = class extends Inbound.Settings {
     }
 };
 Inbound.VmessSettings.Vmess = class extends XrayCommonClass {
-    constructor(id=RandomUtil.randomUUID(), alterId=0, email=RandomUtil.randomText(), totalGB=0, expiryTime=0, enable=true, tgId='', subId=RandomUtil.randomText(16,16)) {
+    constructor(id=RandomUtil.randomUUID(), email=RandomUtil.randomText(), totalGB=0, expiryTime=0, enable=true, tgId='', subId=RandomUtil.randomText(16,16)) {
         super();
         this.id = id;
-        this.alterId = alterId;
         this.email = email;
         this.totalGB = totalGB;
         this.expiryTime = expiryTime;
@@ -1544,7 +1540,6 @@ Inbound.VmessSettings.Vmess = class extends XrayCommonClass {
     static fromJson(json={}) {
         return new Inbound.VmessSettings.Vmess(
             json.id,
-            json.alterId,
             json.email,
             json.totalGB,
             json.expiryTime,
@@ -1740,10 +1735,9 @@ Inbound.TrojanSettings = class extends Inbound.Settings {
     }
 };
 Inbound.TrojanSettings.Trojan = class extends XrayCommonClass {
-    constructor(password=RandomUtil.randomSeq(10), flow='', email=RandomUtil.randomText(), totalGB=0, expiryTime=0, enable=true, tgId='', subId=RandomUtil.randomText(16,16)) {
+    constructor(password=RandomUtil.randomSeq(10), email=RandomUtil.randomText(), totalGB=0, expiryTime=0, enable=true, tgId='', subId=RandomUtil.randomText(16,16)) {
         super();
         this.password = password;
-        this.flow = flow;
         this.email = email;
         this.totalGB = totalGB;
         this.expiryTime = expiryTime;
@@ -1755,7 +1749,6 @@ Inbound.TrojanSettings.Trojan = class extends XrayCommonClass {
     toJson() {
         return {
             password: this.password,
-            flow: this.flow,
             email: this.email,
             totalGB: this.totalGB,
             expiryTime: this.expiryTime,
@@ -1768,7 +1761,6 @@ Inbound.TrojanSettings.Trojan = class extends XrayCommonClass {
     static fromJson(json = {}) {
         return new Inbound.TrojanSettings.Trojan(
             json.password,
-            json.flow,
             json.email,
             json.totalGB,
             json.expiryTime,

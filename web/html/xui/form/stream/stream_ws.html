@@ -1,7 +1,7 @@
 {{define "form/streamWS"}}
 <a-form layout="inline">
     <table width="100%" class="ant-table-tbody">
-        <tr>
+        <tr v-if="inbound.canEnableTls()">
             <td>Accept Proxy Protocol</td>
             <td>
                 <a-form-item>
