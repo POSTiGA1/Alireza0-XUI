@@ -12,7 +12,6 @@
 "protocol" = "Protocol"
 "search" = "Search"
 "filter" = "Filter"
-
 "loading" = "Loading"
 "second" = "Second"
 "minute" = "Minute"
@@ -48,6 +47,7 @@
 "install" = "Install"
 "clients" = "Clients"
 "usage" = "Usage"
+"remained" = "Remained"
 
 [menu]
 "dashboard" = "System Status"

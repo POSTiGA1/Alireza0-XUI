@@ -12,7 +12,6 @@
 "protocol" = "پروتکل"
 "search" = "جستجو"
 "filter" = "فیلتر"
-
 "loading" = "در حال بروزرسانی.."
 "second" = "ثانیه"
 "minute" = "دقیقه"
@@ -48,6 +47,7 @@
 "install" = "نصب"
 "clients" = "کاربران"
 "usage" = "استفاده"
+"remained" = "باقیمانده"
 
 [menu]
 "dashboard" = "وضعیت سیستم"

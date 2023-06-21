@@ -12,7 +12,6 @@
 "protocol" = "协议"
 "search" = "搜尋"
 "filter" = "过滤器"
-
 "loading" = "加载中"
 "second" = "秒"
 "minute" = "分钟"
@@ -48,6 +47,7 @@
 "install" = "安装"
 "clients" = "客户端"
 "usage" = "用法"
+"remained" = "仍然存在"
 
 [menu]
 "dashboard" = "系统状态"

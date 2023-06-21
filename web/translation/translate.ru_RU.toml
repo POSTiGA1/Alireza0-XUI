@@ -12,7 +12,6 @@
 "protocol" = "протокол"
 "search" = "поиск"
 "filter" = "Фильтр"
-
 "loading" = "загрузка"
 "second" = "секунда"
 "minute" = "минута"
@@ -48,6 +47,7 @@
 "install" = "установка"
 "clients" = "клиенты"
 "usage" = "использование"
+"remained" = "остались"
 
 [menu]
 "dashboard" = "статус системы"
