@@ -45,7 +45,7 @@
         <a-tag :color="statsColor(record, client.email)">
             [[ sizeFormat(getUpStats(record, client.email) + getDownStats(record, client.email)) ]] /
             <template v-if="client.totalGB > 0">[[client._totalGB]]GB</template>
-            <template v-else>♾</template>
+            <template v-else>&infin;</template>
         </a-tag>
     </a-popover>
 </template>                                    
