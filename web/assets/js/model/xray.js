@@ -16,16 +16,12 @@ const VmessMethods = {
 };
 
 const SSMethods = {
-    // AES_256_CFB: 'aes-256-cfb',
-    // AES_128_CFB: 'aes-128-cfb',
-    // CHACHA20: 'chacha20',
-    // CHACHA20_IETF: 'chacha20-ietf',
-    // CHACHA20_POLY1305: 'chacha20-poly1305',
-    // AES_256_GCM: 'aes-256-gcm',
-    // AES_128_GCM: 'aes-128-gcm',
+    CHACHA20_POLY1305: 'chacha20-poly1305',
+    AES_256_GCM: 'aes-256-gcm',
+    AES_128_GCM: 'aes-128-gcm',
     BLAKE3_AES_128_GCM: '2022-blake3-aes-128-gcm',
     BLAKE3_AES_256_GCM: '2022-blake3-aes-256-gcm',
-    // BLAKE3_CHACHA20_POLY1305: '2022-blake3-chacha20-poly1305',
+    BLAKE3_CHACHA20_POLY1305: '2022-blake3-chacha20-poly1305',
 };
 
 const TLS_FLOW_CONTROL = {
@@ -876,6 +872,9 @@ class Inbound extends XrayCommonClass {
                 return "";
         }
     }
+    get isSSMultiUser() {
+        return [SSMethods.BLAKE3_AES_128_GCM,SSMethods.BLAKE3_AES_256_GCM].includes(this.method);
+    }
 
     get serverName() {
         if (this.stream.isTls || this.stream.isReality) {
@@ -945,7 +944,7 @@ class Inbound extends XrayCommonClass {
                     return this.settings.trojans[index].expiryTime < new Date().getTime();
                 return false
             case Protocols.SHADOWSOCKS:
-                if(this.settings.shadowsockses[index].expiryTime > 0)
+                if(this.settings.shadowsockses.length > 0 && this.settings.shadowsockses[index].expiryTime > 0)
                     return this.settings.shadowsockses[index].expiryTime < new Date().getTime();
                 return false
             default:
@@ -1275,7 +1274,9 @@ class Inbound extends XrayCommonClass {
                 break;
         }
 
-        let link = `ss://${safeBase64(settings.method + ':' + settings.password + ':' +settings.shadowsockses[clientIndex].password)}@${address}:${this.port}`;
+        let clientPassword = this.isSSMultiUser ? ':' + settings.shadowsockses[clientIndex].password : '';
+
+        let link = `ss://${safeBase64(settings.method + ':' + settings.password + clientPassword)}@${address}:${this.port}`;
         const url = new URL(link);
         for (const [key, value] of params) {
             url.searchParams.set(key, value)
