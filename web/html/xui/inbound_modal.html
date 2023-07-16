@@ -99,6 +99,11 @@
                 if (!inModal.inbound.canEnableReality()) {
                     this.inModal.inbound.reality = false;
                 }
+                if (this.inModal.inbound.protocol == Protocols.VLESS && !inModal.inbound.canEnableTlsFlow()) {
+                    this.inModal.inbound.settings.vlesses.forEach(client => {
+                        client.flow = "";
+                    });
+                }
             },
             SSMethodChange() {
                 if (this.inModal.inbound.isSSMultiUser) {

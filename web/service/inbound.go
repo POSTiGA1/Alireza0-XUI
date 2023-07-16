@@ -134,26 +134,26 @@ func (s *InboundService) checkEmailExistForInbound(inbound *model.Inbound) (stri
 	return "", nil
 }
 
-func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, error) {
+func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, bool, error) {
 	exist, err := s.checkPortExist(inbound.Port, 0)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
 	if exist {
-		return inbound, common.NewError("Port already exists:", inbound.Port)
+		return inbound, false, common.NewError("Port already exists:", inbound.Port)
 	}
 
 	existEmail, err := s.checkEmailExistForInbound(inbound)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
 	if existEmail != "" {
-		return inbound, common.NewError("Duplicate email:", existEmail)
+		return inbound, false, common.NewError("Duplicate email:", existEmail)
 	}
 
 	clients, err := s.GetClients(inbound)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
 
 	db := database.GetDB()
@@ -172,7 +172,26 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, err
 			s.AddClientStat(tx, inbound.Id, &client)
 		}
 	}
-	return inbound, err
+
+	needRestart := false
+	if inbound.Enable {
+		s.xrayApi.Init(p.GetAPIPort())
+		inboundJson, err1 := json.MarshalIndent(inbound.GenXrayInboundConfig(), "", "  ")
+		if err1 != nil {
+			logger.Debug("Unable to marshal inbound config:", err1)
+		}
+
+		err1 = s.xrayApi.AddInbound(inboundJson)
+		if err1 == nil {
+			logger.Debug("New inbound added by api:", inbound.Tag)
+		} else {
+			logger.Debug("Unable to add inbound by api:", err1)
+			needRestart = true
+		}
+		s.xrayApi.Close()
+	}
+
+	return inbound, needRestart, err
 }
 
 func (s *InboundService) AddInbounds(inbounds []*model.Inbound) error {
@@ -207,13 +226,33 @@ func (s *InboundService) AddInbounds(inbounds []*model.Inbound) error {
 	return nil
 }
 
-func (s *InboundService) DelInbound(id int) error {
+func (s *InboundService) DelInbound(id int) (bool, error) {
 	db := database.GetDB()
+
+	var tag string
+	needRestart := false
+	result := db.Model(model.Inbound{}).Select("tag").Where("id = ? and enable = ?", id, true).First(&tag)
+	if result.Error == nil {
+		s.xrayApi.Init(p.GetAPIPort())
+		err1 := s.xrayApi.DelInbound(tag)
+		if err1 == nil {
+			logger.Debug("Inbound deleted by api:", tag)
+		} else {
+			logger.Debug("Unable to delete inbound by api:", err1)
+			needRestart = true
+		}
+		s.xrayApi.Close()
+	} else {
+		logger.Debug("No enabled inbound founded to removing by api", tag)
+	}
+
+	// Delete client traffics of inbounds
 	err := db.Where("inbound_id = ?", id).Delete(xray.ClientTraffic{}).Error
 	if err != nil {
-		return err
+		return false, err
 	}
-	return db.Delete(model.Inbound{}, id).Error
+
+	return needRestart, db.Delete(model.Inbound{}, id).Error
 }
 
 func (s *InboundService) GetInbound(id int) (*model.Inbound, error) {
@@ -226,23 +265,25 @@ func (s *InboundService) GetInbound(id int) (*model.Inbound, error) {
 	return inbound, nil
 }
 
-func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, error) {
+func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, bool, error) {
 	exist, err := s.checkPortExist(inbound.Port, inbound.Id)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
 	if exist {
-		return inbound, common.NewError("Port already exists:", inbound.Port)
+		return inbound, false, common.NewError("Port already exists:", inbound.Port)
 	}
 
 	oldInbound, err := s.GetInbound(inbound.Id)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
+
+	tag := oldInbound.Tag
 
 	err = s.updateClientTraffics(oldInbound, inbound)
 	if err != nil {
-		return inbound, err
+		return inbound, false, err
 	}
 
 	oldInbound.Up = inbound.Up
@@ -259,8 +300,34 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, 
 	oldInbound.Sniffing = inbound.Sniffing
 	oldInbound.Tag = fmt.Sprintf("inbound-%v", inbound.Port)
 
+	needRestart := false
+	s.xrayApi.Init(p.GetAPIPort())
+	err1 := s.xrayApi.DelInbound(tag)
+	if err1 != nil {
+		logger.Debug("Unable to delete old inbound by api:", err1)
+		needRestart = true
+	} else {
+		logger.Debug("Old inbound deleted by api:", tag)
+
+		if inbound.Enable {
+			inboundJson, err2 := json.MarshalIndent(oldInbound.GenXrayInboundConfig(), "", "  ")
+			if err2 != nil {
+				logger.Debug("Unable to marshal updated inbound config:", err2)
+			}
+
+			err2 = s.xrayApi.AddInbound(inboundJson)
+			if err1 == nil {
+				logger.Debug("Updated inbound added by api:", oldInbound.Tag)
+			} else {
+				logger.Debug("Unable to update inbound by api:", err2)
+				needRestart = true
+			}
+		}
+	}
+	s.xrayApi.Close()
+
 	db := database.GetDB()
-	return inbound, db.Save(oldInbound).Error
+	return inbound, needRestart, db.Save(oldInbound).Error
 }
 
 func (s *InboundService) updateClientTraffics(oldInbound *model.Inbound, newInbound *model.Inbound) error {
@@ -379,16 +446,18 @@ func (s *InboundService) AddInboundClient(data *model.Inbound) (bool, error) {
 	for _, client := range clients {
 		if len(client.Email) > 0 {
 			s.AddClientStat(tx, data.Id, &client)
-			err1 := s.xrayApi.AddUser(string(oldInbound.Protocol), oldInbound.Tag, map[string]interface{}{
-				"email":    client.Email,
-				"id":       client.ID,
-				"flow":     client.Flow,
-				"password": client.Password,
-			})
-			if err1 == nil {
-				logger.Debug("Client added by api:", client.Email)
-			} else {
-				needRestart = true
+			if client.Enable {
+				err1 := s.xrayApi.AddUser(string(oldInbound.Protocol), oldInbound.Tag, map[string]interface{}{
+					"email":    client.Email,
+					"id":       client.ID,
+					"flow":     client.Flow,
+					"password": client.Password,
+				})
+				if err1 == nil {
+					logger.Debug("Client added by api:", client.Email)
+				} else {
+					needRestart = true
+				}
 			}
 		} else {
 			needRestart = true
@@ -446,7 +515,7 @@ func (s *InboundService) DelInboundClient(inboundId int, clientId string) (bool,
 		logger.Error("Delete stats Data Error")
 		return false, err
 	}
-	needRestart := true
+	needRestart := false
 	s.xrayApi.Init(p.GetAPIPort())
 	if len(email) > 0 {
 		err = s.xrayApi.RemoveUser(oldInbound.Tag, email)
@@ -552,7 +621,7 @@ func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId strin
 			return false, err
 		}
 	}
-	needRestart := true
+	needRestart := false
 	s.xrayApi.Init(p.GetAPIPort())
 	if len(oldEmail) > 0 {
 		s.xrayApi.RemoveUser(oldInbound.Tag, oldEmail)
@@ -701,15 +770,38 @@ func (s *InboundService) adjustTraffics(tx *gorm.DB, dbClientTraffics []*xray.Cl
 	return dbClientTraffics, nil
 }
 
-func (s *InboundService) DisableInvalidInbounds() (int64, error) {
+func (s *InboundService) DisableInvalidInbounds() (bool, int64, error) {
 	db := database.GetDB()
 	now := time.Now().Unix() * 1000
+	needRestart := false
+
+	if p != nil {
+		var tags []string
+		err := db.Table("inbounds").
+			Select("inbounds.tag").
+			Where("((total > 0 and up + down >= total) or (expiry_time > 0 and expiry_time <= ?)) and enable = ?", now, true).
+			Scan(&tags).Error
+		if err != nil {
+			return false, 0, err
+		}
+		s.xrayApi.Init(p.GetAPIPort())
+		for _, tag := range tags {
+			err = s.xrayApi.DelInbound(tag)
+			if err == nil {
+				logger.Debug("Inbound disabled by api:", tag)
+			} else {
+				needRestart = true
+			}
+		}
+		s.xrayApi.Close()
+	}
+
 	result := db.Model(model.Inbound{}).
 		Where("((total > 0 and up + down >= total) or (expiry_time > 0 and expiry_time <= ?)) and enable = ?", now, true).
 		Update("enable", false)
 	err := result.Error
 	count := result.RowsAffected
-	return count, err
+	return needRestart, count, err
 }
 
 func (s *InboundService) DisableInvalidClients() (bool, int64, error) {
@@ -735,7 +827,7 @@ func (s *InboundService) DisableInvalidClients() (bool, int64, error) {
 		for _, result := range results {
 			err = s.xrayApi.RemoveUser(result.Tag, result.Email)
 			if err == nil {
-				logger.Debug("Client deleted by api:", result.Email)
+				logger.Debug("Client disabled by api:", result.Email)
 			} else {
 				needRestart = true
 			}

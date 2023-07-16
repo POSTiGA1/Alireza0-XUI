@@ -624,7 +624,7 @@
                     port: RandomUtil.randomIntRange(10000, 60000),
                     protocol: baseInbound.protocol,
                     settings: Inbound.Settings.getSettings(baseInbound.protocol).toString(),
-                    streamSettings: baseInbound.stream.toString(),
+		    streamSettings: baseInbound.stream.toString(),
                     sniffing: baseInbound.canSniffing() ? baseInbound.sniffing.toString() : '{}',
                 };
                 await this.submit('/xui/inbound/add', data, inModal);

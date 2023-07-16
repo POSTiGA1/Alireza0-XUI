@@ -96,11 +96,12 @@ func (a *InboundController) addInbound(c *gin.Context) {
 	}
 	user := session.GetLoginUser(c)
 	inbound.UserId = user.Id
-	inbound.Enable = true
 	inbound.Tag = fmt.Sprintf("inbound-%v", inbound.Port)
-	inbound, err = a.inboundService.AddInbound(inbound)
+
+	needRestart := false
+	inbound, needRestart, err = a.inboundService.AddInbound(inbound)
 	jsonMsgObj(c, I18nWeb(c, "pages.inbounds.create"), inbound, err)
-	if err == nil {
+	if err == nil && needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -111,9 +112,10 @@ func (a *InboundController) delInbound(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "delete"), err)
 		return
 	}
-	err = a.inboundService.DelInbound(id)
+	needRestart := true
+	needRestart, err = a.inboundService.DelInbound(id)
 	jsonMsgObj(c, I18nWeb(c, "delete"), id, err)
-	if err == nil {
+	if err == nil && needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -132,9 +134,10 @@ func (a *InboundController) updateInbound(c *gin.Context) {
 		jsonMsg(c, I18nWeb(c, "pages.inbounds.update"), err)
 		return
 	}
-	inbound, err = a.inboundService.UpdateInbound(inbound)
+	needRestart := true
+	inbound, needRestart, err = a.inboundService.UpdateInbound(inbound)
 	jsonMsgObj(c, I18nWeb(c, "pages.inbounds.update"), inbound, err)
-	if err == nil {
+	if err == nil && needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -147,7 +150,7 @@ func (a *InboundController) addInboundClient(c *gin.Context) {
 		return
 	}
 
-	needRestart := false
+	needRestart := true
 
 	needRestart, err = a.inboundService.AddInboundClient(data)
 	if err != nil {
@@ -168,7 +171,7 @@ func (a *InboundController) delInboundClient(c *gin.Context) {
 	}
 	clientId := c.Param("clientId")
 
-	needRestart := false
+	needRestart := true
 
 	needRestart, err = a.inboundService.DelInboundClient(id, clientId)
 	if err != nil {
@@ -191,7 +194,7 @@ func (a *InboundController) updateInboundClient(c *gin.Context) {
 		return
 	}
 
-	needRestart := false
+	needRestart := true
 
 	needRestart, err = a.inboundService.UpdateInboundClient(inbound, clientId)
 	if err != nil {
@@ -212,7 +215,7 @@ func (a *InboundController) resetClientTraffic(c *gin.Context) {
 	}
 	email := c.Param("email")
 
-	needRestart := false
+	needRestart := true
 
 	needRestart, err = a.inboundService.ResetClientTraffic(id, email)
 	if err != nil {
