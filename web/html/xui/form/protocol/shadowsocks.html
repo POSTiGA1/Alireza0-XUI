@@ -125,7 +125,7 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr>
+        <tr v-if="inbound.isSS2022">
             <td>{{ i18n "password" }}
                 <a-icon @click="inbound.settings.password = RandomUtil.randomShadowsocksPassword()" type="sync"> </a-icon>
             </td>

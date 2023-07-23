@@ -228,19 +228,6 @@
                                                 <setting-list-item type="switch" title='{{ i18n "pages.settings.templates.xrayConfigGoogleIPv4"}}' desc='{{ i18n "pages.settings.templates.xrayConfigGoogleIPv4Desc"}}' v-model="GoogleIPv4Settings"></setting-list-item>
                                                 <setting-list-item type="switch" title='{{ i18n "pages.settings.templates.xrayConfigNetflixIPv4"}}' desc='{{ i18n "pages.settings.templates.xrayConfigNetflixIPv4Desc"}}' v-model="NetflixIPv4Settings"></setting-list-item>
                                             </a-collapse-panel>
-                                            <a-collapse-panel header='{{ i18n "pages.settings.templates.manualLists"}}'>
-                                                <a-row :xs="24" :sm="24" :lg="12">
-                                                    <h2 class="collapse-title">
-                                                        <a-icon type="warning"></a-icon>
-                                                        {{ i18n "pages.settings.templates.manualListsDesc" }}
-                                                    </h2>
-                                                </a-row>
-                                                <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualBlockedIPs"}}' v-model="manualBlockedIPs"></setting-list-item>
-                                                <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualBlockedDomains"}}' v-model="manualBlockedDomains"></setting-list-item>
-                                                <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualDirectIPs"}}' v-model="manualDirectIPs"></setting-list-item>
-                                                <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualDirectDomains"}}' v-model="manualDirectDomains"></setting-list-item>
-                                                <setting-list-item type="textarea" title='{{ i18n "pages.settings.templates.manualIPv4Domains"}}' v-model="manualIPv4Domains"></setting-list-item>
-                                            </a-collapse-panel>
                                             <a-collapse-panel header='{{ i18n "pages.settings.resetDefaultConfig"}}'>
                                                 <a-space direction="horizontal" style="padding: 0 20px">
                                                     <a-button type="primary" @click="resetXrayConfigToDefault">{{ i18n "pages.settings.resetDefaultConfig" }}</a-button>
