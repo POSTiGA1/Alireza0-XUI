@@ -48,6 +48,8 @@
 "clients" = "客户端"
 "usage" = "用法"
 "remained" = "仍然存在"
+"secAlertTitle" = "安全警报"
+"secAlertSsl" = "此连接不安全；在激活 TLS 进行数据保护之前，请勿输入敏感信息"
 
 [menu]
 "dashboard" = "系统状态"

@@ -48,6 +48,8 @@
 "clients" = "Clients"
 "usage" = "Usage"
 "remained" = "Remained"
+"secAlertTitle" = "Security Alert"
+"secAlertSsl" = "This connection is not secure; Please refrain from entering sensitive information until TLS is activated for data protection"
 
 [menu]
 "dashboard" = "System Status"

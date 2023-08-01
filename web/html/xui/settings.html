@@ -52,6 +52,15 @@
     <a-layout id="content-layout" :style="themeSwitcher.bgStyle">
         <a-layout-content>
             <a-spin :spinning="spinning" :delay="500" tip="loading">
+                <transition name="list" appear>
+                    <a-alert type="error" v-if="showAlert" style="margin-bottom: 10px"
+                    message='{{ i18n "secAlertTitle" }}'
+                    color="red"
+                    description='{{ i18n "secAlertSsl" }}'
+                    show-icon closable
+                    >
+                    </a-alert>
+                </transition>
                 <a-space direction="vertical">
                     <a-space direction="horizontal">
                         <a-button type="primary" :disabled="saveBtnDisable" @click="updateAllSetting">{{ i18n "pages.settings.save" }}</a-button>
@@ -362,6 +371,7 @@
             saveBtnDisable: true,
             user: {},
             lang: getLang(),
+            showAlert: false,
             ipv4Settings: {
                 tag: "IPv4",
                 protocol: "freedom",
@@ -550,6 +560,9 @@
             }
         },
         async mounted() {
+            if (window.location.protocol !== "https:") {
+                this.showAlert = true;
+            }
             await this.getAllSetting();
             while (true) {
                 await PromiseUtil.sleep(1000);

@@ -23,6 +23,15 @@
         <a-layout-content>
             <a-spin :spinning="spinning" :delay="200" :tip="loadingTip"/>
             <transition name="list" appear>
+                <a-alert type="error" v-if="showAlert" style="margin-bottom: 10px"
+                message='{{ i18n "secAlertTitle" }}'
+                color="red"
+                description='{{ i18n "secAlertSsl" }}'
+                show-icon closable
+                >
+                </a-alert>
+            </transition>
+            <transition name="list" appear>
                 <a-row>
                     <a-card hoverable :class="themeSwitcher.darkCardClass">
                         <a-row>
@@ -409,6 +418,7 @@
             backupModal,
             spinning: false,
             loadingTip: '{{ i18n "loading"}}',
+            showAlert: false,
         },
         methods: {
             loading(spinning, tip = '{{ i18n "loading"}}') {
@@ -527,6 +537,9 @@
             },
         },
         async mounted() {
+            if (window.location.protocol !== "https:") {
+                this.showAlert = true;
+            }
             while (true) {
                 try {
                     await this.getStatus();
