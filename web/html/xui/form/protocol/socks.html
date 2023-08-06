@@ -10,24 +10,25 @@
                 </a-form-item>
             </td>
         </tr>
-    <template v-if="inbound.settings.auth === 'password'">
-        <tr>
-            <td>{{ i18n "username" }}</td>
-            <td>
+        <tr v-if="inbound.settings.auth === 'password'">
+            <td colspan="2">
                 <a-form-item>
-                    <a-input v-model.trim="inbound.settings.accounts[0].user"></a-input>
+                    <a-row>
+                        <a-button size="small" @click="inbound.settings.addAccount(new Inbound.SocksSettings.SocksAccount())">+</a-button>
+                    </a-row>
+                    <a-input-group v-for="(account, index) in inbound.settings.accounts">
+                        <a-input style="width: 45%" v-model.trim="account.user"
+                            addon-before='{{ i18n "username" }}'></a-input>
+                        <a-input style="width: 55%" v-model.trim="account.pass"
+                            addon-before='{{ i18n "password" }}'>
+                            <template slot="addonAfter">
+                                <a-button size="small" @click="inbound.settings.delAccount(index)">-</a-button>
+                            </template>
+                        </a-input>
+                    </a-input-group>
                 </a-form-item>
             </td>
         </tr>
-        <tr>
-            <td>{{ i18n "password" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input v-model.trim="inbound.settings.accounts[0].pass"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
-    </template>
         <tr>
             <td>{{ i18n "pages.inbounds.enable" }} udp</td>
             <td>
@@ -36,10 +37,10 @@
                 </a-form-item>
             </td>
         </tr>
-        <tr>
+        <tr v-if="inbound.settings.udp">
             <td>IP</td>
             <td>
-                <a-form-item v-if="inbound.settings.udp">
+                <a-form-item>
                     <a-input v-model.trim="inbound.settings.ip"></a-input>
                 </a-form-item>
             </td>
