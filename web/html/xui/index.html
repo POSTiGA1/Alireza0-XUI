@@ -42,7 +42,7 @@
                                                     :stroke-color="status.cpu.color"
                                                     :class="themeSwitcher.darkCardClass"
                                                     :percent="status.cpu.percent"></a-progress>
-                                        <div>CPU</div>
+                                        <div>CPU ([[ status.cpuCount ]]core)</div>
                                     </a-col>
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
@@ -92,13 +92,16 @@
                     <a-col :sm="24" :md="12">
                         <a-card hoverable :class="themeSwitcher.darkCardClass">
                             {{ i18n "pages.index.operationHours" }}:
-                            <a-tag color="green">[[ formatSecond(status.uptime) ]]</a-tag>
+                            xray
+                            <a-tag color="green">[[ formatSecond(status.appStats.uptime) ]]</a-tag>
+                            os
                             <a-tooltip>
                                 <template slot="title">
                                     {{ i18n "pages.index.operationHoursDesc" }}
                                 </template>
                                 <a-icon type="question-circle" theme="filled"></a-icon>
                             </a-tooltip>
+                            <a-tag color="green">[[ formatSecond(status.uptime) ]]</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
@@ -131,7 +134,36 @@
                     </a-col>
                     <a-col :sm="24" :md="12">
                         <a-card hoverable :class="themeSwitcher.darkCardClass">
-                            tcp / udp {{ i18n "pages.index.connectionCount" }}: [[ status.tcpCount ]] / [[ status.udpCount ]]
+                            {{ i18n "usage"}}:
+                            Memory [[ sizeFormat(status.appStats.mem) ]] -
+                            Threads [[ status.appStats.threads ]]
+                            </a-tooltip>
+                        </a-card>
+                    </a-col>
+                    <a-col :sm="24" :md="12">
+                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                            Host: [[ status.hostInfo.hostname ]] -
+                            <template v-if="status.hostInfo.ipv4">IPv4:
+                            <a-tooltip>
+                                <template slot="title">
+                                    [[ status.hostInfo.ipv4 ]]
+                                </template>
+                                <a-icon type="question-circle" theme="filled"></a-icon>
+                            </a-tooltip>
+                            </template>
+                            <template v-if="status.hostInfo.ipv6">IPv6:
+                            <a-tooltip>
+                                <template slot="title">
+                                    [[ status.hostInfo.ipv6 ]]
+                                </template>
+                                <a-icon type="question-circle" theme="filled"></a-icon>
+                            </a-tooltip>
+                            </template>
+                        </a-card>
+                    </a-col>
+                    <a-col :sm="24" :md="12">
+                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                            {{ i18n "pages.index.connectionCount" }}: tcp: [[ status.tcpCount ]]  udp: [[ status.udpCount ]]
                             <a-tooltip>
                                 <template slot="title">
                                     {{ i18n "pages.index.connectionCountDesc" }}
@@ -315,6 +347,7 @@
     class Status {
         constructor(data) {
             this.cpu = new CurTotal(0, 0);
+            this.cpuCount = 0;
             this.disk = new CurTotal(0, 0);
             this.loads = [0, 0, 0];
             this.mem = new CurTotal(0, 0);
@@ -324,12 +357,16 @@
             this.tcpCount = 0;
             this.udpCount = 0;
             this.uptime = 0;
+            this.appUptime = 0;
+            this.appStats = {threads: 0, mem: 0, uptime: 0};
+            this.hostInfo = {hostname:"", ipv4: "", ipv6: ""};
             this.xray = {state: State.Stop, errorMsg: "", version: "", color: ""};
 
             if (data == null) {
                 return;
             }
             this.cpu = new CurTotal(data.cpu, 100);
+            this.cpuCount = data.cpuCount;
             this.disk = new CurTotal(data.disk.current, data.disk.total);
             this.loads = data.loads.map(load => toFixed(load, 2));
             this.mem = new CurTotal(data.mem.current, data.mem.total);
@@ -339,6 +376,9 @@
             this.tcpCount = data.tcpCount;
             this.udpCount = data.udpCount;
             this.uptime = data.uptime;
+            this.appUptime = data.appUptime;
+            this.appStats = data.appStats;
+            this.hostInfo = data.hostInfo;
             this.xray = data.xray;
             switch (this.xray.state) {
                 case State.Running:

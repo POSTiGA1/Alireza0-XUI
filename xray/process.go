@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 	"x-ui/config"
 	"x-ui/util/common"
 
@@ -58,16 +59,18 @@ type process struct {
 	version string
 	apiPort int
 
-	config  *Config
-	lines   *queue.Queue
-	exitErr error
+	config    *Config
+	lines     *queue.Queue
+	exitErr   error
+	startTime time.Time
 }
 
 func newProcess(config *Config) *process {
 	return &process{
-		version: "Unknown",
-		config:  config,
-		lines:   queue.New(100),
+		version:   "Unknown",
+		config:    config,
+		lines:     queue.New(100),
+		startTime: time.Now(),
 	}
 }
 
@@ -109,6 +112,10 @@ func (p *Process) GetAPIPort() int {
 
 func (p *Process) GetConfig() *Config {
 	return p.config
+}
+
+func (p *Process) GetUptime() uint64 {
+	return uint64(time.Since(p.startTime).Seconds())
 }
 
 func (p *process) refreshAPIPort() {
