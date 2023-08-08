@@ -403,7 +403,139 @@ show_xray_status() {
     fi
 }
 
+install_acme() {
+    cd ~
+    LOGI "install acme..."
+    curl https://get.acme.sh | sh
+    if [ $? -ne 0 ]; then
+        LOGE "install acme failed"
+        return 1
+    else
+        LOGI "install acme succeed"
+    fi
+    return 0
+}
+
+ssl_cert_issue_main() {
+    echo -e "${green}\t1.${plain} Get SSL"
+    echo -e "${green}\t2.${plain} Revoke"
+    echo -e "${green}\t3.${plain} Force Renew"
+    read -p "Choose an option: " choice
+    case "$choice" in
+        1) ssl_cert_issue ;;
+        2) 
+            local domain=""
+            read -p "Please enter your domain name to revoke the certificate: " domain
+            ~/.acme.sh/acme.sh --revoke -d ${domain}
+            LOGI "Certificate revoked"
+            ;;
+        3)
+            local domain=""
+            read -p "Please enter your domain name to forcefully renew an SSL certificate: " domain
+            ~/.acme.sh/acme.sh --renew -d ${domain} --force ;;
+        *) echo "Invalid choice" ;;
+    esac
+}
+
 ssl_cert_issue() {
+    # check for acme.sh first
+    if ! command -v ~/.acme.sh/acme.sh &>/dev/null; then
+        echo "acme.sh could not be found. we will install it"
+        install_acme
+        if [ $? -ne 0 ]; then
+            LOGE "install acme failed, please check logs"
+            exit 1
+        fi
+    fi
+    # install socat second
+    case "${release}" in
+        ubuntu|debian)
+            apt update && apt install socat -y ;;
+        centos)
+            yum -y update && yum -y install socat ;;
+        fedora)
+            dnf -y update && dnf -y install socat ;;
+        *)
+            echo -e "${red}Unsupported operating system. Please check the script and install the necessary packages manually.${plain}\n"
+            exit 1 ;;
+    esac
+    if [ $? -ne 0 ]; then
+        LOGE "install socat failed, please check logs"
+        exit 1
+    else
+        LOGI "install socat succeed..."
+    fi
+
+    # get the domain here,and we need verify it
+    local domain=""
+    read -p "Please enter your domain name:" domain
+    LOGD "your domain is:${domain},check it..."
+    # here we need to judge whether there exists cert already
+    local currentCert=$(~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}')
+
+    if [ ${currentCert} == ${domain} ]; then
+        local certInfo=$(~/.acme.sh/acme.sh --list)
+        LOGE "system already has certs here,can not issue again,current certs details:"
+        LOGI "$certInfo"
+        exit 1
+    else
+        LOGI "your domain is ready for issuing cert now..."
+    fi
+
+    # create a directory for install cert
+    certPath="/root/cert/${domain}"
+    if [ ! -d "$certPath" ]; then
+        mkdir -p "$certPath"
+    else
+        rm -rf "$certPath"
+        mkdir -p "$certPath"
+    fi
+
+    # get needed port here
+    local WebPort=80
+    read -p "please choose which port do you use,default will be 80 port:" WebPort
+    if [[ ${WebPort} -gt 65535 || ${WebPort} -lt 1 ]]; then
+        LOGE "your input ${WebPort} is invalid,will use default port"
+    fi
+    LOGI "will use port:${WebPort} to issue certs,please make sure this port is open..."
+    # NOTE:This should be handled by user
+    # open the port and kill the occupied progress
+    ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone --httpport ${WebPort}
+    if [ $? -ne 0 ]; then
+        LOGE "issue certs failed,please check logs"
+        rm -rf ~/.acme.sh/${domain}
+        exit 1
+    else
+        LOGE "issue certs succeed,installing certs..."
+    fi
+    # install cert
+    ~/.acme.sh/acme.sh --installcert -d ${domain} \
+        --key-file /root/cert/${domain}/privkey.pem \
+        --fullchain-file /root/cert/${domain}/fullchain.pem
+
+    if [ $? -ne 0 ]; then
+        LOGE "install certs failed,exit"
+        rm -rf ~/.acme.sh/${domain}
+        exit 1
+    else
+        LOGI "install certs succeed,enable auto renew..."
+    fi
+
+    ~/.acme.sh/acme.sh --upgrade --auto-upgrade
+    if [ $? -ne 0 ]; then
+        LOGE "auto renew failed, certs details:"
+        ls -lah cert/*
+        chmod 755 $certPath/*
+        exit 1
+    else
+        LOGI "auto renew succeed, certs details:"
+        ls -lah cert/*
+        chmod 755 $certPath/*
+    fi
+}
+
+ssl_cert_issue_CF() {
     echo -E ""
     LOGD "******Instructions for use******"
     LOGI "This Acme script requires the following data:"
@@ -413,12 +545,14 @@ ssl_cert_issue() {
     LOGI "4.The script applies for a certificate. The default installation path is /root/cert "
     confirm "Confirmed?[y/n]" "y"
     if [ $? -eq 0 ]; then
-        cd ~
-        LOGI "Install Acme-Script"
-        curl https://get.acme.sh | sh
-        if [ $? -ne 0 ]; then
-            LOGE "Failed to install acme script"
-            exit 1
+        # check for acme.sh first
+        if ! command -v ~/.acme.sh/acme.sh &>/dev/null; then
+            echo "acme.sh could not be found. we will install it"
+            install_acme
+            if [ $? -ne 0 ]; then
+                LOGE "install acme failed, please check logs"
+                exit 1
+            fi
         fi
         CF_Domain=""
         CF_GlobalKey=""
@@ -520,7 +654,8 @@ show_menu() {
   ${green}14.${plain} Cancel x-ui Autostart
 ————————————————
   ${green}15.${plain} 一A key installation bbr (latest kernel)
-  ${green}16.${plain} 一Apply for a SSL certificate with one click(acme script)
+  ${green}16.${plain} 一SSL Certificate Management
+  ${green}17.${plain} 一Cloudflare SSL Certificate
  "
     show_status
     echo && read -p "Please enter your selection [0-16]: " num
@@ -575,7 +710,10 @@ show_menu() {
         install_bbr
         ;;
     16)
-        ssl_cert_issue
+        ssl_cert_issue_main
+        ;;
+    17)
+        ssl_cert_issue_CF
         ;;
     *)
         LOGE "Please enter the correct number [0-16]"
