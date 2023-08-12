@@ -31,7 +31,7 @@ jobs:
           rm -f Xray-linux-64.zip geoip.dat geosite.dat iran.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
-          wget https://github.com/bootmortis/iran-hosted-domains/releases/latest/download/iran.dat
+          wget https://github.com/MasterKia/iran-hosted-domains/releases/latest/download/iran.dat
           mv xray xray-linux-amd64
           cd ..
           cd ..
@@ -72,7 +72,7 @@ jobs:
           rm -f Xray-linux-64.zip geoip.dat geosite.dat iran.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
-          wget https://github.com/bootmortis/iran-hosted-domains/releases/latest/download/iran.dat
+          wget https://github.com/Masterkia/iran-hosted-domains/releases/latest/download/iran.dat
           mv xray xray-linux-arm64
           cd ..
           cd ..
@@ -113,7 +113,7 @@ jobs:
           rm -f Xray-linux-64.zip geoip.dat geosite.dat iran.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
           wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
-          wget https://github.com/bootmortis/iran-hosted-domains/releases/latest/download/iran.dat
+          wget https://github.com/Masterkia/iran-hosted-domains/releases/latest/download/iran.dat
           mv xray xray-linux-s390x
           cd ..
           cd ..
