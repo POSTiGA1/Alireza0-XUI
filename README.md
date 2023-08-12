@@ -217,20 +217,6 @@ Reference syntax:
 - Multi language bot
 </details>
 
-# Common problem
-
-<details>
-  <summary>Click for details</summary>
-## Migrating from v2-ui
-
-First install the latest version of x-ui on the server where v2-ui is installed, and then use the following command to migrate, which will migrate the native v2-ui `All inbound account data` to x-ui，`Panel settings and username passwords are not migrated`
-
-> Please `Close v2-ui` and `restart x-ui`, otherwise the inbound of v2-ui will cause a `port conflict with the inbound of x-ui`
-
-```sh
-x-ui v2-ui
-```
-
 # T-Shoots:
 
 **If you upgrade from an old version or other forks, for enable traffic for users you should do :**

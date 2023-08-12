@@ -10,7 +10,7 @@
                         <template slot="title">
                             <span>{{ i18n "pages.inbounds.emailDesc" }}</span>
                         </template>
-                        <a-icon @click="getNewEmail(client)" type="sync"> </a-icon>
+                        <a-icon @click="client.email = RandomUtil.randomLowerAndNum(9)" type="sync"> </a-icon>
                     </a-tooltip>
                 </td>
                 <td>
@@ -28,7 +28,7 @@
                 </td>
             </tr>
             <tr v-if="client.email && app.subSettings.enable">
-                <td>Subscription <a-icon @click="client.subId = RandomUtil.randomText(16,16)" type="sync"></a-icon></td>
+                <td>Subscription <a-icon @click="client.subId = RandomUtil.randomLowerAndNum(16)" type="sync"></a-icon></td>
                 <td>
                     <a-form-item>
                         <a-input v-model.trim="client.subId" style="width: 200px;"></a-input>

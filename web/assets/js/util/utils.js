@@ -75,17 +75,7 @@ class PromiseUtil {
     }
 }
 
-const seq = [
-    'a', 'b', 'c', 'd', 'e', 'f', 'g',
-    'h', 'i', 'j', 'k', 'l', 'm', 'n',
-    'o', 'p', 'q', 'r', 's', 't',
-    'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G',
-    'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T',
-    'U', 'V', 'W', 'X', 'Y', 'Z'
-];
+const seq = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 class RandomUtil {
     static randomIntRange(min, max) {
@@ -119,16 +109,6 @@ class RandomUtil {
             d = Math.floor(d / 16);
             return (c === 'x' ? r : (r & 0x7 | 0x8)).toString(16);
         });
-    }
-
-    static randomText(minLen = 6, varLen = 5) {
-        var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
-        var string = '';
-        var len = minLen + Math.floor(Math.random() * varLen);
-        for (var ii = 0; ii < len; ii++) {
-            string += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return string;
     }
 
     static randomShadowsocksPassword() {

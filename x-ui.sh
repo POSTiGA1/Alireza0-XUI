@@ -623,7 +623,6 @@ show_usage() {
     echo "x-ui enable       - Enable    x-ui on system startup"
     echo "x-ui disable      - Disable   x-ui on system startup"
     echo "x-ui log          - Check     x-ui logs"
-    echo "x-ui v2-ui        - Migrate   v2-ui Account data to x-ui"
     echo "x-ui update       - Update    x-ui"
     echo "x-ui install      - Install   x-ui"
     echo "x-ui uninstall    - Uninstall x-ui"
