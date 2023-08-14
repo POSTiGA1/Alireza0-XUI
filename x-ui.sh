@@ -644,12 +644,12 @@ show_menu() {
   ${green}7.${plain} View current panel settings
 ————————————————
   ${green}8.${plain} Start x-ui
-  ${green}9.${plain} stop x-ui
+  ${green}9.${plain} Stop x-ui
   ${green}10.${plain} Reboot x-ui
   ${green}11.${plain} Check x-ui state
   ${green}12.${plain} Check x-ui logs
 ————————————————
-  ${green}13.${plain} set x-ui Autostart
+  ${green}13.${plain} Set x-ui Autostart
   ${green}14.${plain} Cancel x-ui Autostart
 ————————————————
   ${green}15.${plain} 一A key installation bbr (latest kernel)
@@ -657,7 +657,7 @@ show_menu() {
   ${green}17.${plain} 一Cloudflare SSL Certificate
  "
     show_status
-    echo && read -p "Please enter your selection [0-16]: " num
+    echo && read -p "Please enter your selection [0-17]: " num
 
     case "${num}" in
     0)
