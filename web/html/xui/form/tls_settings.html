@@ -94,12 +94,16 @@
             </td>
         </tr>
         <tr>
-            <td>Alpn</td>
+            <td>ALPN</td>
             <td>
                 <a-form-item>
-                    <a-checkbox-group v-model="inbound.stream.tls.alpn">
-                        <a-checkbox v-for="key,value in ALPN_OPTION" :value="key">[[ value ]]</a-checkbox>
-                    </a-checkbox-group>
+                    <a-select
+                        mode="multiple"
+                        style="width: 250px"
+                        :dropdown-class-name="themeSwitcher.darkCardClass"
+                        v-model="inbound.stream.tls.alpn">
+                        <a-select-option v-for="alpn in ALPN_OPTION" :value="alpn">[[ alpn ]]</a-select-option>
+                    </a-select>
                 </a-form-item>
             </td>
         </tr>
