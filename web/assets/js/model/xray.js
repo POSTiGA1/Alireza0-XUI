@@ -19,7 +19,9 @@ const SSMethods = {
     AES_256_GCM: 'aes-256-gcm',
     AES_128_GCM: 'aes-128-gcm',
     CHACHA20_POLY1305: 'chacha20-poly1305',
+    CHACHA20_IETF_POLY1305: 'chacha20-ietf-poly1305',
     XCHACHA20_POLY1305: 'xchacha20-poly1305',
+    XCHACHA20_IETF_POLY1305: 'xchacha20-ietf-poly1305',
     BLAKE3_AES_128_GCM: '2022-blake3-aes-128-gcm',
     BLAKE3_AES_256_GCM: '2022-blake3-aes-256-gcm',
     BLAKE3_CHACHA20_POLY1305: '2022-blake3-chacha20-poly1305',
@@ -459,8 +461,8 @@ class GrpcStreamSettings extends XrayCommonClass {
 
 class TlsStreamSettings extends XrayCommonClass {
     constructor(serverName='',
-                minVersion = TLS_VERSION_OPTION.TLS10,
-                maxVersion = TLS_VERSION_OPTION.TLS12,
+                minVersion = TLS_VERSION_OPTION.TLS12,
+                maxVersion = TLS_VERSION_OPTION.TLS13,
                 cipherSuites = '',
                 rejectUnknownSni = false,
                 certificates=[new TlsStreamSettings.Cert()],
@@ -674,6 +676,34 @@ RealityStreamSettings.Settings = class extends XrayCommonClass {
     }
 };
 
+class SockoptStreamSettings extends XrayCommonClass {
+    constructor(acceptProxyProtocol = false, tcpFastOpen = false, mark = 0, tproxy="off") {
+        super();
+        this.acceptProxyProtocol = acceptProxyProtocol;
+        this.tcpFastOpen = tcpFastOpen;
+        this.mark = mark;
+        this.tproxy = tproxy;
+    }
+
+    static fromJson(json = {}) {
+        return new SockoptStreamSettings(
+            json.acceptProxyProtocol,
+            json.tcpFastOpen,
+            json.mark,
+            json.tproxy,
+        );
+    }
+
+    toJson() {
+        return {
+            acceptProxyProtocol: this.acceptProxyProtocol,
+            tcpFastOpen: this.tcpFastOpen,
+            mark: this.mark,
+            tproxy: this.tproxy,
+        };
+    }
+}
+
 class StreamSettings extends XrayCommonClass {
     constructor(network='tcp',
                 security='none',
@@ -685,6 +715,7 @@ class StreamSettings extends XrayCommonClass {
                 httpSettings=new HttpStreamSettings(),
                 quicSettings=new QuicStreamSettings(),
                 grpcSettings=new GrpcStreamSettings(),
+                sockopt = undefined,
                 ) {
         super();
         this.network = network;
@@ -697,6 +728,7 @@ class StreamSettings extends XrayCommonClass {
         this.http = httpSettings;
         this.quic = quicSettings;
         this.grpc = grpcSettings;
+        this.sockopt = sockopt;
     }
 
     get isTls() {
@@ -723,6 +755,14 @@ class StreamSettings extends XrayCommonClass {
         }
     }
 
+    get sockoptSwitch() {
+        return this.sockopt != undefined;
+    }
+
+    set sockoptSwitch(value) {
+        this.sockopt = value ? new SockoptStreamSettings() : undefined;
+    }
+
     static fromJson(json={}) {
 
         return new StreamSettings(
@@ -736,6 +776,7 @@ class StreamSettings extends XrayCommonClass {
             HttpStreamSettings.fromJson(json.httpSettings),
             QuicStreamSettings.fromJson(json.quicSettings),
             GrpcStreamSettings.fromJson(json.grpcSettings),
+            SockoptStreamSettings.fromJson(json.sockopt),
         );
     }
 
@@ -752,6 +793,7 @@ class StreamSettings extends XrayCommonClass {
             httpSettings: network === 'http' ? this.http.toJson() : undefined,
             quicSettings: network === 'quic' ? this.quic.toJson() : undefined,
             grpcSettings: network === 'grpc' ? this.grpc.toJson() : undefined,
+            sockopt: this.sockopt != undefined ? this.sockopt.toJson() : undefined,
         };
     }
 }

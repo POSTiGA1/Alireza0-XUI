@@ -266,6 +266,8 @@
 "subUpdatesDesc" = "ساعت های فاصله بین به روز رسانی در برنامه کاربر"
 "subEncrypt" = "رمزگذاری کانفیگ ها"
 "subEncryptDesc" = "رمزگذاری کانفیگ های بازگشتی سابسکریپشن"
+"subShowInfo" = "نمایش اطلاعات مصرف"
+"subShowInfoDesc" = "ترافیک و زمان باقیمانده را در هر کانفیگ نمایش میدهد"
 
 [pages.settings.templates]
 "title" = "الگوها"

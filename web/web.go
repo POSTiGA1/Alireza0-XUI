@@ -244,9 +244,6 @@ func (s *Server) startTask() {
 		s.cron.AddJob("@every 10s", job.NewXrayTrafficJob())
 	}()
 
-	// Check the inbound traffic every 30 seconds that the traffic exceeds and expires
-	s.cron.AddJob("@every 30s", job.NewCheckInboundJob())
-
 	// Make a traffic condition every day, 8:30
 	var entry cron.EntryID
 	isTgbotenabled, err := s.settingService.GetTgbotenabled()
