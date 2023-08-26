@@ -1,5 +1,6 @@
 {{define "form/sniffing"}}
 <a-form layout="inline">
+  <a-divider dashed style="margin:0;">
   <a-form-item>
             <span slot="label">
                 sniffing
@@ -12,6 +13,7 @@
             </span>
     <a-switch v-model="inbound.sniffing.enabled"></a-switch>
   </a-form-item>
+  </a-divider>
   <a-form-item>
     <a-checkbox-group v-model="inbound.sniffing.destOverride" v-if="inbound.sniffing.enabled">
       <a-checkbox v-for="key,value in SNIFFING_OPTION" :value="key">[[ value ]]</a-checkbox>

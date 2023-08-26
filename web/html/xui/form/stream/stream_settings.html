@@ -1,6 +1,7 @@
 {{define "form/streamSettings"}}
 <!-- select stream network -->
 <a-form layout="inline">
+    <a-divider dashed style="margin:0;">
     <a-form-item label="{{ i18n "transmission" }}">
         <a-select v-model="inbound.stream.network" @change="streamNetworkChange"
             :dropdown-class-name="themeSwitcher.darkCardClass">
@@ -12,6 +13,7 @@
             <a-select-option value="grpc">grpc</a-select-option>
         </a-select>
     </a-form-item>
+    </a-divider>
 </a-form>
 
 <!-- tcp -->
