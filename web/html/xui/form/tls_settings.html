@@ -1,15 +1,14 @@
 {{define "form/tlsSettings"}}
 <!-- tls enable -->
+<a-divider style="margin:0;"></a-divider>
 <a-form v-if="inbound.canSetTls()" layout="inline">
-    <a-divider dashed style="margin:0;">
     <a-form-item label="TLS">
         <a-switch v-model="inbound.tls">
         </a-switch>
     </a-form-item>
-    <a-form-item v-if="inbound.canEnableReality()" label="Reality">
+    <a-form-item label="Reality" v-if="inbound.canEnableReality()">
         <a-switch v-model="inbound.reality"></a-switch>
     </a-form-item>
-    </a-divider>
 </a-form>
 
 <!-- tls settings -->
