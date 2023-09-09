@@ -10,7 +10,7 @@ jobs:
     name: build x-ui amd64 version
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -49,7 +49,7 @@ jobs:
     name: build x-ui arm64 version
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -90,7 +90,7 @@ jobs:
     name: build x-ui s390x version
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
