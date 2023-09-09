@@ -405,6 +405,8 @@
 "disabled" = "🛑 Disabled: {{ .Disabled }}\r\n"
 "depleteSoon" = "🔜 Deplete soon: {{ .Deplete }}\r\n \r\n"
 "backupTime" = "🗄 Backup Time: {{ .Time }}\r\n"
+"yes" = "✅ Yes"
+"no" = "❌ No"
 
 [tgbot.buttons]
 "dbBackup" = "Get DB Backup"

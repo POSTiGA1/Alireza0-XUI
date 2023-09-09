@@ -405,6 +405,8 @@
 "disabled" = "🛑 禁用：{{ .Disabled }}\r\n"
 "depleteSoon" = "🔜 即将耗尽：{{ .Deplete }}\r\n \r\n"
 "backupTime" = "🗄 备份时间：{{ .Time }}\r\n"
+"yes" = "✅ 是"
+"no" = "❌ 不"
 
 [tgbot.buttons]
 "dbBackup" = "获取数据库备份"
