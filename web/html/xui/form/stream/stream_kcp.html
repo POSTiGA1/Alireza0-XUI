@@ -5,7 +5,7 @@
             <td>{{ i18n "camouflage" }}</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="inbound.stream.kcp.type" style="width: 250px;" :dropdown-class-name="themeSwitcher.darkCardClass">
+                    <a-select v-model="inbound.stream.kcp.type" style="width: 250px;" :dropdown-class-name="themeSwitcher.currentTheme">
                         <a-select-option value="none">none (not camouflage)</a-select-option>
                         <a-select-option value="srtp">srtp (video call)</a-select-option>
                         <a-select-option value="utp">utp (BT download)</a-select-option>

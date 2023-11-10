@@ -3,9 +3,9 @@
     v-model="infoModal.visible" title='{{ i18n "pages.inbounds.details"}}'
     :closable="true"
     :mask-closable="true"
-    :class="themeSwitcher.darkCardClass"
     :footer="null"
     width="600px"
+    :class="themeSwitcher.currentTheme"
     >
     <table style="margin-bottom: 10px; width: 100%;">
         <tr><td>
@@ -311,7 +311,7 @@
                 if(infoModal.clientStats){
                     return infoModal.clientStats.enable;
                 }
-                return infoModal.dbInbound.isEnable;
+                return true;
             },
             get isEnable() {
                 if(infoModal.clientSettings){

@@ -354,7 +354,7 @@ func (s *Server) Start() (err error) {
 	isTgbotenabled, err := s.settingService.GetTgbotenabled()
 	if (err == nil) && (isTgbotenabled) {
 		tgBot := s.tgbotService.NewTgbot()
-		tgBot.Start(i18nFS)
+		go tgBot.Start(i18nFS)
 	}
 
 	return nil

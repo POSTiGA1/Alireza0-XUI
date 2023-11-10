@@ -2,12 +2,10 @@ package entity
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"net"
 	"strings"
 	"time"
 	"x-ui/util/common"
-	"x-ui/xray"
 )
 
 type Msg struct {
@@ -17,36 +15,35 @@ type Msg struct {
 }
 
 type AllSetting struct {
-	WebListen          string `json:"webListen" form:"webListen"`
-	WebDomain          string `json:"webDomain" form:"webDomain"`
-	WebPort            int    `json:"webPort" form:"webPort"`
-	WebCertFile        string `json:"webCertFile" form:"webCertFile"`
-	WebKeyFile         string `json:"webKeyFile" form:"webKeyFile"`
-	WebBasePath        string `json:"webBasePath" form:"webBasePath"`
-	SessionMaxAge      int    `json:"sessionMaxAge" form:"sessionMaxAge"`
-	PageSize           int    `json:"pageSize" form:"pageSize"`
-	ExpireDiff         int    `json:"expireDiff" form:"expireDiff"`
-	TrafficDiff        int    `json:"trafficDiff" form:"trafficDiff"`
-	TgBotEnable        bool   `json:"tgBotEnable" form:"tgBotEnable"`
-	TgBotToken         string `json:"tgBotToken" form:"tgBotToken"`
-	TgBotChatId        string `json:"tgBotChatId" form:"tgBotChatId"`
-	TgRunTime          string `json:"tgRunTime" form:"tgRunTime"`
-	TgBotBackup        bool   `json:"tgBotBackup" form:"tgBotBackup"`
-	TgBotLoginNotify   bool   `json:"tgBotLoginNotify" form:"tgBotLoginNotify"`
-	TgCpu              int    `json:"tgCpu" form:"tgCpu"`
-	TgLang             string `json:"tgLang" form:"tgLang"`
-	XrayTemplateConfig string `json:"xrayTemplateConfig" form:"xrayTemplateConfig"`
-	TimeLocation       string `json:"timeLocation" form:"timeLocation"`
-	SubEnable          bool   `json:"subEnable" form:"subEnable"`
-	SubListen          string `json:"subListen" form:"subListen"`
-	SubPort            int    `json:"subPort" form:"subPort"`
-	SubPath            string `json:"subPath" form:"subPath"`
-	SubDomain          string `json:"subDomain" form:"subDomain"`
-	SubCertFile        string `json:"subCertFile" form:"subCertFile"`
-	SubKeyFile         string `json:"subKeyFile" form:"subKeyFile"`
-	SubUpdates         int    `json:"subUpdates" form:"subUpdates"`
-	SubEncrypt         bool   `json:"subEncrypt" form:"subEncrypt"`
-	SubShowInfo        bool   `json:"subShowInfo" form:"subShowInfo"`
+	WebListen        string `json:"webListen" form:"webListen"`
+	WebDomain        string `json:"webDomain" form:"webDomain"`
+	WebPort          int    `json:"webPort" form:"webPort"`
+	WebCertFile      string `json:"webCertFile" form:"webCertFile"`
+	WebKeyFile       string `json:"webKeyFile" form:"webKeyFile"`
+	WebBasePath      string `json:"webBasePath" form:"webBasePath"`
+	SessionMaxAge    int    `json:"sessionMaxAge" form:"sessionMaxAge"`
+	PageSize         int    `json:"pageSize" form:"pageSize"`
+	ExpireDiff       int    `json:"expireDiff" form:"expireDiff"`
+	TrafficDiff      int    `json:"trafficDiff" form:"trafficDiff"`
+	TgBotEnable      bool   `json:"tgBotEnable" form:"tgBotEnable"`
+	TgBotToken       string `json:"tgBotToken" form:"tgBotToken"`
+	TgBotChatId      string `json:"tgBotChatId" form:"tgBotChatId"`
+	TgRunTime        string `json:"tgRunTime" form:"tgRunTime"`
+	TgBotBackup      bool   `json:"tgBotBackup" form:"tgBotBackup"`
+	TgBotLoginNotify bool   `json:"tgBotLoginNotify" form:"tgBotLoginNotify"`
+	TgCpu            int    `json:"tgCpu" form:"tgCpu"`
+	TgLang           string `json:"tgLang" form:"tgLang"`
+	TimeLocation     string `json:"timeLocation" form:"timeLocation"`
+	SubEnable        bool   `json:"subEnable" form:"subEnable"`
+	SubListen        string `json:"subListen" form:"subListen"`
+	SubPort          int    `json:"subPort" form:"subPort"`
+	SubPath          string `json:"subPath" form:"subPath"`
+	SubDomain        string `json:"subDomain" form:"subDomain"`
+	SubCertFile      string `json:"subCertFile" form:"subCertFile"`
+	SubKeyFile       string `json:"subKeyFile" form:"subKeyFile"`
+	SubUpdates       int    `json:"subUpdates" form:"subUpdates"`
+	SubEncrypt       bool   `json:"subEncrypt" form:"subEncrypt"`
+	SubShowInfo      bool   `json:"subShowInfo" form:"subShowInfo"`
 }
 
 func (s *AllSetting) CheckValid() error {
@@ -97,13 +94,7 @@ func (s *AllSetting) CheckValid() error {
 		s.WebBasePath += "/"
 	}
 
-	xrayConfig := &xray.Config{}
-	err := json.Unmarshal([]byte(s.XrayTemplateConfig), xrayConfig)
-	if err != nil {
-		return common.NewError("xray template config invalid:", err)
-	}
-
-	_, err = time.LoadLocation(s.TimeLocation)
+	_, err := time.LoadLocation(s.TimeLocation)
 	if err != nil {
 		return common.NewError("time location not exist:", s.TimeLocation)
 	}

@@ -21,7 +21,7 @@
             <td>{{ i18n "pages.inbounds.network"}}</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="inbound.settings.network" style="width: 100px;" :dropdown-class-name="themeSwitcher.darkCardClass">
+                    <a-select v-model="inbound.settings.network" style="width: 100px;" :dropdown-class-name="themeSwitcher.currentTheme">
                         <a-select-option value="tcp,udp">tcp+udp</a-select-option>
                         <a-select-option value="tcp">tcp</a-select-option>
                         <a-select-option value="udp">udp</a-select-option>

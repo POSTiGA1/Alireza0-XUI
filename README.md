@@ -47,7 +47,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.s
 ## Manual install & upgrade
 
 1. First download the latest compressed package from https://github.com/alireza0/x-ui/releases, generally choose Architecture `amd64`
-2. Then upload the compressed package to the server's `/root/` directory and `root` rootlog in to the server with user
+2. Then upload the compressed package to the server's `/root/` directory and login to the server with user `root` 
 
 > If your server cpu architecture is not `amd64` replace another architecture
 

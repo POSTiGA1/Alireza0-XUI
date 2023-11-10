@@ -6,6 +6,9 @@
         .ant-layout-content {
             margin: 24px 16px;
         }
+        .ant-card-hoverable {
+            margin-inline: 0.3rem;
+        }
     }
 
     .ant-col-sm-24 {
@@ -17,9 +20,9 @@
     }
 </style>
 <body>
-<a-layout id="app" v-cloak>
+<a-layout id="app" v-cloak :class="themeSwitcher.currentTheme">
     {{ template "commonSider" . }}
-    <a-layout id="content-layout" :style="themeSwitcher.bgStyle">
+    <a-layout id="content-layout">
         <a-layout-content>
             <a-spin :spinning="spinning" :delay="200" :tip="loadingTip"/>
             <transition name="list" appear>
@@ -33,21 +36,19 @@
             </transition>
             <transition name="list" appear>
                 <a-row>
-                    <a-card hoverable :class="themeSwitcher.darkCardClass">
+                    <a-card hoverable>
                         <a-row>
                             <a-col :sm="24" :md="12">
                                 <a-row>
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.cpu.color"
-                                                    :class="themeSwitcher.darkCardClass"
                                                     :percent="status.cpu.percent"></a-progress>
                                         <div>CPU: ([[ status.cpuCount ]]core)</div>
                                     </a-col>
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.mem.color"
-                                                    :class="themeSwitcher.darkCardClass"
                                                     :percent="status.mem.percent"></a-progress>
                                         <div>
                                             {{ i18n "pages.index.memory"}}: [[ sizeFormat(status.mem.current) ]] / [[ sizeFormat(status.mem.total) ]]
@@ -60,7 +61,6 @@
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.swap.color"
-                                                    :class="themeSwitcher.darkCardClass"
                                                     :percent="status.swap.percent"></a-progress>
                                         <div>
                                             Swap: [[ sizeFormat(status.swap.current) ]] / [[ sizeFormat(status.swap.total) ]]
@@ -69,7 +69,6 @@
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.disk.color"
-                                                    :class="themeSwitcher.darkCardClass"
                                                     :percent="status.disk.percent"></a-progress>
                                         <div>
                                             {{ i18n "pages.index.hard"}}: [[ sizeFormat(status.disk.current) ]] / [[ sizeFormat(status.disk.total) ]]
@@ -84,16 +83,16 @@
             <transition name="list" appear>
                 <a-row>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
-                            X-UI: <a href="https://github.com/alireza0/x-ui/releases" target="_blank"><a-tag color="green">{{ .cur_ver }}</a-tag></a>
-                            Xray: <a-tag color="green" style="cursor: pointer;" @click="openSelectV2rayVersion">[[ status.xray.version ]]</a-tag>
+                        <a-card hoverable>
+                            X-UI: <a href="https://github.com/alireza0/x-ui/releases" target="_blank"><a-tag color="blue">{{ .cur_ver }}</a-tag></a>
+                            Xray: <a-tag color="blue" style="cursor: pointer;" @click="openSelectV2rayVersion">[[ status.xray.version ]]</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "pages.index.operationHours" }}:
                             Xray
-                            <a-tag color="green">[[ formatSecond(status.appStats.uptime) ]]</a-tag>
+                            <a-tag color="blue">[[ formatSecond(status.appStats.uptime) ]]</a-tag>
                             OS
                             <a-tooltip>
                                 <template slot="title">
@@ -101,11 +100,11 @@
                                 </template>
                                 <a-icon type="question-circle" theme="filled"></a-icon>
                             </a-tooltip>
-                            <a-tag color="green">[[ formatSecond(status.uptime) ]]</a-tag>
+                            <a-tag color="blue">[[ formatSecond(status.uptime) ]]</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "pages.index.xrayStatus" }}:
                             <a-tag :color="status.xray.color">[[ status.xray.state ]]</a-tag>
                             <a-tooltip v-if="status.xray.state === State.Error">
@@ -114,26 +113,26 @@
                                 </template>
                                 <a-icon type="question-circle" theme="filled"></a-icon>
                             </a-tooltip>
-                            <a-tag color="blue" style="cursor: pointer;" @click="stopXrayService">{{ i18n "pages.index.stopXray" }}</a-tag>
-                            <a-tag color="blue" style="cursor: pointer;" @click="restartXrayService">{{ i18n "pages.index.restartXray" }}</a-tag>                    
-                            <a-tag color="blue" style="cursor: pointer;" @click="openSelectV2rayVersion">{{ i18n "pages.index.xraySwitch" }}</a-tag>
+                            <a-tag color="purple" style="cursor: pointer;" @click="stopXrayService">{{ i18n "pages.index.stopXray" }}</a-tag>
+                            <a-tag color="purple" style="cursor: pointer;" @click="restartXrayService">{{ i18n "pages.index.restartXray" }}</a-tag>                    
+                            <a-tag color="purple" style="cursor: pointer;" @click="openSelectV2rayVersion">{{ i18n "pages.index.xraySwitch" }}</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "menu.link" }}:
-                            <a-tag color="blue" style="cursor: pointer;" @click="openLogs()">{{ i18n "pages.index.logs" }}</a-tag>
-                            <a-tag color="blue" style="cursor: pointer;" @click="openConfig">{{ i18n "pages.index.config" }}</a-tag>
-                            <a-tag color="blue" style="cursor: pointer;" @click="openBackup">{{ i18n "pages.index.backup" }}</a-tag>
+                            <a-tag color="purple" style="cursor: pointer;" @click="openLogs()">{{ i18n "pages.index.logs" }}</a-tag>
+                            <a-tag color="purple" style="cursor: pointer;" @click="openConfig">{{ i18n "pages.index.config" }}</a-tag>
+                            <a-tag color="purple" style="cursor: pointer;" @click="openBackup">{{ i18n "pages.index.backup" }}</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "pages.index.systemLoad" }}: [[ status.loads[0] ]] | [[ status.loads[1] ]] | [[ status.loads[2] ]]
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "usage"}}:
                             Memory: [[ sizeFormat(status.appStats.mem) ]] -
                             Threads: [[ status.appStats.threads ]]
@@ -141,7 +140,7 @@
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             Host: [[ status.hostInfo.hostname ]] -
                             <template v-if="status.hostInfo.ipv4">IPv4:
                             <a-tooltip>
@@ -162,7 +161,7 @@
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             {{ i18n "pages.index.connectionCount" }}: TCP: [[ status.tcpCount ]]  UDP: [[ status.udpCount ]]
                             <a-tooltip>
                                 <template slot="title">
@@ -173,7 +172,7 @@
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             <a-row>
                                 <a-col :span="12">
                                     <a-icon type="arrow-up"></a-icon>
@@ -199,7 +198,7 @@
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
-                        <a-card hoverable :class="themeSwitcher.darkCardClass">
+                        <a-card hoverable>
                             <a-row>
                                 <a-col :span="12">
                                     <a-icon type="cloud-upload"></a-icon>
@@ -231,12 +230,12 @@
 
     <a-modal id="version-modal" v-model="versionModal.visible" title='{{ i18n "pages.index.xraySwitch" }}'
              :closable="true" @ok="() => versionModal.visible = false"
-             :class="themeSwitcher.darkCardClass"
+             :class="themeSwitcher.currentTheme"
              footer="">
         <h2>{{ i18n "pages.index.xraySwitchClick"}}</h2>
         <h2>{{ i18n "pages.index.xraySwitchClickDesk"}}</h2>
         <template v-for="version, index in versionModal.versions">
-            <a-tag :color="index % 2 == 0 ? 'blue' : 'green'"
+            <a-tag :color="index % 2 == 0 ? 'purple' : 'blue'"
                    style="margin: 10px" @click="switchV2rayVersion(version)">
                 [[ version ]]
             </a-tag>
@@ -245,15 +244,14 @@
 
     <a-modal id="log-modal" v-model="logModal.visible" title="X-UI logs"
              :closable="true" @ok="() => logModal.visible = false" @cancel="() => logModal.visible = false"
-             :class="themeSwitcher.darkCardClass"
+             :class="themeSwitcher.currentTheme"
              width="800px"
              footer="">
         <a-form layout="inline">
             <a-form-item label="Count">
                 <a-select v-model="logModal.rows"
                 style="width: 80px"
-                @change="openLogs()"
-                :dropdown-class-name="themeSwitcher.darkCardClass">
+                @change="openLogs()" :dropdown-class-name="themeSwitcher.currentTheme">
                     <a-select-option value="10">10</a-select-option>
                     <a-select-option value="20">20</a-select-option>
                     <a-select-option value="50">50</a-select-option>
@@ -263,8 +261,7 @@
             <a-form-item label="Log Level">
                 <a-select v-model="logModal.level"
                 style="width: 120px"
-                @change="openLogs()"
-                :dropdown-class-name="themeSwitcher.darkCardClass">
+                @change="openLogs()" :dropdown-class-name="themeSwitcher.currentTheme">
                     <a-select-option value="debug">Debug</a-select-option>
                     <a-select-option value="info">Info</a-select-option>
                     <a-select-option value="warning">Warning</a-select-option>
@@ -289,12 +286,13 @@
     </a-modal>
 
     <a-modal id="backup-modal" v-model="backupModal.visible" :title="backupModal.title"
-            :closable="true" :class="themeSwitcher.darkCardClass"
+            :closable="true"
+            :class="themeSwitcher.currentTheme"
             @ok="() => backupModal.hide()" @cancel="() => backupModal.hide()">
-        <p style="color: inherit; font-size: 16px; padding: 4px 2px;">
-            <a-icon type="warning" style="color: inherit; font-size: 20px;"></a-icon>
-            [[ backupModal.description ]]
-        </p>
+            <a-alert type="warning" style="margin-bottom: 10px; width: fit-content"
+            :message="backupModal.description"
+            show-icon
+            ></a-alert>
         <a-space direction="horizontal" style="text-align: center" style="margin-bottom: 10px;">
             <a-button type="primary" @click="exportDatabase()">
                 [[ backupModal.exportText ]]
@@ -335,11 +333,11 @@
         get color() {
             const percent = this.percent;
             if (percent < 80) {
-                return '#67C23A';
+                return '#0e49b5';
             } else if (percent < 90) {
-                return '#E6A23C';
+                return '#ffa031';
             } else {
-                return '#F56C6C';
+                return '#e04141';
             }
         }
     }
@@ -382,7 +380,7 @@
             this.xray = data.xray;
             switch (this.xray.state) {
                 case State.Running:
-                    this.xray.color = "green";
+                    this.xray.color = "blue";
                     break;
                 case State.Stop:
                     this.xray.color = "orange";
@@ -487,8 +485,8 @@
                 this.$confirm({
                     title: '{{ i18n "pages.index.xraySwitchVersionDialog"}}',
                     content: '{{ i18n "pages.index.xraySwitchVersionDialogDesc"}}' + ` ${version}?`,
+                    class: themeSwitcher.currentTheme,
                     okText: '{{ i18n "confirm"}}',
-                    class: themeSwitcher.darkCardClass,
                     cancelText: '{{ i18n "cancel"}}',
                     onOk: async () => {
                         versionModal.hide();

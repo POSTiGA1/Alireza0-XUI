@@ -1,8 +1,5 @@
 {{define "form/client"}}
 <a-form layout="inline" v-if="client">
-    <template v-if="isEdit">
-    <a-tag v-if="isExpiry || isTrafficExhausted" color="red" style="margin-bottom: 10px;display: block;text-align: center;">Account is (Expired|Traffic Ended) And Disabled</a-tag>
-    </template>
     <table width="100%" class="ant-table-tbody">
         <tr>
             <td>{{ i18n "pages.inbounds.enable" }}</td>
@@ -66,7 +63,7 @@
             <td>Flow</td>
             <td>
                 <a-form-item>
-                    <a-select v-model="client.flow" style="width: 250px" :dropdown-class-name="themeSwitcher.darkCardClass">
+                    <a-select v-model="client.flow" style="width: 250px" :dropdown-class-name="themeSwitcher.currentTheme">
                         <a-select-option value="" selected>{{ i18n "none" }}</a-select-option>
                         <a-select-option v-for="key in TLS_FLOW_CONTROL" :value="key">[[ key ]]</a-select-option>
                     </a-select>
@@ -107,11 +104,11 @@
             <td>{{ i18n "pages.client.delayedStart" }}</td>
             <td>
                 <a-form-item>
-                    <a-switch v-model="clientModal.delayedStart" @click="client._expiryTime=0"></a-switch>
+                    <a-switch v-model="delayedStart" @click="client._expiryTime=0"></a-switch>
                 </a-form-item>
             </td>
         </tr>
-        <tr v-if="clientModal.delayedStart">
+        <tr v-if="delayedStart">
             <td>{{ i18n "pages.client.expireDays" }}</td>
             <td>
                 <a-form-item>
@@ -132,9 +129,25 @@
             <td>
                 <a-form-item>
                     <a-date-picker :show-time="{ format: 'HH:mm:ss' }" format="YYYY-MM-DD HH:mm:ss"
-                                   :dropdown-class-name="themeSwitcher.darkCardClass"
+                                   :dropdown-class-name="themeSwitcher.currentTheme"
                                    v-model="client._expiryTime" style="width: 250px;"></a-date-picker>
-                    <a-tag color="red" v-if="isExpiry">Expired</a-tag>
+                    <a-tag color="red" v-if="isEdit && isExpiry">Expired</a-tag>
+                </a-form-item>
+            </td>
+        </tr>
+        <tr v-if="client.expiryTime != 0">
+            <td>
+                <span>{{ i18n "pages.client.renew" }}</span>
+                <a-tooltip>
+                    <template slot="title">
+                        <span>{{ i18n "pages.client.renewDesc" }}</span>
+                    </template>
+                    <a-icon type="question-circle" theme="filled"></a-icon>
+                </a-tooltip>
+            </td>
+            <td>
+                <a-form-item>
+                    <a-input-number v-model.number="client.reset" :min="0"></a-input-number>
                 </a-form-item>
             </td>
         </tr>
