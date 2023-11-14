@@ -76,6 +76,10 @@
                                 <a-tag color="blue">[[ dbInbounds.length ]]</a-tag>
                             </a-col>
                             <a-col :xs="24" :sm="24" :lg="12">
+                                <template>
+                                    <div>
+                                        <a-back-top :target="() => document.getElementById('content-layout')" visibility-height="200">
+                                        </a-back-top>
                                 {{ i18n "clients" }}:
                                 <a-tag color="blue">[[ total.clients ]]</a-tag>
                                 <a-popover title='{{ i18n "disabled" }}' :overlay-class-name="themeSwitcher.currentTheme">
@@ -102,6 +106,8 @@
                                     </template>
                                     <a-tag color="green" v-if="onlineClients.length">[[ onlineClients.length ]]</a-tag>
                                 </a-popover>
+                                    </div>
+                                </template>
                             </a-col>
                         </a-row>
                     </a-card>
@@ -166,6 +172,7 @@
                                 <a-radio-button value="online">{{ i18n "online" }}</a-radio-button>
                             </a-radio-group>
                         </div>
+                        <a-back-top></a-back-top>
                         <a-table :columns="isMobile ? mobileColums : columns" :row-key="dbInbound => dbInbound.id"
                                  :data-source="searchedInbounds"
                                  :scroll="isMobile ? {} : { x: 1000 }"
@@ -1112,7 +1119,7 @@
                 if (email.length == 0) return 0;
                 clientStats = dbInbound.clientStats.find(stats => stats.email === email);
                 if (!clientStats) return 0;
-                remained = clientStats.totalGB - (clientStats.up + clientStats.down);
+                remained = clientStats.total - (clientStats.up + clientStats.down);
                 return remained>0 ? remained : 0;
             },
             clientStatsColor(dbInbound, email) {
