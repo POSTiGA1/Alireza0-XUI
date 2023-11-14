@@ -466,11 +466,11 @@ func (t *Tgbot) clientInfoMsg(traffic *xray.ClientTraffic) string {
 		active = t.I18nBot("tgbot.messages.no")
 	}
 
-	status := t.I18nBot("offline")
+	status := "🔴 " + t.I18nBot("offline")
 	if p.IsRunning() {
 		for _, online := range p.GetOnlineClients() {
 			if online == traffic.Email {
-				status = t.I18nBot("online")
+				status = "🟢 " + t.I18nBot("online")
 				break
 			}
 		}

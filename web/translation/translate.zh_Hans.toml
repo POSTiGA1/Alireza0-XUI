@@ -279,7 +279,7 @@
 "subShowInfo" = "显示使用信息"
 "subShowInfoDesc" = "在配置名称后显示剩余流量和日期"
 
-[pages.settings.templates]
+[pages.xray]
 "title" = "Xray 设置"
 "basicTemplate" = "基本模板"
 "advancedTemplate" = "高级模板部件"

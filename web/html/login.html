@@ -179,7 +179,6 @@
             lang: ""
         },
         created() {
-            this.updateBackground();
             this.lang = getLang();
         },
         methods: {
@@ -190,15 +189,7 @@
                 if (msg.success) {
                     location.href = basePath + 'xui/';
                 }
-            },
-            updateBackground() {
-                document.querySelector('#app').style.background = colors[this.themeSwitcher.currentTheme].bg;
-            },
-        },
-        watch: {
-            'themeSwitcher.isDarkTheme'(newVal, oldVal) {
-                this.updateBackground();
-            },
+            }
         },
     });
 </script>
