@@ -305,10 +305,10 @@
 
 </a-layout>
 {{template "js" .}}
+<script src="{{ .base_path }}assets/clipboard/clipboard.min.js"></script>
 {{template "component/themeSwitcher" .}}
 {{template "textModal"}}
 <script>
-
     const State = {
         Running: "running",
         Stop: "stop",

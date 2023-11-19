@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 {{template "head" .}}
+<link rel="stylesheet" href="{{ .base_path }}assets/codemirror/codemirror.css">
+<link rel="stylesheet" href="{{ .base_path }}assets/codemirror/fold/foldgutter.css">
+<link rel="stylesheet" href="{{ .base_path }}assets/codemirror/xq.css">
+<link rel="stylesheet" href="{{ .base_path }}assets/codemirror/lint/lint.css">
+<script src="{{ .base_path }}assets/codemirror/codemirror.js"></script>
+<script src="{{ .base_path }}assets/codemirror/javascript.js"></script>
+<script src="{{ .base_path }}assets/codemirror/jshint.js"></script>
+<script src="{{ .base_path }}assets/codemirror/jsonlint.js"></script>
+<script src="{{ .base_path }}assets/codemirror/lint/lint.js"></script>
+<script src="{{ .base_path }}assets/codemirror/lint/javascript-lint.js"></script>
+<script src="{{ .base_path }}assets/codemirror/hint/javascript-hint.js"></script>
+<script src="{{ .base_path }}assets/codemirror/fold/foldcode.js"></script>
+<script src="{{ .base_path }}assets/codemirror/fold/foldgutter.js"></script>
+<script src="{{ .base_path }}assets/codemirror/fold/brace-fold.js"></script>
 <style>
     @media (min-width: 769px) {
         .ant-layout-content {
@@ -74,7 +88,7 @@
                             </a-col>
                         </a-row>
                     </a-card>
-                    <a-tabs default-active-key="1">
+                    <a-tabs default-active-key="1" @change="(activeKey) => { if(activeKey == 'tpl-2') this.changeCode(); }">
                         <a-tab-pane key="tpl-1" tab='{{ i18n "pages.xray.basicTemplate"}}' style="padding-top: 20px;">
                             <a-collapse>
                                 <a-collapse-panel header='{{ i18n "pages.xray.generalConfigs"}}'>
@@ -187,48 +201,15 @@
                                 </a-collapse-panel>
                             </a-collapse>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-2" tab='{{ i18n "pages.xray.manualLists"}}' style="padding-top: 20px;">
-                            <a-row :xs="24" :sm="24" :lg="12" style="margin-bottom: 10px;">
-                                <a-alert type="warning" style="float: left; width: fit-content">
-                                    <template slot="message">
-                                        <a-icon type="exclamation-circle" theme="filled" style="color: #FFA031"></a-icon>
-                                        {{ i18n "pages.xray.manualListsDesc" }}
-                                    </template>
-                                </a-alert>
-                            </a-row>
-                            <a-collapse>
-                                <a-collapse-panel header='{{ i18n "pages.xray.manualBlockedIPs"}}'>
-                                    <setting-list-item type="textarea" v-model="manualBlockedIPs"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.manualBlockedDomains"}}'>
-                                    <setting-list-item type="textarea" v-model="manualBlockedDomains"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.manualDirectIPs"}}'>
-                                    <setting-list-item type="textarea" v-model="manualDirectIPs"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.manualDirectDomains"}}'>
-                                    <setting-list-item type="textarea" v-model="manualDirectDomains"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.manualIPv4Domains"}}'>
-                                    <setting-list-item type="textarea" v-model="manualIPv4Domains"></setting-list-item>
-                                </a-collapse-panel>
-                            </a-collapse>
-                        </a-tab-pane>
-                        <a-tab-pane key="tpl-3" tab='{{ i18n "pages.xray.advancedTemplate"}}' style="padding-top: 20px;">
-                            <a-collapse>
-                                <a-collapse-panel header='{{ i18n "pages.xray.Inbounds"}}'>
-                                    <setting-list-item type="textarea" title='{{ i18n "pages.xray.Inbounds"}}' desc='{{ i18n "pages.xray.InboundsDesc"}}' v-model="inboundSettings"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.Outbounds"}}'>
-                                    <setting-list-item type="textarea" title='{{ i18n "pages.xray.Outbounds"}}' desc='{{ i18n "pages.xray.OutboundsDesc"}}' v-model="outboundSettings"></setting-list-item>
-                                </a-collapse-panel>
-                                <a-collapse-panel header='{{ i18n "pages.xray.Routings"}}'>
-                                    <setting-list-item type="textarea" title='{{ i18n "pages.xray.Routings"}}' desc='{{ i18n "pages.xray.RoutingsDesc"}}' v-model="routingRuleSettings"></setting-list-item>
-                                </a-collapse-panel>
-                            </a-collapse>
-                        </a-tab-pane>
-                        <a-tab-pane key="tpl-4" tab='{{ i18n "pages.xray.completeTemplate"}}' style="padding-top: 20px;">
-                            <setting-list-item type="textarea" title='{{ i18n "pages.xray.Template"}}' desc='{{ i18n "pages.xray.TemplateDesc"}}' v-model="xraySetting"></setting-list-item>
+                        <a-tab-pane key="tpl-2" tab='{{ i18n "pages.xray.advancedTemplate"}}' style="padding-top: 20px;" force-render="true">
+                            <a-list-item-meta title='{{ i18n "pages.xray.Template"}}' description='{{ i18n "pages.xray.TemplateDesc"}}'></a-list-item-meta>
+                            <a-radio-group v-model="advSettings" @change="changeCode" button-style="solid" style="margin: 10px 0;" :size="isMobile ? 'small' : ''">
+                                <a-radio-button value="xraySetting">{{ i18n "pages.xray.completeTemplate"}}</a-radio-button>
+                                <a-radio-button value="inboundSettings">{{ i18n "pages.xray.Inbounds" }}</a-radio-button>
+                                <a-radio-button value="outboundSettings">{{ i18n "pages.xray.Outbounds" }}</a-radio-button>
+                                <a-radio-button value="routingRuleSettings">{{ i18n "pages.xray.Routings" }}</a-radio-button>
+                            </a-radio-group>
+                            <textarea style="position:absolute; left: -800px;" id="xraySetting"></textarea>
                         </a-tab-pane>
                     </a-tabs>
                 </a-space>
@@ -247,11 +228,36 @@
         data: {
             siderDrawer,
             themeSwitcher,
+            isDarkTheme: themeSwitcher.isDarkTheme,
             spinning: false,
             oldXraySetting: '',
             xraySetting: '',
             saveBtnDisable: true,
             showAlert: false,
+            isMobile: window.innerWidth <= 768,
+            advSettings: 'xraySetting',
+            cm: null,
+            cmOptions: {
+                lineNumbers: true,
+                mode: "application/json",
+                lint: true,
+                styleActiveLine: true,
+                matchBrackets: true,
+                theme: "xq",
+                autoCloseTags: true,
+                lineWrapping: true,
+                indentUnit: 2,
+                indentWithTabs: true,
+                smartIndent: true,
+                tabSize: 2,
+                lineWiseCopyCut: false,
+                foldGutter: true,
+                gutters: [
+                    "CodeMirror-lint-markers",
+                    "CodeMirror-linenumbers",
+                    "CodeMirror-foldgutter",
+                ],
+            },
             ipv4Settings: {
                 tag: "IPv4",
                 protocol: "freedom",
@@ -421,6 +427,28 @@
                     newTemplateSettings.routing.rules = newRules;
                 }
                 this.templateSettings = newTemplateSettings;
+            },
+            changeCode() {
+                if(this.cm != null) {
+                    this.cm.toTextArea();
+                }
+                textAreaObj = document.getElementById('xraySetting');
+                textAreaObj.value = this[this.advSettings];
+                this.cm = CodeMirror.fromTextArea(textAreaObj, this.cmOptions);
+                this.cm.on('change',editor => {
+                    value = editor.getValue();
+                    if(this.isJsonString(value)){
+                        this[this.advSettings] = value;
+                    }
+                });
+            },
+            isJsonString(str) {
+                try {
+                    JSON.parse(str);
+                } catch (e) {
+                    return false;
+                }
+                return true;
             }
         },
         async mounted() {
@@ -783,7 +811,7 @@
                 }
             },
         },
-    });
+});
 </script>
 </body>
 </html>

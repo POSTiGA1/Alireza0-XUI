@@ -530,6 +530,7 @@ style attribute {
 .dark .ant-select-dropdown-menu-item,
 .dark .ant-divider:not(.ant-divider-with-text-center),
 .dark .ant-calendar-input,
+.dark .client-table-header,
 .dark .ant-calendar-time-picker-inner {
     background-color: #222D42;
     border-color: #2c3950;
@@ -556,8 +557,7 @@ style attribute {
 .dark .ant-radio-button-wrapper:before {
     color: rgb(255 255 255 / 65%);
     background-color: rgb(14 73 181 / 30%);
-    border: 1px solid #0e49b5;
-    border-left: inherit;
+    border-color: #0e49b5;
 }
 
 .dark .ant-btn:focus:not(.ant-btn-primary):not(.ant-btn-danger) ,
@@ -574,7 +574,8 @@ style attribute {
     border-color: #42516c;
 }
 
-.dark .ant-table-tbody>tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td {
+.dark .ant-table-tbody>tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td,
+.dark .client-table-odd-row {
     background-color: #122444;
 }
 

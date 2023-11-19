@@ -169,6 +169,18 @@
 {{template "component/themeSwitcher" .}}
 {{template "component/password" .}}
 <script>
+    class User {
+        constructor() {
+            this.username = "";
+            this.password = "";
+        }
+    }
+    const State = {
+        Running: "running",
+        Stop: "stop",
+        Error: "error",
+    }
+
     const app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
