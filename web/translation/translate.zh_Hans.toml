@@ -279,6 +279,13 @@
 "subShowInfo" = "显示使用信息"
 "subShowInfoDesc" = "在配置名称后显示剩余流量和日期"
 
+[pages.settings.toasts]
+"modifySettings" = "修改设置"
+"getSettings" = "获取设置"
+"modifyUser" = "修改用户"
+"originalUserPassIncorrect" = "原用户名或原密码错误"
+"userPassMustBeNotEmpty" = "新用户名和新密码不能为空"
+
 [pages.xray]
 "title" = "Xray 设置"
 "basicTemplate" = "基本模板"
@@ -339,13 +346,21 @@
 "Inbounds" = "界内"
 "Outbounds" = "出站"
 "Routings" = "路由规则"
+"RoutingsDesc" = "每条规则的优先级都很重要"
 
-[pages.settings.toasts]
-"modifySettings" = "修改设置"
-"getSettings" = "获取设置"
-"modifyUser" = "修改用户"
-"originalUserPassIncorrect" = "原用户名或原密码错误"
-"userPassMustBeNotEmpty" = "新用户名和新密码不能为空"
+[pages.xray.rules]
+"firsto" = "第一个"
+"last" = "最后"
+"up" = "向上"
+"down" = "向下"
+"source" = "来源"
+"dest" = "目的地"
+"inbound" = "入站"
+"outbound" = "出站"
+"info" = "信息"
+"add" = "添加规则"
+"edit" = "编辑规则"
+"useComma" = "逗号分隔的项目"
 
 [tgbot]
 "noResult" = "❗ 没有结果！"

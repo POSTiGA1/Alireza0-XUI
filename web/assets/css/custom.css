@@ -465,6 +465,18 @@ style attribute {
     border-color: #151f31;
 }
 
+.dark .ant-table-bordered,
+.dark .ant-table-bordered.ant-table-empty .ant-table-placeholder,
+.dark .ant-table-bordered .ant-table-body>table,
+.dark .ant-table-bordered .ant-table-fixed-left table,
+.dark .ant-table-bordered .ant-table-fixed-right table,
+.dark .ant-table-bordered .ant-table-header>table,
+.dark .ant-table-bordered .ant-table-thead>tr:not(:last-child)>th,
+.dark .ant-table-bordered .ant-table-tbody>tr>td,
+.dark .ant-table-bordered .ant-table-thead>tr>th {
+    border-color: #2C3950;
+}
+
 .dark .ant-table-tbody>tr>td,
 .dark .ant-table-thead>tr>th,
 .dark .ant-card-head,
@@ -527,10 +539,12 @@ style attribute {
 .dark .ant-empty-normal,
 .dark.ant-select-dropdown,
 .dark .ant-select-dropdown,
+.dark .ant-select-dropdown li,
 .dark .ant-select-dropdown-menu-item,
 .dark .ant-divider:not(.ant-divider-with-text-center),
 .dark .ant-calendar-input,
 .dark .client-table-header,
+.dark .ant-select-selection--multiple .ant-select-selection__choice,
 .dark .ant-calendar-time-picker-inner {
     background-color: #222D42;
     border-color: #2c3950;

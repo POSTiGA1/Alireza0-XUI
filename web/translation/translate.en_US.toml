@@ -279,6 +279,13 @@
 "subShowInfo" = "Show usage info"
 "subShowInfoDesc" = "Show remianed traffic and date after config name"
 
+[pages.settings.toasts]
+"modifySettings" = "Modify Settings "
+"getSettings" = "Get Settings "
+"modifyUser" = "Modify User "
+"originalUserPassIncorrect" = "Incorrect original username or password"
+"userPassMustBeNotEmpty" = "New username and new password cannot be empty"
+
 [pages.xray]
 "title" = "Xray Settings"
 "basicTemplate" = "Basic Template"
@@ -339,13 +346,21 @@
 "Inbounds" = "Inbounds"
 "Outbounds" = "Outbounds"
 "Routings" = "Routing rules"
+"RoutingsDesc" = "The priority of each rule is important!"
 
-[pages.settings.toasts]
-"modifySettings" = "Modify Settings "
-"getSettings" = "Get Settings "
-"modifyUser" = "Modify User "
-"originalUserPassIncorrect" = "Incorrect original username or password"
-"userPassMustBeNotEmpty" = "New username and new password cannot be empty"
+[pages.xray.rules]
+"first" = "First"
+"last" = "Last"
+"up" = "Up"
+"down" = "Down"
+"source" = "Source"
+"dest" = "Destination"
+"inbound" = "Inbound"
+"outbound" = "Outbound"
+"info" = "Info"
+"add" = "Add Rule"
+"edit" = "Edit Rule"
+"useComma" = "Comma separated items"
 
 [tgbot]
 "noResult" = "❗ No result!"

@@ -278,6 +278,13 @@
 "subShowInfo" = "نمایش اطلاعات مصرف"
 "subShowInfoDesc" = "ترافیک و زمان باقیمانده را در هر کانفیگ نمایش میدهد"
 
+[pages.settings.toasts]
+"modifySettings" = "ویرایش تنظیمات"
+"getSettings" = "دریافت تنظیمات"
+"modifyUser" = "ویرایش کاربر"
+"originalUserPassIncorrect" = "نام کاربری و رمز عبور فعلی اشتباه می باشد "
+"userPassMustBeNotEmpty" = "نام کاربری و رمز عبور جدید نمیتواند خالی باشد "
+
 [pages.xray]
 "title" = "تنظیمات Xray"
 "basicTemplate" = "بخش الگو پایه"
@@ -335,16 +342,24 @@
 "NetflixIPv4" = "استفاده از آیپی ورژن 4 برای اتصال به نتفلیکس"
 "NetflixIPv4Desc" = "مسیردهی جدید برای اتصال به نتفلیکس با آیپی ورژن 4 اضافه میکند"
 "completeTemplate" = "کامل"
-"Inbounds" = "ورودی"
-"Outbounds" = "خروجی"
+"Inbounds" = "ورودی‌ها"
+"Outbounds" = "خروجی‌ها"
 "Routings" = "قوانین مسیریابی"
+"RoutingsDesc" = "اولویت هر قانون مهم است!"
 
-[pages.settings.toasts]
-"modifySettings" = "ویرایش تنظیمات"
-"getSettings" = "دریافت تنظیمات"
-"modifyUser" = "ویرایش کاربر"
-"originalUserPassIncorrect" = "نام کاربری و رمز عبور فعلی اشتباه می باشد "
-"userPassMustBeNotEmpty" = "نام کاربری و رمز عبور جدید نمیتواند خالی باشد "
+[pages.xray.rules]
+"first" = "اولین"
+"last" = "آخرین"
+"up" = "بالا"
+"down" = "پایین"
+"source" = "مبدا"
+"dest" = "مقصد"
+"inbound" = "ورودی"
+"outbound" = "خروجی"
+"info" = "اطلاعات"
+"add" = "افزودن قانون"
+"edit" = "ویرایش قانون"
+"useComma" = "موارد جدا شده با کاما"
 
 [tgbot]
 "noResult" = "❗ نتیجه‌ای یافت نشد!"

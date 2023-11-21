@@ -279,6 +279,13 @@
 "subShowInfo" = "Показать информацию об использовании"
 "subShowInfoDesc" = "Показывать восстановленный трафик и дату после имени конфигурации"
 
+[pages.settings.toasts]
+"modifySettings" = "Изменение настроек"
+"getSettings" = "Просмотр настроек"
+"modifyUser" = "Изменение пользователя "
+"originalUserPassIncorrect" = "Неверное имя пользователя или пароль"
+"userPassMustBeNotEmpty" = "Новое имя пользователя и новый пароль должны быть заполнены"
+
 [pages.xray]
 "title" = "Xray Настройки"
 "basicTemplate" = "Базовые шаблоны"
@@ -339,13 +346,21 @@
 "Inbounds" = "Входящие"
 "Outbounds" = "Исходящие"
 "Routings" = "Правила маршрутизации"
+"RoutingsDesc" = "Важен приоритет каждого правила!"
 
-[pages.settings.toasts]
-"modifySettings" = "Изменение настроек"
-"getSettings" = "Просмотр настроек"
-"modifyUser" = "Изменение пользователя "
-"originalUserPassIncorrect" = "Неверное имя пользователя или пароль"
-"userPassMustBeNotEmpty" = "Новое имя пользователя и новый пароль должны быть заполнены"
+[pages.xray.rules]
+"first" = "Первый"
+"last" = "Последний"
+"up" = "Вверх"
+"down" = "Вниз"
+"source" = "Источник"
+"dest" = "Пункт назначения"
+"inbound" = "Входящий"
+"outboun" = "Исходящий"
+"info" = "Информация"
+"add" = "Добавить правило"
+"edit" = "Редактировать правило"
+"useComma" = "Элементы, разделенные запятыми"
 
 [tgbot]
 "noResult" = "❗ Нет результатов!"

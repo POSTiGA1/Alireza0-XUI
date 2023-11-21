@@ -94,6 +94,7 @@
                     <a-select
                         mode="multiple"
                         style="width: 250px"
+                        :dropdown-class-name="themeSwitcher.currentTheme"
                         v-model="inbound.stream.tls.alpn">
                         <a-select-option v-for="alpn in ALPN_OPTION" :value="alpn">[[ alpn ]]</a-select-option>
                     </a-select>

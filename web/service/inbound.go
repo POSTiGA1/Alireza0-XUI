@@ -1289,6 +1289,16 @@ func (s *InboundService) SearchInbounds(query string) ([]*model.Inbound, error) 
 	return inbounds, nil
 }
 
+func (s *InboundService) GetInboundTags() (string, error) {
+	db := database.GetDB()
+	var inboundTags []string
+	err := db.Model(model.Inbound{}).Select("tag").Find(&inboundTags).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return "", err
+	}
+	return "[\"" + strings.Join(inboundTags, "\", \"") + "\"]", nil
+}
+
 func (s *InboundService) MigrationRequirements() {
 	db := database.GetDB()
 	tx := db.Begin()
