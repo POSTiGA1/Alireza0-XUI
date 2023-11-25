@@ -52,6 +52,7 @@
 "remained" = "Remained"
 "secAlertTitle" = "Security Alert"
 "secAlertSsl" = "This connection is not secure; Please refrain from entering sensitive information until TLS is activated for data protection"
+"security" = "Security"
 
 [menu]
 "dashboard" = "System Status"
@@ -361,6 +362,20 @@
 "add" = "Add Rule"
 "edit" = "Edit Rule"
 "useComma" = "Comma separated items"
+
+[pages.xray.outbound]
+"addOutbound" = "Add outbound"
+"addReverse" = "Add reverse"
+"editOutbound" = "Edit outbound"
+"editReverse" = "Edit reverse"
+"tag" = "Tag"
+"address" = "Address"
+"reverse" = "Reverse"
+"domain" = "Domain"
+"type" = "Type"
+"bridge" = "Bridge"
+"portal" = "Portal"
+"intercon" = "Interconnection"
 
 [tgbot]
 "noResult" = "❗ No result!"

@@ -38,7 +38,7 @@
             address = this.dbInbound.address;
             this.subId = '';
             this.qrcodes = [];
-            if (this.inbound.tls && !ObjectUtil.isArrEmpty(this.inbound.stream.tls.settings.domains)) {
+            if (this.inbound.stream.isTls && !ObjectUtil.isArrEmpty(this.inbound.stream.tls.settings.domains)) {
                 this.inbound.stream.tls.settings.domains.forEach((domain) => {
                     remarkText = [remark, domain.remark].filter(Boolean).join('-');
                     this.qrcodes.push({

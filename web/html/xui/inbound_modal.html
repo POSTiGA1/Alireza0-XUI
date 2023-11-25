@@ -92,11 +92,11 @@
         },
         methods: {
             streamNetworkChange() {
-                if (!inModal.inbound.canSetTls()) {
+                if (!inModal.inbound.canEnableTls()) {
                     this.inModal.inbound.stream.security = 'none';
                 }
                 if (!inModal.inbound.canEnableReality()) {
-                    this.inModal.inbound.reality = false;
+                    this.inModal.inbound.stream.isReality = false;
                 }
                 if (this.inModal.inbound.protocol == Protocols.VLESS && !inModal.inbound.canEnableTlsFlow()) {
                     this.inModal.inbound.settings.vlesses.forEach(client => {

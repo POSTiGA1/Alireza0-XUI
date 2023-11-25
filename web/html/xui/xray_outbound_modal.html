@@ -1,0 +1,75 @@
+{{define "outModal"}}
+<a-modal id="out-modal" v-model="outModal.visible" :title="outModal.title" @ok="outModal.ok"
+         :confirm-loading="outModal.confirmLoading" :closable="true" :mask-closable="false"
+         :ok-button-props="{ props: { disabled: !isValid } }"
+         :ok-text="outModal.okText" cancel-text='{{ i18n "close" }}' :class="themeSwitcher.currentTheme">
+         <pre>[[ outModal.outbound ]]</pre>
+         {{template "form/outbound"}}
+</a-modal>
+<script>
+
+    const outModal = {
+        title: '',
+        visible: false,
+        confirmLoading: false,
+        okText: '{{ i18n "sure" }}',
+        isEdit: false,
+        confirm: null,
+        outbound: new Outbound(),
+        outboundTags: [],
+        ok() {
+            ObjectUtil.execute(outModal.confirm, outModal.outbound.toJson());
+        },
+        show({ title='', okText='{{ i18n "sure" }}', outbound, confirm=(outbound)=>{}, isEdit=false  }) {
+            this.title = title;
+            this.okText = okText;
+            this.confirm = confirm;
+            this.visible = true;
+            this.outbound = isEdit ? Outbound.fromJson(outbound) : new Outbound();
+
+            this.isEdit = isEdit;
+            this.outboundTags = app.templateSettings.outbounds.map(obj => obj.tag);
+        },
+        close() {
+            outModal.visible = false;
+            outModal.loading(false);
+        },
+        loading(loading) {
+            outModal.confirmLoading = loading;
+        }
+    };
+
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#out-modal',
+        data: {
+            outModal: outModal,
+            duplicateTag: false,
+            isValid: false,
+            get outbound() {
+                return outModal.outbound;
+            },
+        },
+        methods: {
+            streamNetworkChange() {
+                if (this.outModal.outbound.protocol == Protocols.VLESS && !outModal.outbound.canEnableTlsFlow()) {
+                    delete this.outModal.outbound.settings.flow;
+                }
+            },
+            canEnableTls() {
+                return this.outModal.outbound.canEnableTls();
+            },
+            check(){
+                if(outModal.outbound.tag == '' || this.outModal.outboundTags.includes(outModal.outbound.tag)){
+                    this.duplicateTag = true;
+                    this.isValid = false;
+                } else {
+                    this.duplicateTag = false;
+                    this.isValid = true;
+                }
+            },
+        },
+    });
+
+</script>
+{{end}}

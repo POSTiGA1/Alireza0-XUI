@@ -52,6 +52,7 @@
 "remained" = "باقیمانده"
 "secAlertTitle" = "هشدار امنیتی"
 "secAlertSsl" = "این اتصال امن نیست؛ لطفا تا زمانی که تی‌ال‌اس برای حفاظت از داده ها فعال نشده است از وارد کردن اطلاعات حساس خودداری کنید"
+"security" = "امنیت"
 
 [menu]
 "dashboard" = "وضعیت سیستم"
@@ -360,6 +361,21 @@
 "add" = "افزودن قانون"
 "edit" = "ویرایش قانون"
 "useComma" = "موارد جدا شده با کاما"
+
+[pages.xray.outbound]
+"addOutbound" = "افزودن خروجی"
+"addReverse" = "افزودن معکوس"
+"editOutbound" = "ویرایش خروجی"
+"editReverse" = "ویرایش معکوس"
+"tag" = "برچسب"
+"address" = "آدرس"
+"reverse" = "معکوس"
+"domain" = "دامنه"
+"type" = "نوع"
+"bridge" = "پل"
+"portal" = "پرتال"
+"intercon" = "اتصال میانی"
+
 
 [tgbot]
 "noResult" = "❗ نتیجه‌ای یافت نشد!"

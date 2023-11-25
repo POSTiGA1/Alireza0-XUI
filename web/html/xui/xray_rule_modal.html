@@ -217,6 +217,12 @@
             this.inboundTags = app.templateSettings.inbounds.map(obj => obj.tag);
             this.inboundTags.push(...app.inboundTags);
             this.outboundTags = app.templateSettings.outbounds.map(obj => obj.tag);
+            if(app.templateSettings.reverse){
+                if(app.templateSettings.reverse.bridges) {
+                    this.inboundTags.push(...app.templateSettings.reverse.bridges.map(b => b.tag));
+                }
+                if(app.templateSettings.reverse.portals) this.outboundTags.push(...app.templateSettings.reverse.portals.map(b => b.tag));
+            }
         },
         close() {
             ruleModal.visible = false;
@@ -262,11 +268,7 @@
         el: '#rule-modal',
         data: {
             ruleModal: ruleModal,
-        },
-        methods: {
-        },
-        computed: {
-        },
+        }
     });
 
 </script>

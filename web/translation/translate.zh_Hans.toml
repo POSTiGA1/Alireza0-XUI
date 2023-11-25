@@ -52,6 +52,7 @@
 "remained" = "仍然存在"
 "secAlertTitle" = "安全警报"
 "secAlertSsl" = "此连接不安全；在激活 TLS 进行数据保护之前，请勿输入敏感信息"
+"security" = "安全"
 
 [menu]
 "dashboard" = "系统状态"
@@ -361,6 +362,20 @@
 "add" = "添加规则"
 "edit" = "编辑规则"
 "useComma" = "逗号分隔的项目"
+
+[pages.xray.outbound]
+"addOutbound" = "添加出站"
+"addReverse" = "添加反向"
+"editOutbound" = "编辑出站"
+"editReverse" = "编辑反向"
+"tag" = "标签"
+"address" = "地址"
+"rreverse" = "反转"
+"domain" = "域名"
+"type" = "类型"
+"bridge" = "桥"
+"portal" = "门户"
+"intercon" = "互连"
 
 [tgbot]
 "noResult" = "❗ 没有结果！"

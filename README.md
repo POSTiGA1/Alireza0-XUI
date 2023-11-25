@@ -22,6 +22,8 @@ xray panel supporting multi-protocol, **Multi-lang (English,Farsi,Chinese,Russia
 | Backup database using Telegram BOT   | :heavy_check_mark: |
 | Subscription link + userInfo         | :heavy_check_mark: |
 | Calculate expire date on first usage | :heavy_check_mark: |
+| Show Online Clients                  | :heavy_check_mark: |
+
 
 **If you think this project is helpful to you, you may wish to give a** :star2:
 
@@ -110,6 +112,7 @@ docker build -t x-ui .
 - Support one-click SSL certificate application and automatic renewal
 - For more advanced configuration items, please refer to the panel
 - Support export/import database from panel
+- Show online users
 
 ## suggestion system
 
@@ -123,21 +126,23 @@ docker build -t x-ui .
 - `/login` with `PUSH` user data: `{username: '', password: ''}` for login
 - `/xui/API/inbounds` base for following actions:
 
-| Method | Path                            | Action                                    |
-| :----: | ------------------------------- | ----------------------------------------- |
-| `GET`  | `"/"`                           | Get all inbounds                          |
-| `GET`  | `"/get/:id"`                    | Get inbound with inbound.id               |
-| `GET`  | `"/createbackup"`               | Telegram bot sends backup to admins       |
-| `POST` | `"/add"`                        | Add inbound                               |
-| `POST` | `"/del/:id"`                    | Delete Inbound                            |
-| `POST` | `"/update/:id"`                 | Update Inbound                            |
-| `POST` | `"/addClient/"`                 | Add Client to inbound                     |
-| `POST` | `"/:id/delClient/:clientId"`    | Delete Client by clientId\*               |
-| `POST` | `"/updateClient/:clientId"`     | Update Client by clientId\*               |
-| `POST` | `"/getClientTraffics/:email"`   | Get Client's Traffic                      |
-| `POST` | `"/resetAllTraffics"`           | Reset traffics of all inbounds            |
-| `POST` | `"/resetAllClientTraffics/:id"` | Reset inbound clients traffics (-1: all)  |
-| `POST` | `"/delDepletedClients/:id"`     | Delete inbound depleted clients (-1: all) |
+| Method | Path                               | Action                                    |
+| :----: | ---------------------------------  | ----------------------------------------- |
+| `GET`  | `"/"`                              | Get all inbounds                          |
+| `GET`  | `"/get/:id"`                       | Get inbound with inbound.id               |
+| `GET`  | `"/createbackup"`                  | Telegram bot sends backup to admins       |
+| `POST` | `"/add"`                           | Add inbound                               |
+| `POST` | `"/del/:id"`                       | Delete Inbound                            |
+| `POST` | `"/update/:id"`                    | Update Inbound                            |
+| `POST` | `"/addClient/"`                    | Add Client to inbound                     |
+| `POST` | `"/:id/delClient/:clientId"`       | Delete Client by clientId\*               |
+| `POST` | `"/updateClient/:clientId"`        | Update Client by clientId\*               |
+| `GET`  | `"/getClientTraffics/:email"`      | Get Client's Traffic                      |
+| `POST` | `"/:id/resetClientTraffic/:email"` | Reset Client's Traffic                    |
+| `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds            |
+| `POST` | `"/resetAllClientTraffics/:id"`    | Reset inbound clients traffics (-1: all)  |
+| `POST` | `"/delDepletedClients/:id"`        | Delete inbound depleted clients (-1: all) |
+| `POST` | `"/onlines"`                       | Get Online users ( list of emails )       |
 
 \*- The field `clientId` should be filled by:
 
@@ -154,10 +159,12 @@ docker build -t x-ui .
 | XUI_BIN_FOLDER |                    `string`                    | `"bin"`       |
 | XUI_DB_FOLDER  |                    `string`                    | `"/etc/x-ui"` |
 
-# Screenshot from Inbouds page
+# Screenshots
 
 ![inbounds](./media/inbounds.png)
 ![Dark inbounds](./media/inbounds-dark.png)
+![outbounds](./media/outbounds.png)
+![rules](./media/rules.png)
 
 ## SSL certificate application
 

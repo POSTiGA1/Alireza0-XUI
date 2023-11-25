@@ -51,11 +51,11 @@
             </table>
         </td></tr>
         <tr colspan="2" v-if="dbInbound.hasLink()">
-            <td v-if="inbound.tls">
+            <td v-if="inbound.stream.isTls">
                 tls: <a-tag color="green">{{ i18n "enabled" }}</a-tag><br />
                 tls {{ i18n "domainName" }}: <a-tag :color="inbound.serverName ? 'green' : 'orange'">[[ inbound.serverName ? inbound.serverName : '' ]]</a-tag>
             </td>
-            <td v-else-if="inbound.reality">
+            <td v-else-if="inbound.stream.isReality">
                 reality: <a-tag color="green">{{ i18n "enabled" }}</a-tag><br />
                 reality Destination: <a-tag :color="inbound.stream.reality.dest ? 'green' : 'orange'">[[ inbound.stream.reality.dest ]]</a-tag>
             </td>
@@ -268,7 +268,7 @@
             remark = [this.dbInbound.remark, ( this.clientSettings ? this.clientSettings.email : '')].filter(Boolean).join('-');
             address = this.dbInbound.address;
             this.links = [];
-            if (this.inbound.tls && !ObjectUtil.isArrEmpty(this.inbound.stream.tls.settings.domains)) {
+            if (this.inbound.stream.isTls && !ObjectUtil.isArrEmpty(this.inbound.stream.tls.settings.domains)) {
                 this.inbound.stream.tls.settings.domains.forEach((domain) => {
                     remarkText = [remark, domain.remark].filter(Boolean).join('-');
                     this.links.push({
