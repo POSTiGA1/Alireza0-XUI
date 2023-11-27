@@ -544,10 +544,7 @@
             refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000,
             subSettings: {
                 enable : false,
-                port: 0,
-                path: '',
-                domain: '',
-                tls: false
+                subURI : ''
             },
             tgBotEnable: false,
             showAlert: false,
@@ -591,10 +588,7 @@
                     this.tgBotEnable = tgBotEnable;
                     this.subSettings = {
                         enable : subEnable,
-                        port: subPort,
-                        path: subPath,
-                        domain: subDomain,
-                        tls: subTLS
+                        subURI: subURI
                     };
                     this.pageSize = pageSize;
                 }

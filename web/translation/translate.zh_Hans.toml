@@ -279,6 +279,8 @@
 "subEncryptDesc" = "在订阅中加密返回的配置"
 "subShowInfo" = "显示使用信息"
 "subShowInfoDesc" = "在配置名称后显示剩余流量和日期"
+"subURI" = "反向代理 URI"
+"subURIDesc" = "更改订阅 URL 的基本 URI 以在代理后面使用"
 
 [pages.settings.toasts]
 "modifySettings" = "修改设置"

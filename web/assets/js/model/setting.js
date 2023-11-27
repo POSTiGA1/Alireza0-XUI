@@ -29,6 +29,7 @@ class AllSetting {
         this.subUpdates = 0;
         this.subEncrypt = true;
         this.subShowInfo = false;
+        this.subURI = '';
 
         this.timeLocation = "Asia/Tehran";
 

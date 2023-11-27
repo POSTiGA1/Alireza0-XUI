@@ -495,7 +495,7 @@ func (t *Tgbot) getClientUsage(chatId int64, tgUserName string) {
 		return
 	}
 
-	traffics, err := t.inboundService.GetClientTrafficTgBot(tgUserName)
+	traffics, err := t.inboundService.GetClientTrafficTgBot(strconv.FormatInt(chatId, 10), tgUserName)
 	if err != nil {
 		logger.Warning(err)
 		msg := t.I18nBot("tgbot.wentWrong")
@@ -504,6 +504,7 @@ func (t *Tgbot) getClientUsage(chatId int64, tgUserName string) {
 	}
 	if len(traffics) == 0 {
 		msg := t.I18nBot("tgbot.answers.askToAddUserName", "TgUserName=="+tgUserName)
+		msg += "\r\n" + t.I18nBot("tgbot.commands.getID", "ID=="+strconv.FormatInt(chatId, 10))
 		t.SendMsgToTgbot(chatId, msg)
 		return
 	}

@@ -152,7 +152,7 @@
             </a-row>
         </template>
         <template v-if="app.tgBotEnable && infoModal.clientSettings.tgId">
-            <a-divider>Telegram Username</a-divider>
+            <a-divider>Telegram ID</a-divider>
             <a-row>
                 <a-col :span="22"><a :href="[[ infoModal.tgLink ]]" target="_blank">@[[ infoModal.clientSettings.tgId ]]</a></a-col>
                 <a-col :span="2">
@@ -296,8 +296,7 @@
             infoModal.visible = false;
         },
         genSubLink(subID) {
-            const { domain: host, port, tls: isTLS, path: base } = app.subSettings;
-            return buildURL({ host, port, isTLS, base, path: subID+'?name='+subID });
+            return app.subSettings.subURI+subID+'?name='+subID;
         }
     };
 

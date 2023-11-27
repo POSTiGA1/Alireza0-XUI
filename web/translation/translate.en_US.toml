@@ -279,6 +279,8 @@
 "subEncryptDesc" = "Encrypt the returned configs in subscription"
 "subShowInfo" = "Show usage info"
 "subShowInfoDesc" = "Show remianed traffic and date after config name"
+"subURI" = "Reverse Proxy URI"
+"subURIDesc" = "Change base URI of subscription URL for using on behind of proxies"
 
 [pages.settings.toasts]
 "modifySettings" = "Modify Settings "

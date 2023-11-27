@@ -1,5 +1,7 @@
 {{define "form/outbound"}}
 <!-- base -->
+<a-tabs :active-key="outModal.activeKey"  style="padding: 0; background-color: transparent;" @change="(activeKey) => {outModal.toggleJson(activeKey == '2'); }">
+<a-tab-pane key="1" tab="Form">
 <a-form layout="inline">
     <table width="100%" class="ant-table-tbody">
         <tr>
@@ -16,7 +18,7 @@
             <td>{{ i18n "pages.xray.outbound.tag" }}</td>
             <td>
                 <a-form-item>
-                    <a-input v-model.trim="outbound.tag" style="width: 250px" @change="check" :style="duplicateTag? 'border-color: red;' : ''"></a-input>
+                    <a-input v-model.trim="outbound.tag" style="width: 250px" @change="outModal.check()" :style="outModal.duplicateTag? 'border-color: red;' : ''"></a-input>
                 </a-form-item>
             </td>
         </tr>
@@ -528,6 +530,16 @@
                 </tr>
         </template>
 </template>
+</template>
     </table>
 </a-form>
+</a-tab-pane>
+<a-tab-pane key="2" tab="JSON" force-render="true">
+    <a-form-item style="margin: 10px 0">
+        Link: <a-input v-model.trim="outModal.link" style="width: 300px; margin-right: 5px;" placeholder="vmess:// vless:// trojan:// ss://"></a-input>
+        <a-button @click="convertLink" type="primary"><a-icon type="form"></a-icon></a-button>
+    </a-form-item>
+        <textarea style="position:absolute; left: -800px;" id="outboundJson"></textarea>
+</a-tab-pane>
+</a-tabs>
 {{end}}

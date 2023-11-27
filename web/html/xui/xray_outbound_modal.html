@@ -1,9 +1,8 @@
 {{define "outModal"}}
 <a-modal id="out-modal" v-model="outModal.visible" :title="outModal.title" @ok="outModal.ok"
          :confirm-loading="outModal.confirmLoading" :closable="true" :mask-closable="false"
-         :ok-button-props="{ props: { disabled: !isValid } }"
+         :ok-button-props="{ props: { disabled: !outModal.isValid } }" style="overflow: hidden;"
          :ok-text="outModal.okText" cancel-text='{{ i18n "close" }}' :class="themeSwitcher.currentTheme">
-         <pre>[[ outModal.outbound ]]</pre>
          {{template "form/outbound"}}
 </a-modal>
 <script>
@@ -16,7 +15,12 @@
         isEdit: false,
         confirm: null,
         outbound: new Outbound(),
-        outboundTags: [],
+        jsonMode: false,
+        link: '',
+        cm: null,
+        duplicateTag: false,
+        isValid: true,
+        activeKey: '1',
         ok() {
             ObjectUtil.execute(outModal.confirm, outModal.outbound.toJson());
         },
@@ -24,11 +28,13 @@
             this.title = title;
             this.okText = okText;
             this.confirm = confirm;
+            this.jsonMode = false;
+            this.link = '';
+            this.activeKey = '1';
             this.visible = true;
             this.outbound = isEdit ? Outbound.fromJson(outbound) : new Outbound();
-
             this.isEdit = isEdit;
-            this.outboundTags = app.templateSettings.outbounds.map(obj => obj.tag);
+            this.check()
         },
         close() {
             outModal.visible = false;
@@ -36,7 +42,49 @@
         },
         loading(loading) {
             outModal.confirmLoading = loading;
-        }
+        },
+        check(){
+            if(outModal.outbound.tag == ''){
+                this.duplicateTag = true;
+                this.isValid = false;
+            } else {
+                this.duplicateTag = false;
+                this.isValid = true;
+            }
+        },
+        toggleJson(jsonTab) {
+            textAreaObj = document.getElementById('outboundJson');
+            if(jsonTab){
+                if(this.cm != null) {
+                        this.cm.toTextArea();
+                        this.cm=null;
+                }
+                textAreaObj.value = JSON.stringify(this.outbound.toJson(), null, 2);
+                this.cm = CodeMirror.fromTextArea(textAreaObj, app.cmOptions);
+                this.cm.on('change',editor => {
+                    value = editor.getValue();
+                    if(this.isJsonString(value)){
+                        this.outbound = Outbound.fromJson(JSON.parse(value));
+                        this.check();
+                    }
+                });
+                this.activeKey = '2';
+            } else {
+                if(this.cm != null) {
+                        this.cm.toTextArea();
+                        this.cm=null;
+                }
+                this.activeKey = '1';
+            }
+        },
+        isJsonString(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        },
     };
 
     new Vue({
@@ -44,8 +92,6 @@
         el: '#out-modal',
         data: {
             outModal: outModal,
-            duplicateTag: false,
-            isValid: false,
             get outbound() {
                 return outModal.outbound;
             },
@@ -59,14 +105,10 @@
             canEnableTls() {
                 return this.outModal.outbound.canEnableTls();
             },
-            check(){
-                if(outModal.outbound.tag == '' || this.outModal.outboundTags.includes(outModal.outbound.tag)){
-                    this.duplicateTag = true;
-                    this.isValid = false;
-                } else {
-                    this.duplicateTag = false;
-                    this.isValid = true;
-                }
+            convertLink(){
+                this.outModal.outbound = Outbound.fromLink(outModal.link);
+                this.outModal.toggleJson(true);
+                this.outModal.check();
             },
         },
     });

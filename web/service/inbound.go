@@ -1194,27 +1194,16 @@ func (s *InboundService) DelDepletedClients(id int) (err error) {
 	return nil
 }
 
-func (s *InboundService) GetClientTrafficTgBot(tguname string) ([]*xray.ClientTraffic, error) {
+func (s *InboundService) GetClientTrafficTgBot(tgid string, tguname string) ([]*xray.ClientTraffic, error) {
 	db := database.GetDB()
-	var inbounds []*model.Inbound
-	err := db.Model(model.Inbound{}).Where("settings like ?", fmt.Sprintf(`%%"tgId": "%s"%%`, tguname)).Find(&inbounds).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, err
-	}
-	var emails []string
-	for _, inbound := range inbounds {
-		clients, err := s.GetClients(inbound)
-		if err != nil {
-			logger.Error("Unable to get clients from inbound")
-		}
-		for _, client := range clients {
-			if client.TgID == tguname {
-				emails = append(emails, client.Email)
-			}
-		}
-	}
 	var traffics []*xray.ClientTraffic
-	err = db.Model(xray.ClientTraffic{}).Where("email IN ?", emails).Find(&traffics).Error
+	err := db.Model(xray.ClientTraffic{}).Where(`email IN(
+		SELECT JSON_EXTRACT(client.value, '$.email') as email
+		FROM inbounds,
+	  	JSON_EACH(JSON_EXTRACT(inbounds.settings, '$.clients')) AS client
+		WHERE
+	  	JSON_EXTRACT(client.value, '$.tgId') in (?,?)
+		)`, tgid, tguname).Find(&traffics).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			logger.Warning(err)

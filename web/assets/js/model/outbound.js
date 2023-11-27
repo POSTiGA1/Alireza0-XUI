@@ -470,6 +470,61 @@ class Outbound extends CommonClass {
             streamSettings: this.canEnableStream() ? this.stream.toJson() : undefined,
         };
     }
+
+    static fromLink(link) {
+        data = link.split('://');
+        if(data.length !=2) return null;
+        switch(data[0].toLowerCase()){
+            case Protocols.VMess:
+                return this.fromVmessLink(JSON.parse(atob(data[1])));
+            case Protocols.VLESS:
+            case Protocols.Trojan:
+            case 'ss':
+            default:
+                return null;
+        }
+    }
+
+    static fromVmessLink(json={}){
+        let stream = new StreamSettings(json.net, json.tls);
+
+        let network = json.net;
+        if (network === 'tcp') {
+            stream.tcp = new TcpStreamSettings(
+                json.type,
+                json.host ? json.host.split(','): [],
+                json.path ? json.path.split(','): []);
+        } else if (network === 'kcp') {
+            stream.kcp = new KcpStreamSettings();
+            stream.type = json.type;
+            stream.seed = json.path;
+        } else if (network === 'ws') {
+            stream.ws = new WsStreamSettings(json.path,json.host);
+        } else if (network === 'http' || network == 'h2') {
+            stream.network = 'http'
+            stream.http = new HttpStreamSettings(
+                json.path,
+                json.host ? json.host.split(',') : []);
+        } else if (network === 'quic') {
+            strem.quic = new QuicStreamSettings(
+                json.host ? json.host : 'none',
+                json.path,
+                json.type ? json.type : 'none');
+        } else if (network === 'grpc') {
+            stream.grpc = new GrpcStreamSettings(json.path, json.type == 'multi');
+        }
+
+        if(json.tls && json.tls == 'tls'){
+            stream.tls = new TlsStreamSettings(
+                json.sni,
+                json.alpn ? json.alpn.split(',') : [],
+                json.fp,
+                json.allowInsecure);
+        }
+
+
+        return new Outbound(json.ps, Protocols.VMess, new Outbound.VmessSettings(json.add, json.port, json.id), stream);
+    }
 }
 
 Outbound.Settings = class extends CommonClass {
@@ -512,7 +567,6 @@ Outbound.Settings = class extends CommonClass {
         return {};
     }
 };
-
 Outbound.FreedomSettings = class extends CommonClass {
     constructor(domainStrategy='', fragment={}) {
         super();
