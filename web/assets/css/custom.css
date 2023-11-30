@@ -404,6 +404,10 @@ style attribute {
     color: #e04141;
 }
 
+.ant-input::placeholder{
+    opacity: 0.5;
+}
+
 .ant-input:hover,
 .ant-input:focus {
     background-color: #edf4fa;

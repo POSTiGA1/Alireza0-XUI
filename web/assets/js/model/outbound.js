@@ -480,6 +480,7 @@ class Outbound extends CommonClass {
             case Protocols.VLESS:
             case Protocols.Trojan:
             case 'ss':
+                return this.fromParamLink(link);
             default:
                 return null;
         }
@@ -506,7 +507,7 @@ class Outbound extends CommonClass {
                 json.path,
                 json.host ? json.host.split(',') : []);
         } else if (network === 'quic') {
-            strem.quic = new QuicStreamSettings(
+            stream.quic = new QuicStreamSettings(
                 json.host ? json.host : 'none',
                 json.path,
                 json.type ? json.type : 'none');
@@ -524,6 +525,85 @@ class Outbound extends CommonClass {
 
 
         return new Outbound(json.ps, Protocols.VMess, new Outbound.VmessSettings(json.add, json.port, json.id), stream);
+    }
+
+    static fromParamLink(link){
+        const url = new URL(link);
+        let type = url.searchParams.get('type');
+        let security = url.searchParams.get('security') ?? 'none';
+        let stream = new StreamSettings(type, security);
+
+        let headerType = url.searchParams.get('headerType');
+        let host = url.searchParams.get('host');
+        let path = url.searchParams.get('path');
+
+        if (type === 'tcp') {
+            stream.tcp = new TcpStreamSettings(headerType ?? 'none', host, path);
+        } else if (type === 'kcp') {
+            stream.kcp = new KcpStreamSettings();
+            stream.kcp.type = headerType ?? 'none';
+            stream.kcp.seed = path;
+        } else if (type === 'ws') {
+            stream.ws = new WsStreamSettings(path,host);
+        } else if (type === 'http' || type == 'h2') {
+            stream.http = new HttpStreamSettings(path,host);
+        } else if (type === 'quic') {
+            stream.quic = new QuicStreamSettings(
+                url.searchParams.get('quicSecurity') ?? 'none',
+                url.searchParams.get('key') ?? '',
+                headerType ?? 'none');
+        } else if (type === 'grpc') {
+            stream.grpc = new GrpcStreamSettings(url.searchParams.get('serviceName') ?? '', url.searchParams.get('mode') == 'multi');
+        }
+
+        if(security == 'tls'){
+            let fp=url.searchParams.get('fp') ?? 'none';
+            let alpn=url.searchParams.get('alpn');
+            let allowInsecure=url.searchParams.get('allowInsecure');
+            let sni=url.searchParams.get('sni') ?? '';
+            stream.tls = new TlsStreamSettings(sni, alpn ? alpn.split(',') : [], fp, allowInsecure == 1);
+        }
+
+        if(security == 'reality'){
+            let pbk=url.searchParams.get('pbk');
+            let fp=url.searchParams.get('fp');
+            let sni=url.searchParams.get('sni') ?? '';
+            let sid=url.searchParams.get('sid') ?? '';
+            let spx=url.searchParams.get('spx') ?? '';
+            stream.tls = new RealityStreamSettings(pbk, fp, sni, sid, spx);
+        }
+
+        let data = link.split('?');
+        if(data.length != 2) return null;
+
+        const regex = /([^@]+):\/\/([^@]+)@([^:]+):(\d+)\?(.*)$/;
+        const match = link.match(regex);
+
+        if (!match) return null;
+        let [, protocol, userData, address, port, ] = match;
+        if(protocol == 'ss') {
+            protocol = 'shadowsocks';
+            userData = atob(userData).split(':');
+        }
+        var settings;
+        switch(protocol){
+            case Protocols.VLESS:
+                settings = new Outbound.VLESSSettings(address, port, userData, url.searchParams.get('flow') ?? '');
+                break;
+            case Protocols.Trojan:
+                settings = new Outbound.TrojanSettings(address, port, userData);
+                break;
+            case Protocols.Shadowsocks:
+                let method = userData.splice(0,1)[0];
+                settings = new Outbound.ShadowsocksSettings(address, port, userData.join(":"), method, true);
+                break;
+            default:
+                return null;
+        }
+        let remark = decodeURIComponent(url.hash);
+        // Remove '#' from url.hash
+        remark = remark.length > 0 ? remark.substring(1) : 'out-' + protocol + '-' + port;
+        return new Outbound(remark, protocol, settings, stream);
     }
 }
 

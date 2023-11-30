@@ -4,9 +4,8 @@
     <a-divider style="margin:0;"></a-divider>
     <table width="100%" class="ant-table-tbody">
         <tr>
-            <td width="30%">{{ i18n "security" }}</td>
-            <td>
-                <a-form-item>
+            <td colspan="2">
+                <a-form-item label='{{ i18n "security" }}'>
                     <a-radio-group v-model="inbound.stream.security" button-style="solid">
                         <a-radio-button value="none">{{ i18n "none" }}</a-radio-button>
                         <a-radio-button value="tls">TLS</a-radio-button>
@@ -22,7 +21,7 @@
         <td>SNI</td>
         <td>
             <a-form-item placeholder="Server Name Indication">
-                <a-input v-model.trim="inbound.stream.tls.settings.serverName" style="width: 250px"></a-input>
+                <a-input v-model.trim="inbound.stream.tls.sni" style="width: 250px"></a-input>
             </a-form-item>                
         </td>
     </tr>
@@ -61,33 +60,6 @@
                     <a-select-option value=''>None</a-select-option>
                     <a-select-option v-for="key in UTLS_FINGERPRINT" :value="key">[[ key ]]</a-select-option>
                 </a-select>
-            </a-form-item>
-        </td>
-    </tr>
-    <tr style="line-height: 40px;">
-        <td>Multi Domain</td>
-        <td>
-                <a-switch v-model="multiDomain"></a-switch>
-                <a-button v-if="multiDomain" style="margin-left: 10px" size="small" @click="inbound.stream.tls.settings.domains.push({remark: '', domain: ''})">+</a-button>
-        </td>
-    </tr>
-    <tr v-if="multiDomain" style="line-height: 40px;">
-        <td colspan="2" width="100%">
-                <a-input-group style="margin-top:5px;" compact v-for="(row, index) in inbound.stream.tls.settings.domains">
-                    <a-input style="width: 50%" v-model.trim="row.remark" placeholder='{{ i18n "remark" }}'>
-                        <template slot="addonBefore" style="margin: 0;">[[ index+1 ]]</template>
-                    </a-input>
-                    <a-input style="width: 50%" v-model.trim="row.domain" placeholder='{{ i18n "host" }}'>
-                        <a-button slot="addonAfter" size="small" style="margin: 0px" @click="inbound.stream.tls.settings.domains.splice(index, 1)">-</a-button>
-                    </a-input>
-                </a-input-group>
-        </td>
-    </tr>
-    <tr v-else>
-        <td>{{ i18n "domainName" }}</td>
-        <td>
-            <a-form-item>
-                <a-input v-model.trim="inbound.stream.tls.server" style="width: 250px"></a-input>
             </a-form-item>
         </td>
     </tr>
@@ -190,14 +162,6 @@
 
 <!-- reality settings -->
 <template v-if="inbound.stream.isReality">
-        <tr>
-            <td>{{ i18n "domainName" }}</td>
-            <td>
-                <a-form-item>
-                    <a-input v-model.trim="inbound.stream.reality.settings.serverName" style="width: 250px"></a-input>
-                </a-form-item>
-            </td>
-        </tr>
         <tr>
             <td>Show</td>
             <td>

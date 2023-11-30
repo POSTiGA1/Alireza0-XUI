@@ -106,9 +106,17 @@
                 return this.outModal.outbound.canEnableTls();
             },
             convertLink(){
-                this.outModal.outbound = Outbound.fromLink(outModal.link);
-                this.outModal.toggleJson(true);
-                this.outModal.check();
+                newOutbound = Outbound.fromLink(outModal.link);
+                if(newOutbound){
+                    this.outModal.outbound = newOutbound;
+                    this.outModal.toggleJson(true);
+                    this.outModal.check();
+                    this.$message.success('Link imported successfully...');      
+                    outModal.link = '';
+                } else {
+                    this.$message.error('Wrong Link!');
+                    outModal.link = '';
+                }
             },
         },
     });

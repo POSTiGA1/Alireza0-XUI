@@ -136,14 +136,9 @@ class DBInbound {
                 return false;
         }
     }
-
-    genLink(address=this.address, remark=this.remark, clientIndex=0) {
-        const inbound = this.toInbound();
-        return inbound.genLink(address, remark, clientIndex);
-    }
     
 	get genInboundLinks() {
         const inbound = this.toInbound();
-        return inbound.genInboundLinks(this.address, this.remark);
+        return inbound.genInboundLinks(this.remark);
     }
 }
