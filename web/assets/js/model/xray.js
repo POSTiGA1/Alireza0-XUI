@@ -904,9 +904,8 @@ class Inbound extends XrayCommonClass {
     }
 
     get serverName() {
-        if (this.stream.isTls || this.stream.isReality) {
-            return this.stream.tls.server;
-        }
+        if (this.stream.isTls) return this.stream.tls.sni;
+        if (this.stream.isReality) return this.stream.reality.serverNames;
         return "";
     }
 

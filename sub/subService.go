@@ -255,7 +255,7 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 			}
 			newObj["ps"] = s.genRemark(inbound, email, ep["remark"].(string))
 			newObj["add"] = ep["dest"].(string)
-			newObj["port"] = ep["port"].(string)
+			newObj["port"] = int(ep["port"].(float64))
 
 			if newSecurity != "same" {
 				newObj["tls"] = newSecurity
@@ -416,8 +416,8 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 			ep, _ := externalProxy.(map[string]interface{})
 			newSecurity, _ := ep["forceTls"].(string)
 			dest, _ := ep["dest"].(string)
-			port, _ := ep["port"].(string)
-			link := fmt.Sprintf("vless://%s@%s:%s", uuid, dest, port)
+			port := int(ep["port"].(float64))
+			link := fmt.Sprintf("vless://%s@%s:%d", uuid, dest, port)
 
 			if newSecurity != "same" {
 				params["security"] = newSecurity
@@ -594,8 +594,8 @@ func (s *SubService) genTrojanLink(inbound *model.Inbound, email string) string 
 			ep, _ := externalProxy.(map[string]interface{})
 			newSecurity, _ := ep["forceTls"].(string)
 			dest, _ := ep["dest"].(string)
-			port, _ := ep["port"].(string)
-			link := fmt.Sprintf("trojan://%s@%s:%s", password, dest, port)
+			port := int(ep["port"].(float64))
+			link := fmt.Sprintf("trojan://%s@%s:%d", password, dest, port)
 
 			if newSecurity != "same" {
 				params["security"] = newSecurity
@@ -747,8 +747,8 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 			ep, _ := externalProxy.(map[string]interface{})
 			newSecurity, _ := ep["forceTls"].(string)
 			dest, _ := ep["dest"].(string)
-			port, _ := ep["port"].(string)
-			link := fmt.Sprintf("ss://%s@%s:%s", base64.StdEncoding.EncodeToString([]byte(encPart)), dest, port)
+			port := int(ep["port"].(float64))
+			link := fmt.Sprintf("ss://%s@%s:%d", base64.StdEncoding.EncodeToString([]byte(encPart)), dest, port)
 
 			if newSecurity != "same" {
 				params["security"] = newSecurity

@@ -72,8 +72,8 @@
                         <a-row>
                             <a-col :xs="24" :sm="8" style="padding: 4px;">
                                 <a-space direction="horizontal">
-                                    <a-button type="primary" :disabled="saveBtnDisable" @click="updateXraySetting">{{ i18n "pages.settings.save" }}</a-button>
-                                    <a-button type="danger" :disabled="!saveBtnDisable" @click="restartPanel">{{ i18n "pages.settings.restartPanel" }}</a-button>
+                                    <a-button type="primary" :disabled="saveBtnDisable" @click="updateXraySetting">{{ i18n "pages.xray.save" }}</a-button>
+                                    <a-button type="danger" :disabled="!saveBtnDisable" @click="restartXray">{{ i18n "pages.xray.restart" }}</a-button>
                                 </a-space>
                             </a-col>
                             <a-col :xs="24" :sm="16">
@@ -564,19 +564,9 @@
                     await this.getXraySetting();
                 }
             },
-            async restartPanel() {
-                await new Promise(resolve => {
-                    this.$confirm({
-                        title: '{{ i18n "pages.settings.restartPanel" }}',
-                        content: '{{ i18n "pages.settings.restartPanelDesc" }}',
-                        class: themeSwitcher.currentTheme,
-                        okText: '{{ i18n "sure" }}',
-                        cancelText: '{{ i18n "cancel" }}',
-                        onOk: () => resolve(),
-                    });
-                });
+            async restartXray() {
                 this.loading(true);
-                const msg = await HttpUtil.post("/xui/setting/restartPanel");
+                const msg = await HttpUtil.post("server/restartXrayService");
                 this.loading(false);
             },
             async resetXrayConfigToDefault() {
@@ -794,7 +784,7 @@
                 if(reverseTypeObj.length == 0) Reflect.deleteProperty(newTemplateSettings.reverse, oldData.type+'s');
                 if(Object.keys(newTemplateSettings.reverse).length === 0) Reflect.deleteProperty(newTemplateSettings, 'reverse');
 
-                newRules = newTemplateSettings.routing.rules.filter(r => r.outboundTag != oldtag && (r.inboundTag && !r.inboundTag.includes(oldtag)));
+                newRules = newTemplateSettings.routing.rules.filter(r => r.outboundTag != oldData.tag && (r.inboundTag && !r.inboundTag.includes(oldData.tag)));
                 newTemplateSettings.routing.rules = newRules;
                 
                 this.templateSettings = newTemplateSettings;

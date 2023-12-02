@@ -514,7 +514,6 @@ style attribute {
 .dark .ant-tabs-tab-arrow-show:not(.ant-tabs-tab-btn-disabled),
 .dark .anticon-close,
 .dark .ant-list-item-meta-title,
-.dark .ant-list-item-meta-description,
 .dark .ant-select-selection i,
 .dark .ant-modal-confirm-title,
 .dark .ant-modal-confirm-content,
@@ -525,6 +524,10 @@ style attribute {
 .dark .ant-popover-inner-content,
 .dark h2 {
     color: rgb(255 255 255 / 65%);
+}
+
+.dark .ant-list-item-meta-description {
+    color: rgb(255 255 255 / 45%);
 }
 
 .dark .ant-pagination-disabled i,

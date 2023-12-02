@@ -291,6 +291,8 @@
 
 [pages.xray]
 "title" = "تنظیمات Xray"
+"save" = "ذخیره تنظیمات"
+"restart" = "ریستارت ایکس‌ری"
 "basicTemplate" = "بخش الگو پایه"
 "advancedTemplate" = "بخش الگو پیشرفته"
 "generalConfigs" = "تنظیمات عمومی"

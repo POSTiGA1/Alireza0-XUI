@@ -631,30 +631,32 @@ show_usage() {
 
 show_menu() {
     echo -e "
-  ${green}x-ui Panel Management Script${plain}
-  ${green}0.${plain} exit script
+  ${green}X-UI Panel Management Script${plain}
 ————————————————
-  ${green}1.${plain} Install x-ui
-  ${green}2.${plain} Update x-ui
-  ${green}3.${plain} Uninstall x-ui
+  ${green}0.${plain} Exit Script
 ————————————————
-  ${green}4.${plain} Reset username and password
-  ${green}5.${plain} Reset panel settings
-  ${green}6.${plain} Set panel port
-  ${green}7.${plain} View current panel settings
+  ${green}1.${plain} Install X-UI
+  ${green}2.${plain} Update X-UI
+  ${green}3.${plain} Uninstall X-UI
 ————————————————
-  ${green}8.${plain} Start x-ui
-  ${green}9.${plain} Stop x-ui
-  ${green}10.${plain} Reboot x-ui
-  ${green}11.${plain} Check x-ui state
-  ${green}12.${plain} Check x-ui logs
+  ${green}4.${plain} Reset Username and Password
+  ${green}5.${plain} Reset Panel Settings
+  ${green}6.${plain} Set Panel Port
+  ${green}7.${plain} View Current Panel Settings
 ————————————————
-  ${green}13.${plain} Set x-ui Autostart
-  ${green}14.${plain} Cancel x-ui Autostart
+  ${green}8.${plain} Start X-UI
+  ${green}9.${plain} Stop X-UI
+  ${green}10.${plain} Reboot X-UI
+  ${green}11.${plain} Check X-UI State
+  ${green}12.${plain} Check X-UI Logs
 ————————————————
-  ${green}15.${plain} 一A key installation bbr (latest kernel)
+  ${green}13.${plain} Set X-UI Autostart
+  ${green}14.${plain} Cancel X-UI Autostart
+————————————————
+  ${green}15.${plain} 一A Key Installation BBR (latest kernel)
   ${green}16.${plain} 一SSL Certificate Management
   ${green}17.${plain} 一Cloudflare SSL Certificate
+————————————————
  "
     show_status
     echo && read -p "Please enter your selection [0-17]: " num
