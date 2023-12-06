@@ -102,12 +102,12 @@
 <body>
 <a-layout id="app" v-cloak :class="themeSwitcher.currentTheme">
     <transition name="list" appear>
-        <a-layout-content class="under">
+        <a-layout-content class="under" style="min-height: 0;">
             <div class='wave'></div>
             <div class='wave wave2'></div>
             <div class='wave wave3'></div>
-            <a-row type="flex" justify="center" align="middle" style="height: 100%;">
-            <a-col :xs="22" :sm="20" :md="14" :lg="10" :xl="6" id="login">
+            <a-row type="flex" justify="center" align="middle" style="height: 100%; overflow: auto;">
+            <a-col :xs="22" :sm="20" :md="14" :lg="10" :xl="8" :xxl="6" id="login" style="margin: 3rem 0;">
             <a-row type="flex" justify="center">
                 <a-col>
                     <h1 class="title">{{ i18n "pages.login.title" }}</h1>
@@ -129,10 +129,12 @@
                         </a-form-item>
                         <a-form-item>
                             <a-row justify="center" class="centered">
-                                <a-button type="primary" :loading="loading" @click="login" :icon="loading ? 'poweroff' : undefined"
-                                          :style="loading ? { width: '50px' } : { display: 'block', width: '100%' }">
-                                    [[ loading ? '' : '{{ i18n "login" }}' ]]
-                                </a-button>
+                                <div class="wave-btn-bg wave-btn-bg-cl">
+                                    <a-button class="ant-btn-primary-login" type="primary" :loading="loading" @click="login" :icon="loading ? 'poweroff' : undefined"
+                                              :style="loading ? { width: '50px' } : { display: 'inline-block' }">
+                                        [[ loading ? '' : '{{ i18n "login" }}' ]]
+                                    </a-button>
+                                </div>
                             </a-row>
                         </a-form-item>
                         <a-form-item>

@@ -374,6 +374,7 @@
 "editOutbound" = "Chỉnh sửa đầu vào"
 "editReverse" = "Chỉnh sửa đảo ngược"
 "tag" = "Nhãn"
+"tagDesc" = "thẻ duy nhất"
 "address" = "Địa chỉ"
 "reverse" = "Đảo ngược"
 "domain" = "Tên Miền"
