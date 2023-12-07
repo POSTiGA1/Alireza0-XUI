@@ -170,6 +170,10 @@
 "subscriptionDesc" = "Bạn có thể tìm thấy liên kết phụ của mình trên Chi tiết, bạn cũng có thể sử dụng cùng tên cho một số cấu hình"
 "info" = "Thông tin"
 "same" = "Như nhau"
+"inboundData" = "Dữ liệu gửi đến"
+"copyToClipboard" = "Sao chép vào bảng nhớ tạm"
+"import" = "Nhập"
+"importInbound" = "Nhập hàng gửi về"
 
 [pages.client]
 "add" = "Thêm máy khách"

@@ -113,22 +113,41 @@
                             </a-list>
                         </a-tab-pane>
                         <a-tab-pane key="2" tab='{{ i18n "pages.settings.userSettings"}}'>
-                            <a-form style="padding: 20px;">
-                                <a-form-item label='{{ i18n "pages.settings.oldUsername"}}'>
-                                    <a-input v-model="user.oldUsername" style="max-width: 300px"></a-input>
-                                </a-form-item>
-                                <a-form-item label='{{ i18n "pages.settings.currentPassword"}}'>
-                                    <password-input v-model="user.oldPassword" style="max-width: 300px"></password-input>
-                                </a-form-item>
-                                <a-form-item label='{{ i18n "pages.settings.newUsername"}}'>
-                                    <a-input v-model="user.newUsername" style="max-width: 300px"></a-input>
-                                </a-form-item>
-                                <a-form-item label='{{ i18n "pages.settings.newPassword"}}'>
-                                    <password-input v-model="user.newPassword" style="max-width: 300px"></password-input>
-                                </a-form-item>
-                                <a-form-item>
-                                    <a-button type="primary" @click="updateUser">{{ i18n "confirm" }}</a-button>
-                                </a-form-item>
+                            <a-form style="padding: 20px;" layout="inline">
+                                <table cellpadding="2">
+                                    <tr>
+                                        <td>{{ i18n "pages.settings.oldUsername"}}:</td>
+                                        <td>
+                                            <a-form-item>
+                                                <a-input v-model="user.oldUsername" style="width: 200px"></a-input>
+                                            </a-form-item>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ i18n "pages.settings.currentPassword"}}:</td>
+                                        <td>
+                                            <a-form-item>
+                                                <password-input v-model="user.oldPassword" style="width: 200px"></password-input>
+                                            </a-form-item>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ i18n "pages.settings.newUsername"}}:</td>
+                                        <td>
+                                            <a-form-item>
+                                                <a-input v-model="user.newUsername" style="width: 200px"></a-input>
+                                            </a-form-item>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ i18n "pages.settings.newPassword"}}:</td>
+                                        <td>
+                                            <a-form-item>
+                                                <password-input v-model="user.newPassword" style="width: 200px"></password-input>
+                                            </a-form-item>            
+                                        </td>
+                                    </tr>
+                                </table>
                             </a-form>
                         </a-tab-pane>
                         <a-tab-pane key="3" tab='{{ i18n "pages.settings.TGBotSettings"}}'>
