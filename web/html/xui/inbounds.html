@@ -554,6 +554,7 @@
                 enable : false,
                 subURI : ''
             },
+            remarkModel: '-ieo',
             tgBotEnable: false,
             showAlert: false,
             pageSize: 0,
@@ -599,6 +600,7 @@
                         subURI: subURI
                     };
                     this.pageSize = pageSize;
+                    this.remarkModel = remarkModel;
                 }
             },
             setInbounds(dbInbounds) {
@@ -942,7 +944,7 @@
             resetTraffic(dbInboundId) {
                 dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
                 this.$confirm({
-                    title: '{{ i18n "pages.inbounds.resetTraffic"}}',
+                    title: '{{ i18n "pages.inbounds.resetTraffic"}}' + ' #' + dbInboundId,
                     content: '{{ i18n "pages.inbounds.resetTrafficContent"}}',
                     class: themeSwitcher.currentTheme,
                     okText: '{{ i18n "reset"}}',
@@ -957,7 +959,7 @@
             },
             delInbound(dbInboundId) {
                 this.$confirm({
-                    title: '{{ i18n "pages.inbounds.deleteInbound"}}',
+                    title: '{{ i18n "pages.inbounds.deleteInbound"}}' + ' #' + dbInboundId,
                     content: '{{ i18n "pages.inbounds.deleteInboundContent"}}',
                     class: themeSwitcher.currentTheme,
                     okText: '{{ i18n "delete"}}',
@@ -970,7 +972,7 @@
                 clientId = this.getClientId(dbInbound.protocol, client);
                 if (confirmation){
                     this.$confirm({
-                        title: '{{ i18n "pages.inbounds.deleteClient"}}',
+                        title: '{{ i18n "pages.inbounds.deleteClient"}}' + ' ' + client.email,
                         content: '{{ i18n "pages.inbounds.deleteClientContent"}}',
                         class: themeSwitcher.currentTheme,
                         okText: '{{ i18n "delete"}}',
@@ -1051,7 +1053,7 @@
             resetClientTraffic(client, dbInboundId, confirmation = true) {
                 if (confirmation){
                     this.$confirm({
-                        title: '{{ i18n "pages.inbounds.resetTraffic"}}',
+                        title: '{{ i18n "pages.inbounds.resetTraffic"}}' + ' ' + client.email,
                         content: '{{ i18n "pages.inbounds.resetTrafficContent"}}',
                         class: themeSwitcher.currentTheme,
                         okText: '{{ i18n "reset"}}',
@@ -1173,7 +1175,7 @@
             inboundLinks(dbInboundId) {
                 dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
                 newDbInbound = this.checkFallback(dbInbound);
-                txtModal.show('{{ i18n "pages.inbounds.export"}}', newDbInbound.genInboundLinks, newDbInbound.remark);
+                txtModal.show('{{ i18n "pages.inbounds.export"}}', newDbInbound.genInboundLinks(this.remarkModel), newDbInbound.remark);
             },
             importInbound() {
                 promptModal.open({
@@ -1190,7 +1192,7 @@
 			exportAllLinks() {
                 let copyText = [];
                 for (const dbInbound of this.dbInbounds) {
-                    copyText.push(dbInbound.genInboundLinks);
+                    copyText.push(dbInbound.genInboundLinks(this.remarkModel));
                 }
                 txtModal.show('{{ i18n "pages.inbounds.export"}}', copyText.join('\r\n'), 'All-Inbounds');
             },
