@@ -151,7 +151,7 @@
                                         <a-alert type="warning" style="text-align: center;">
                                             <template slot="message">
                                                 <a-icon type="exclamation-circle" theme="filled" style="color: #FFA031"></a-icon>
-                                                {{ i18n "pages.xray.generalConfigsDesc" }}
+                                                {{ i18n "pages.xray.blockConfigsDesc" }}
                                             </template>
                                         </a-alert>
                                     </a-row>
@@ -512,13 +512,13 @@
                 ips: {
                     local: ["geoip:private"],
                     cn: ["geoip:cn"],
-                    ir: ["geoip:ir"],
+                    ir: ["ext:geoip_IR.dat:ir","ext:geoip_IR.dat:arvancloud","ext:geoip_IR.dat:derakcloud","ext:geoip_IR.dat:iranserver"],
                     ru: ["geoip:ru"],
                 },
                 domains: {
                     ads: [
                         "geosite:category-ads-all",
-                        "ext:iran.dat:ads"
+                        "ext:geosite_IR.dat:category-ads-all"
                     ],
                     google: ["geosite:google"],
                     netflix: ["geosite:netflix"],
@@ -532,9 +532,8 @@
                     ],
                     ir: [
                         "regexp:.*\\.ir$",
-                        "ext:iran.dat:ir",
-                        "ext:iran.dat:other",
-                        "geosite:category-ir"
+                        "regexp:.*\\.xn--mgba3a4f16a$",  // .ایران
+                        "ext:geosite_IR.dat:ir"  // have rules to bypass all .ir domains.
                     ]
                 },
                 familyProtectDNS: {
