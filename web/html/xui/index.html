@@ -251,8 +251,10 @@
              :closable="true" @ok="() => versionModal.visible = false"
              :class="themeSwitcher.currentTheme"
              footer="">
-        <h2>{{ i18n "pages.index.xraySwitchClick"}}</h2>
-        <h2>{{ i18n "pages.index.xraySwitchClickDesk"}}</h2>
+        <a-alert type="warning" style="margin-bottom: 12px; width: fit-content"
+        message='{{ i18n "pages.index.xraySwitchClickDesk" }}'
+        show-icon
+        ></a-alert>
         <template v-for="version, index in versionModal.versions">
             <a-tag :color="index % 2 == 0 ? 'purple' : 'blue'"
                    style="margin: 10px" @click="switchV2rayVersion(version)">
@@ -328,9 +330,9 @@
 {{template "textModal"}}
 <script>
     const State = {
-        Running: "Running",
-        Stop: "Stop",
-        Error: "Error",
+        Running: "running",
+        Stop: "stop",
+        Error: "error",
     }
     Object.freeze(State);
 
