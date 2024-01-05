@@ -108,7 +108,7 @@ docker run -itd \
 > Build your own image
 
 ```shell
-docker build -t x-ui
+docker build -t x-ui .
 ```
 
 </details>
