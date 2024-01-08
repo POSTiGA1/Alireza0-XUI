@@ -32,7 +32,7 @@
 "transmission" = "传输"
 "host" = "主持人"
 "path" = "小路"
-"camouflage" = "伪装"
+"camouflage" = "混淆"
 "status" = "状态"
 "enabled" = "开启"
 "disabled" = "关闭"
@@ -63,7 +63,7 @@
 "link" = "管理"
 
 [pages.login]
-"title" = "登录"
+"title" = "欢迎"
 "loginAgain" = "登录时效已过，请重新登录"
 
 [pages.login.toasts]
@@ -188,10 +188,10 @@
 "prefix" = "前缀"
 "postfix" = "后缀"
 "delayedStart" = "首次使用后开始"
-"expireDays" = "过期天数"
+"expireDays" = "期间"
 "days" = "天"
 "renew" = "自动续订"
-"renewDesc" = "过期后自动续订。0 = 禁用"
+"renewDesc" = "到期后自动续订。(0 = 禁用)(单元: 天)"
 
 [pages.inbounds.toasts]
 "obtain" = "获取"
@@ -388,6 +388,12 @@
 "bridge" = "桥"
 "portal" = "门户"
 "intercon" = "互连"
+"secretKey" = "密钥"
+"publicKey" = "公钥"
+"allowedIPs" = "允许的 IP"
+"endpoint" = "终点"
+"psk" = "共享密钥"
+"domainStrategy" = "域策略"
 
 [tgbot]
 "noResult" = "❗ 没有结果！"
