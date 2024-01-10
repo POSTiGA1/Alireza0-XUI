@@ -388,6 +388,8 @@
 "bridge" = "Мост"
 "portal" = "Портал"
 "intercon" = "Соединение"
+
+[pages.xray.wireguard]
 "secretKey" = "Секретный ключ"
 "publicKey" = "Открытый ключ"
 "allowedIPs" = "Разрешенные IP-адреса"

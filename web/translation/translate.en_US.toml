@@ -388,10 +388,12 @@
 "bridge" = "Bridge"
 "portal" = "Portal"
 "intercon" = "Interconnection"
+
+[pages.xray.wireguard]
 "secretKey" = "Secret Key"
 "publicKey" = "Public Key"
 "allowedIPs" = "Allowed IPs"
-"endpoint" = "Endpoint"
+"endpoint" = "End Point"
 "psk" = "PreShared Key"
 "domainStrategy" = "Domain Strategy"
 

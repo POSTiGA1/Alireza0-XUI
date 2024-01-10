@@ -388,6 +388,8 @@
 "bridge" = "Liên kết"
 "portal" = "Cổng thông tin"
 "intercon" = "Kết nối"
+
+[pages.xray.wireguard]
 "secretKey" = "Chìa khoá bí mật"
 "publicKey" = "Khóa công khai"
 "allowedIPs" = "IP được phép"

@@ -6,6 +6,7 @@ const Protocols = {
     DOKODEMO: 'dokodemo-door',
     SOCKS: 'socks',
     HTTP: 'http',
+    WIREGUARD: 'wireguard',
 };
 
 const SSMethods = {
@@ -1445,6 +1446,7 @@ Inbound.Settings = class extends XrayCommonClass {
             case Protocols.DOKODEMO: return new Inbound.DokodemoSettings(protocol);
             case Protocols.SOCKS: return new Inbound.SocksSettings(protocol);
             case Protocols.HTTP: return new Inbound.HttpSettings(protocol);
+            case Protocols.WIREGUARD: return new Inbound.WireguardSettings(protocol);
             default: return null;
         }
     }
@@ -1458,6 +1460,7 @@ Inbound.Settings = class extends XrayCommonClass {
             case Protocols.DOKODEMO: return Inbound.DokodemoSettings.fromJson(json);
             case Protocols.SOCKS: return Inbound.SocksSettings.fromJson(json);
             case Protocols.HTTP: return Inbound.HttpSettings.fromJson(json);
+            case Protocols.WIREGUARD: return Inbound.WireguardSettings.fromJson(json);
             default: return null;
         }
     }
@@ -2046,5 +2049,71 @@ Inbound.HttpSettings.HttpAccount = class extends XrayCommonClass {
 
     static fromJson(json={}) {
         return new Inbound.HttpSettings.HttpAccount(json.user, json.pass);
+    }
+};
+
+Inbound.WireguardSettings = class extends XrayCommonClass {
+    constructor(protocol, mtu=1420, secretKey=Wireguard.generateKeypair().privateKey, peers=[new Inbound.WireguardSettings.Peer()], kernelMode=false) {
+        super(protocol);
+        this.mtu = mtu;
+        this.secretKey = secretKey;
+        this.pubKey = secretKey.length>0 ? Wireguard.generateKeypair(secretKey).publicKey : '';
+        this.peers = peers;
+        this.kernelMode = kernelMode;
+    }
+
+    addPeer() {
+        this.peers.push(new Inbound.WireguardSettings.Peer());
+    }
+
+    delPeer(index) {
+        this.peers.splice(index, 1);
+    }
+
+    static fromJson(json={}){
+        return new Inbound.WireguardSettings(
+            Protocols.WIREGUARD,
+            json.mtu,
+            json.secretKey,
+            json.peers.map(peer => Inbound.WireguardSettings.Peer.fromJson(peer)),
+            json.kernelMode,
+        );
+    }
+
+    toJson() {
+        return {
+            mtu: this.mtu?? undefined,
+            secretKey: this.secretKey,
+            peers: Inbound.WireguardSettings.Peer.toJsonArray(this.peers),
+            kernelMode: this.kernelMode,
+        };
+    }
+};
+
+Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
+    constructor(publicKey='', psk='', allowedIPs=['0.0.0.0/0','::/0'], keepAlive=0) {
+        super();
+        this.publicKey = publicKey;
+        this.psk = psk;
+        this.allowedIPs = allowedIPs;
+        this.keepAlive = keepAlive;
+    }
+
+    static fromJson(json={}){
+        return new Inbound.WireguardSettings.Peer(
+            json.publicKey,
+            json.preSharedKey,
+            json.allowedIPs,
+            json.keepAlive
+        );
+    }
+
+    toJson() {
+        return {
+            publicKey: this.publicKey,
+            preSharedKey: this.psk.length>0 ? this.psk : undefined,
+            allowedIPs: this.allowedIPs,
+            keepAlive: this.keepAlive?? undefined,
+        };
     }
 };
