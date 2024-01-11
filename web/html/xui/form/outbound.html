@@ -142,14 +142,13 @@
         </a-form-item>
         <a-form-item>
             <template slot="label">
-                <a-tooltip>
-                    <template slot="title">
-                        <span>{{ i18n "pages.xray.rules.useComma" }}</span>
-                    </template>
-                    {{ i18n "pages.xray.wireguard.allowedIPs" }} <a-icon type="question-circle"></a-icon>
-                </a-tooltip>
+                {{ i18n "pages.xray.wireguard.allowedIPs" }} <a-button type="primary" size="small" @click="peer.allowedIPs.push('')">+</a-button>
             </template>
-            <a-input v-model.trim="peer.allowedIPs"></a-input>
+            <template v-for="(aip, index) in peer.allowedIPs" style="margin-bottom: 10px;">
+                <a-input v-model.trim="peer.allowedIPs[index]">
+                    <a-button v-if="peer.allowedIPs.length>1" slot="addonAfter" size="small" @click="peer.allowedIPs.splice(index, 1)">-</a-button>
+                </a-input>
+            </template>
         </a-form-item>
         <a-form-item label='Keep Alive'>
             <a-input-number v-model.number="peer.keepAlive" :min="0"></a-input>

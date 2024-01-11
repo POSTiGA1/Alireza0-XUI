@@ -408,7 +408,7 @@ class HttpStreamSettings extends XrayCommonClass {
 
 class QuicStreamSettings extends XrayCommonClass {
     constructor(security='none',
-                key='', type='none') {
+                key=RandomUtil.randomSeq(10), type='none') {
         super();
         this.security = security;
         this.key = key;
@@ -460,7 +460,7 @@ class TlsStreamSettings extends XrayCommonClass {
                 cipherSuites = '',
                 rejectUnknownSni = false,
                 certificates=[new TlsStreamSettings.Cert()],
-                alpn=[],
+                alpn=[ALPN_OPTION.H2,ALPN_OPTION.HTTP1],
                 settings=new TlsStreamSettings.Settings()) {
         super();
         this.sni = serverName;
@@ -814,7 +814,7 @@ class Sniffing extends XrayCommonClass {
 class Inbound extends XrayCommonClass {
     constructor(port=RandomUtil.randomIntRange(10000, 60000),
                 listen='',
-                protocol=Protocols.VMESS,
+                protocol=Protocols.VLESS,
                 settings=null,
                 streamSettings=new StreamSettings(),
                 tag='',
@@ -1140,7 +1140,7 @@ class Inbound extends XrayCommonClass {
             }
         }
 
-        if (security === 'reality') {
+        else if (security === 'reality') {
             params.set("security", "reality");
             params.set("pbk", this.stream.reality.settings.publicKey);
             params.set("fp", this.stream.reality.settings.fingerprint);
@@ -1156,6 +1156,10 @@ class Inbound extends XrayCommonClass {
             if (type == 'tcp' && !ObjectUtil.isEmpty(flow)) {
                 params.set("flow", flow);
             }
+        }
+
+        else {
+            params.set("security", "none");
         }
 
         const link = `vless://${uuid}@${address}:${port}`;
@@ -1316,7 +1320,7 @@ class Inbound extends XrayCommonClass {
             }
         }
 
-        if (security === 'reality') {
+        else if (security === 'reality') {
             params.set("security", "reality");
             params.set("pbk", this.stream.reality.settings.publicKey);
             params.set("fp", this.stream.reality.settings.fingerprint);
@@ -1329,6 +1333,9 @@ class Inbound extends XrayCommonClass {
             if (!ObjectUtil.isEmpty(this.stream.reality.settings.spiderX)) {
                 params.set("spx", this.stream.reality.settings.spiderX);
             }
+        }
+        else {
+            params.set("security", "none");
         }
 
         const link = `trojan://${clientPassword}@${address}:${port}`;

@@ -962,11 +962,11 @@ Outbound.WireguardSettings = class extends CommonClass {
     }
 };
 Outbound.WireguardSettings.Peer = class extends CommonClass {
-    constructor(publicKey='', psk='', allowedIPs='0.0.0.0/0,::/0', endpoint='', keepAlive=0) {
+    constructor(publicKey='', psk='', allowedIPs=['0.0.0.0/0','::/0'], endpoint='', keepAlive=0) {
         super();
         this.publicKey = publicKey;
         this.psk = psk;
-        this.allowedIPs = allowedIPs instanceof Array ? allowedIPs.join(',') : allowedIPs;
+        this.allowedIPs = allowedIPs;
         this.endpoint = endpoint;
         this.keepAlive = keepAlive;
     }
@@ -985,7 +985,7 @@ Outbound.WireguardSettings.Peer = class extends CommonClass {
         return {
             publicKey: this.publicKey,
             preSharedKey: this.psk.length>0 ? this.psk : undefined,
-            allowedIPs: this.allowedIPs ? this.allowedIPs.split(",") : undefined,
+            allowedIPs: this.allowedIPs ? this.allowedIPs : undefined,
             endpoint: this.endpoint,
             keepAlive: this.keepAlive?? undefined,
         };

@@ -44,7 +44,7 @@
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.cpu.color"
                                                     :percent="status.cpu.percent"></a-progress>
-                                        <div>CPU: [[ status.cpuCount ]] Core(s)</div>
+                                            <div>CPU:  [[ cpuCoreFormat(status.cpuCount) ]]</div>
                                     </a-col>
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
