@@ -474,6 +474,10 @@ func (s *InboundService) DelInboundClient(inboundId int, clientId string) (bool,
 		}
 	}
 
+	if len(newClients) == 0 {
+		return false, common.NewError("no client remained in Inbound")
+	}
+
 	settings["clients"] = newClients
 	newSettings, err := json.MarshalIndent(settings, "", "  ")
 	if err != nil {

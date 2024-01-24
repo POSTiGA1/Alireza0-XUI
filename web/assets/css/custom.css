@@ -1049,3 +1049,29 @@ li.ant-select-dropdown-menu-item:empty:after {
 .ant-input-number {
     overflow: clip;
 }
+
+.ant-modal-body,
+.ant-collapse-content>.ant-collapse-content-box {
+    overflow-x: auto;
+}
+
+.dark .ant-dropdown-menu-item:hover,
+.dark .ant-dropdown-menu-submenu-title:hover,
+.dark .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled),
+.dark .ant-select-dropdown-menu-item:hover:not(.ant-select-dropdown-menu-item-disabled) {
+    background-color: #313f5a;
+}
+
+.ant-select-dropdown,
+.ant-popover-inner {
+    overflow-x: hidden;
+}
+
+.ant-popover-inner-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ant-input-group-addon:not(:first-child):not(:last-child), .ant-input-group-wrap:not(:first-child):not(:last-child), .ant-input-group>.ant-input:not(:first-child):not(:last-child) {
+    border-radius: 0rem 1rem 1rem 0rem;
+}
