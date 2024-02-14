@@ -133,8 +133,14 @@ custom_version() {
     eval $install_command
 }
 
+# Function to handle the deletion of the script file
+delete_script() {
+    rm "$0"  # Remove the script file itself
+    exit 1
+}
+
 uninstall() {
-    confirm "Are you sure you want to uninstall the panel? xray will also uninstalled!" "n"
+    confirm "Are you sure you want to uninstall the panel? xray will also uninstalled!" " n"
     if [[ $? != 0 ]]; then
         if [[ $# == 0 ]]; then
             show_menu
@@ -148,14 +154,14 @@ uninstall() {
     systemctl reset-failed
     rm /etc/x-ui/ -rf
     rm /usr/local/x-ui/ -rf
-
+    echo -e "\nUninstalled Successfully."
     echo ""
-    echo -e "Uninstalled Successfully，If you want to remove this script，then after exiting the script run ${green}rm /usr/bin/x-ui -f${plain} to delete it."
+    echo -e "If you need to install this panel again, you can use below command:"
+    echo -e "${green}bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.sh)${plain}"
     echo ""
-
-    if [[ $# == 0 ]]; then
-        before_show_menu
-    fi
+    # Trap the SIGTERM signal
+    trap delete_script SIGTERM
+    delete_script
 }
 
 reset_user() {

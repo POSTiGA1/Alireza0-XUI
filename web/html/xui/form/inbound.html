@@ -35,13 +35,13 @@
         <template slot="label">
             <a-tooltip>
                 <template slot="title">
-                    0 <span>{{ i18n "pages.inbounds.meansNoLimit" }}</span>
+                    <span>{{ i18n "pages.inbounds.meansNoLimit" }}</span>
                 </template>
-                {{ i18n "pages.inbounds.totalFlow" }} (GB)
+                {{ i18n "pages.inbounds.totalFlow" }}
                 <a-icon type="question-circle"></a-icon>
             </a-tooltip>
         </template>
-        <a-input-number v-model="dbInbound.totalGB" :min="0"></a-input-number>
+        <a-input-number v-model="dbInbound.totalGB" :min="0"></a-input-number> GB
     </a-form-item>
 
     <a-form-item>

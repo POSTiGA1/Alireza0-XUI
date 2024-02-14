@@ -33,9 +33,9 @@ import (
 type ProcessState string
 
 const (
-	Running ProcessState = "running"
-	Stop    ProcessState = "stop"
-	Error   ProcessState = "error"
+	Running ProcessState = "Running"
+	Stop    ProcessState = "Stop"
+	Error   ProcessState = "Error"
 )
 
 type Status struct {

@@ -1347,6 +1347,28 @@ class Inbound extends XrayCommonClass {
         return url.toString();
     }
 
+    getWireguardLink(address, port, remark, peerId) {
+        let txt = `[Interface]\n`
+        txt += `PrivateKey = ${this.settings.peers[peerId].privateKey}\n`
+        txt += `Address = ${this.settings.peers[peerId].allowedIPs[0]}\n`
+        txt += `DNS = 1.1.1.1, 9.9.9.9\n`
+        if (this.settings.mtu) {
+            txt += `MTU = ${this.settings.mtu}\n`
+        }
+        txt += `\n# ${remark}\n`
+        txt += `[Peer]\n`
+        txt += `PublicKey = ${this.settings.pubKey}\n`
+        txt += `AllowedIPs = 0.0.0.0/0, ::/0\n`
+        txt += `Endpoint = ${address}:${port}`
+        if (this.settings.peers[peerId].psk) {
+            txt += `\nPresharedKey = ${this.settings.peers[peerId].psk}`
+        }
+        if (this.settings.peers[peerId].keepAlive) {
+            txt += `\nPersistentKeepalive = ${this.settings.peers[peerId].keepAlive}\n`
+        }
+        return txt;
+    }
+
     genLink(address='', port=this.port, forceTls='same', remark='', client) {
         switch (this.protocol) {
             case Protocols.VMESS:
@@ -1370,7 +1392,7 @@ class Inbound extends XrayCommonClass {
         const orderChars = remarkModel.slice(1);
         let orders = {
             'i': remark,
-            'e': client ? client.email : '',
+            'e': email,
             'o': '',
           };
         if(ObjectUtil.isArrEmpty(this.stream.externalProxy)){
@@ -1393,6 +1415,7 @@ class Inbound extends XrayCommonClass {
     }
 
     genInboundLinks(remark = '', remarkModel = '-ieo') {
+        let addr = !ObjectUtil.isEmpty(this.listen) && this.listen !== "0.0.0.0" ? this.listen : location.hostname;
         if(this.clients){
            let links = [];
            this.clients.forEach((client) => {
@@ -1402,7 +1425,14 @@ class Inbound extends XrayCommonClass {
             });
             return links.join('\r\n');
         } else {
-            if(this.protocol == Protocols.SHADOWSOCKS && !this.isSSMultiUser) return this.genSSLink(this.listen, this.port, 'same', remark);
+            if(this.protocol == Protocols.SHADOWSOCKS && !this.isSSMultiUser) return this.genSSLink(addr, this.port, 'same', remark);
+            if(this.protocol == Protocols.WIREGUARD) {
+                let links = [];
+                this.settings.peers.forEach((p,index) => {
+                    links.push(this.getWireguardLink(addr,this.port,remark + remarkModel.charAt(0) + (index+1),index));
+                });
+                return links.join('\r\n');
+            }
             return '';
         }
     }
@@ -2098,9 +2128,13 @@ Inbound.WireguardSettings = class extends XrayCommonClass {
 };
 
 Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
-    constructor(publicKey='', psk='', allowedIPs=['0.0.0.0/0','::/0'], keepAlive=0) {
+    constructor(privateKey, publicKey, psk='', allowedIPs=['10.0.0.0/24'], keepAlive=0) {
         super();
+        this.privateKey = privateKey
         this.publicKey = publicKey;
+        if (!this.publicKey){
+            [this.publicKey, this.privateKey] = Object.values(Wireguard.generateKeypair())
+        }
         this.psk = psk;
         this.allowedIPs = allowedIPs;
         this.keepAlive = keepAlive;
@@ -2108,6 +2142,7 @@ Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
 
     static fromJson(json={}){
         return new Inbound.WireguardSettings.Peer(
+            json.privateKey,
             json.publicKey,
             json.preSharedKey,
             json.allowedIPs,
@@ -2117,6 +2152,7 @@ Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
 
     toJson() {
         return {
+            privateKey: this.privateKey,
             publicKey: this.publicKey,
             preSharedKey: this.psk.length>0 ? this.psk : undefined,
             allowedIPs: this.allowedIPs,

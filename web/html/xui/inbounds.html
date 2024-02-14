@@ -68,15 +68,15 @@
                     <a-card hoverable>
                         <a-row>
                             <a-col :xs="24" :sm="24" :lg="12">
-                                {{ i18n "pages.inbounds.totalDownUp" }}:
+                                <strong>{{ i18n "pages.inbounds.totalDownUp" }}:</strong>
                                 <a-tag color="blue">[[ sizeFormat(total.up) ]] / [[ sizeFormat(total.down) ]]</a-tag>
                             </a-col>
                             <a-col :xs="24" :sm="24" :lg="12">
-                                {{ i18n "pages.inbounds.totalUsage" }}:
+                                <strong>{{ i18n "pages.inbounds.totalUsage" }}:</strong>
                                 <a-tag color="blue">[[ sizeFormat(total.up + total.down) ]]</a-tag>
                             </a-col>
                             <a-col :xs="24" :sm="24" :lg="12">
-                                {{ i18n "pages.inbounds.inboundCount" }}:
+                                <strong>{{ i18n "pages.inbounds.inboundCount" }}:</strong>
                                 <a-tag color="blue">[[ dbInbounds.length ]]</a-tag>
                             </a-col>
                             <a-col :xs="24" :sm="24" :lg="12">
@@ -84,7 +84,7 @@
                                     <div>
                                         <a-back-top :target="() => document.getElementById('content-layout')" visibility-height="200">
                                         </a-back-top>
-                                {{ i18n "clients" }}:
+                                <strong>{{ i18n "clients" }}:</strong>
                                 <a-tag color="blue">[[ total.clients ]]</a-tag>
                                 <a-popover title='{{ i18n "disabled" }}' :overlay-class-name="themeSwitcher.currentTheme">
                                     <template slot="content">
@@ -137,6 +137,10 @@
                                                 <a-icon type="export"></a-icon>
                                                 {{ i18n "pages.inbounds.export" }}
                                             </a-menu-item>
+                                            <a-menu-item key="subs">
+                                                <a-icon type="export"></a-icon>
+                                                {{ i18n "pages.inbounds.export" }} - {{ i18n "pages.settings.subSettings" }}
+                                            </a-menu-item>
                                             <a-menu-item key="resetInbounds">
                                                 <a-icon type="reload"></a-icon>
                                                 {{ i18n "pages.inbounds.resetAllTraffic" }}
@@ -145,7 +149,7 @@
                                                 <a-icon type="file-done"></a-icon>
                                                 {{ i18n "pages.inbounds.resetAllClientTraffics" }}
                                             </a-menu-item>
-                                            <a-menu-item key="delDepletedClients">
+                                            <a-menu-item key="delDepletedClients" style="color: #FF4D4F;">
                                                 <a-icon type="rest"></a-icon>
                                                 {{ i18n "pages.inbounds.delDepletedClients" }}
                                             </a-menu-item>
@@ -199,7 +203,7 @@
                                             <a-icon type="edit"></a-icon>
                                             {{ i18n "edit" }}
                                         </a-menu-item>
-                                        <a-menu-item key="qrcode" v-if="dbInbound.isSS && !dbInbound.toInbound().isSSMultiUser">
+                                        <a-menu-item key="qrcode" v-if="(dbInbound.isSS && !dbInbound.toInbound().isSSMultiUser) || dbInbound.isWireguard">
                                             <a-icon type="qrcode"></a-icon>
                                             {{ i18n "qrCode" }}
                                         </a-menu-item>
@@ -220,7 +224,11 @@
                                                 <a-icon type="export"></a-icon>
                                                 {{ i18n "pages.inbounds.export"}}
                                             </a-menu-item>
-                                            <a-menu-item key="delDepletedClients">
+                                            <a-menu-item key="subs">
+                                                <a-icon type="export"></a-icon>
+                                                {{ i18n "pages.inbounds.export"}} - {{ i18n "pages.settings.subSettings" }}
+                                            </a-menu-item>
+                                            <a-menu-item key="delDepletedClients" style="color: #FF4D4F;">
                                                 <a-icon type="rest"></a-icon>
                                                 {{ i18n "pages.inbounds.delDepletedClients" }}
                                             </a-menu-item>
@@ -236,7 +244,7 @@
                                         </a-menu-item>
                                         <a-menu-item key="clipboard">
                                             <a-icon type="copy"></a-icon>
-                                            {{ i18n "pages.inbounds.copyToClipboard" }}
+                                            {{ i18n "pages.inbounds.exportInbound" }}
                                         </a-menu-item>
                                         <a-menu-item key="clone">
                                             <a-icon type="block"></a-icon> {{ i18n "pages.inbounds.clone"}}
@@ -727,6 +735,9 @@
                     case "export":
                         this.exportAllLinks();
                         break;
+                    case "subs":
+                        this.exportAllSubs();
+                        break;
                     case "resetInbounds":
                         this.resetAllTraffic();
                         break;
@@ -757,6 +768,9 @@
                         break;
                     case "export":
                         this.inboundLinks(dbInbound.id);
+                        break;
+                    case "subs":
+                        this.exportSubs(dbInbound.id);
                         break;
                     case "clipboard":
                         this.copyToClipboard(dbInbound.id);
@@ -1182,6 +1196,22 @@
                 newDbInbound = this.checkFallback(dbInbound);
                 txtModal.show('{{ i18n "pages.inbounds.export"}}', newDbInbound.genInboundLinks(this.remarkModel), newDbInbound.remark);
             },
+            exportSubs(dbInboundId) {
+                const dbInbound = this.dbInbounds.find(row => row.id === dbInboundId);
+                const clients = this.getInboundClients(dbInbound);
+                let subLinks = []
+                if (clients != null){
+                    clients.forEach(c => {
+                        if (c.subId && c.subId.length>0){
+                            subLinks.push(this.subSettings.subURI + c.subId + "?name=" + c.subId)
+                        }
+                    })
+                }
+                txtModal.show(
+                    '{{ i18n "pages.inbounds.export"}} - {{ i18n "pages.settings.subSettings" }}',
+                    [...new Set(subLinks)].join('\n'),
+                    dbInbound.remark + "-Subs");
+            },
             importInbound() {
                 promptModal.open({
                     title: '{{ i18n "pages.inbounds.importInbound" }}',
@@ -1194,7 +1224,24 @@
                     },
                 });
             },
-			exportAllLinks() {
+			exportAllSubs() {
+                let subLinks = []
+                for (const dbInbound of this.dbInbounds) {
+                    const clients = this.getInboundClients(dbInbound);
+                    if (clients != null){
+                        clients.forEach(c => {
+                            if (c.subId && c.subId.length>0){
+                                subLinks.push(this.subSettings.subURI + c.subId + "?name=" + c.subId)
+                            }
+                        })
+                    }
+                }
+                txtModal.show(
+                    '{{ i18n "pages.inbounds.export"}} - {{ i18n "pages.settings.subSettings" }}',
+                    [...new Set(subLinks)].join('\r\n'),
+                    'All-Inbounds-Subs');
+            },
+            exportAllLinks() {
                 let copyText = [];
                 for (const dbInbound of this.dbInbounds) {
                     copyText.push(dbInbound.genInboundLinks(this.remarkModel));
