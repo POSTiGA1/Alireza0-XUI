@@ -369,6 +369,8 @@
 "OpenAIWARPDesc" = "将OpenAI（ChatGPT）路由添加到WARP"
 "NetflixWARP" = "将 Netflix 路由到 WARP"
 "NetflixWARPDesc" = "为Netflix添加路由到WARP"
+"MetaWARP"="元"
+"MetaWARPDesc" = "通过 WARP 将流量路由到 Meta（Instagram、Facebook、WhatsApp、Threads...）"
 "SpotifyWARP" = "将 Spotify 路由到 WARP"
 "SpotifyWARPDesc" = "为Spotify添加路由到WARP"
 "completeTemplate" = "全部"

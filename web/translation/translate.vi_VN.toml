@@ -369,6 +369,8 @@
 "OpenAIWARPDesc" = "Thêm định tuyến cho OpenAI (ChatGPT) qua WARP."
 "NetflixWARP" = "Định tuyến Netflix qua WARP."
 "NetflixWARPDesc" = "Thêm định tuyến cho Netflix qua WARP."
+"MetaWARP" = "Meta"
+"MetaWARPDesc" = "Định tuyến lưu lượng truy cập tới Meta (Instagram, Facebook, WhatsApp, Threads,...) thông qua WARP."
 "SpotifyWARP" = "Định tuyến Spotify qua WARP."
 "SpotifyWARPDesc" = "Thêm định tuyến cho Spotify qua WARP."
 "completeTemplate" = "Tất cả"

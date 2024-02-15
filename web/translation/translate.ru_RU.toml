@@ -369,6 +369,8 @@
 "OpenAIWARPDesc" = "Добавить маршрутизацию для OpenAI (ChatGPT) через WARP"
 "NetflixWARP" = "Маршрутизация Netflix через WARP"
 "NetflixWARPDesc" = "Добавить маршрутизацию для Netflix через WARP"
+"MetaWARP" = "Мета"
+"MetaWARPDesc" = "Направляет трафик в Meta (Instagram, Facebook, WhatsApp, Threads...) через WARP."
 "SpotifyWARP" = "Маршрутизация Spotify через WARP"
 "SpotifyWARPDesc" = "Добавить маршрутизацию для Spotify через WARP"
 "completeTemplate" = "Все"
