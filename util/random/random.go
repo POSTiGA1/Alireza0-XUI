@@ -41,3 +41,7 @@ func Seq(n int) string {
 	}
 	return string(runes)
 }
+
+func Num(n int) int {
+	return rand.Intn(n)
+}
