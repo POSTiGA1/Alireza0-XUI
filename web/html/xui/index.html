@@ -436,7 +436,7 @@
         show(logs) {
             this.visible = true;
             this.logs = logs; 
-            this.formattedLogs = this.logs.length > 0 ? this.formatLogs(this.logs) : "No Record...";
+            this.formattedLogs = this.logs?.length > 0 ? this.formatLogs(this.logs) : "No Record...";
         },
         formatLogs(logs) {
             let formattedLogs = '';
