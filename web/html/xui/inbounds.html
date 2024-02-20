@@ -564,7 +564,8 @@
             refreshInterval: Number(localStorage.getItem("refreshInterval")) || 5000,
             subSettings: {
                 enable : false,
-                subURI : ''
+                subURI : '',
+                subJsonURI : '',
             },
             remarkModel: '-ieo',
             tgBotEnable: false,
@@ -609,7 +610,8 @@
                     this.tgBotEnable = tgBotEnable;
                     this.subSettings = {
                         enable : subEnable,
-                        subURI: subURI
+                        subURI: subURI,
+                        subJsonURI: subJsonURI
                     };
                     this.pageSize = pageSize;
                     this.remarkModel = remarkModel;
@@ -646,8 +648,12 @@
                     clientCount = clients.length;
                     if (dbInbound.enable) {
                         clients.forEach(client => {
-                            client.enable ? active.push(client.email) : deactive.push(client.email);
-                            if(this.isClientOnline(client.email)) online.push(client.email);
+                            if (client.enable) {
+                                active.push(client.email);
+                                if(this.isClientOnline(client.email)) online.push(client.email);
+                            } else {
+                                deactive.push(client.email);
+                            }
                         });
                         clientStats.forEach(client => {
                             if (!client.enable) {
@@ -850,8 +856,8 @@
                     port: RandomUtil.randomIntRange(10000, 60000),
                     protocol: baseInbound.protocol,
                     settings: Inbound.Settings.getSettings(baseInbound.protocol).toString(),
-		    streamSettings: baseInbound.stream.toString(),
-                    sniffing: baseInbound.canSniffing() ? baseInbound.sniffing.toString() : '{}',
+                    streamSettings: baseInbound.stream.toString(),
+                    sniffing: baseInbound.sniffing.toString(),
                 };
                 await this.submit('/xui/inbound/add', data, inModal);
             },
@@ -870,7 +876,7 @@
                     settings: inbound.settings.toString(),
                 };
                 if (inbound.canEnableStream()) data.streamSettings = inbound.stream.toString();
-                if (inbound.canSniffing()) data.sniffing = inbound.sniffing.toString();
+                data.sniffing = inbound.sniffing.toString();
 
                 await this.submit('/xui/inbound/add', data, inModal);
             },
@@ -889,7 +895,7 @@
                     settings: inbound.settings.toString(),
                 };
                 if (inbound.canEnableStream()) data.streamSettings = inbound.stream.toString();
-                if (inbound.canSniffing()) data.sniffing = inbound.sniffing.toString();
+                data.sniffing = inbound.sniffing.toString();
 
                 await this.submit(`/xui/inbound/update/${dbInbound.id}`, data, inModal);
             },

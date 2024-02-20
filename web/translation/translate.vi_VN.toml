@@ -52,6 +52,7 @@
 "remained" = "Còn lại"
 "secAlertTitle" = "Cảnh báo an ninh-Tiếng Việt by Ohoang7"
 "secAlertSsl" = "Kết nối này không an toàn; Vui lòng không nhập thông tin nhạy cảm cho đến khi TLS được kích hoạt để bảo vệ dữ liệu của Bạn"
+"secAlertConf" = "Một số cấu hình nhất định đã được xác định là dễ bị tấn công, thúc đẩy hành động ngay lập tức để củng cố các giao thức bảo mật và bảo vệ chống lại các vi phạm bảo mật tiềm ẩn."
 "security" = "Bảo vệ"
 
 [menu]
@@ -293,6 +294,8 @@
 "subShowInfoDesc" = "Hiển thị lưu lượng truy cập còn lại và ngày sau tên cấu hình"
 "subURI" = "URI proxy ngược"
 "subURIDesc" = "Thay đổi URI cơ sở của URL đăng ký để sử dụng ở phía sau proxy"
+"fragment" = "Sự phân mảnh"
+"fragmentDesc" = "Kích hoạt phân mảnh cho gói TLS hello"
 
 [pages.settings.toasts]
 "modifySettings" = "Sửa đổi cài đặt"
@@ -378,6 +381,7 @@
 "Outbounds" = "Đầu ra"
 "Routings" = "Quy tắc định tuyến"
 "RoutingsDesc" = "Mức độ ưu tiên của mỗi quy tắc là quan trọng!"
+"Balancers" = "Cân bằng"
 
 [pages.xray.rules]
 "first" = "Đầu tiên"
@@ -392,6 +396,7 @@
 "add" = "Thêm quy tắc"
 "edit" = "Chỉnh sửa quy tắc"
 "useComma" = "Các mục được phân tách bằng dấu phẩy"
+"balancer" = "Cân bằng"
 
 [pages.xray.outbound]
 "addOutbound" = "Thêm Đầu vào"
@@ -411,6 +416,15 @@
 "accountInfo" = "Thông tin tài khoản"
 "outboundStatus" = "Trạng thái đầu ra"
 
+[pages.xray.balancer]
+"addBalancer" = "Thêm cân bằng"
+"editBalancer" = "Chỉnh sửa cân bằng"
+"balancerStrategy" = "Chiến lược"
+"balancerSelectors" = "Bộ chọn"
+"tag" = "Thẻ"
+"tagDesc" = "thẻ duy nhất"
+"balancerDesc" = "Không thể sử dụng balancerTag và outboundTag cùng một lúc. Nếu sử dụng cùng lúc thì chỉ outboundTag mới hoạt động."
+
 [pages.xray.wireguard]
 "secretKey" = "Chìa khoá bí mật"
 "publicKey" = "Khóa công khai"
@@ -418,6 +432,21 @@
 "endpoint" = "Điểm cuối"
 "psk" = "Khóa chia sẻ"
 "domainStrategy" = "Chiến lược tên miền"
+
+[pages.xray.dns]
+"enable" = "Kích hoạt DNS"
+"enableDesc" = "Kích hoạt máy chủ DNS tích hợp"
+"strategy" = "Chiến lược truy vấn"
+"strategyDesc" = "Chiến lược tổng thể để phân giải tên miền"
+"add" = "Thêm máy chủ"
+"edit" = "Chỉnh sửa máy chủ"
+"domains" = "Tên miền"
+
+[pages.xray.fakedns]
+"add" = "Thêm DNS giả"
+"edit" = "Chỉnh sửa DNS giả"
+"ipPool" = "Mạng con nhóm IP"
+"poolSize" = "Kích thước bể bơi"
 
 [tgbot]
 "noResult" = "❗ Không có kết quả!"

@@ -203,7 +203,7 @@
                                         <template slot="title">
                                             {{ i18n "pages.index.upSpeed" }}
                                         </template>
-                                        <strong>UL:</strong> [[ sizeFormat(status.netIO.up) ]]/s
+                                        <strong>Up:</strong> [[ sizeFormat(status.netIO.up) ]]/s
                                     </a-tooltip>
                                 </a-col>
                                 <a-col :span="12">
@@ -212,7 +212,7 @@
                                         <template slot="title">
                                             {{ i18n "pages.index.downSpeed" }}
                                         </template>
-                                        <strong>DL:</strong> [[ sizeFormat(status.netIO.down) ]]/s
+                                        <strong>Down:</strong> [[ sizeFormat(status.netIO.down) ]]/s
                                     </a-tooltip>
                                 </a-col>
                             </a-row>
@@ -400,7 +400,7 @@
             this.xray = data.xray;
             switch (this.xray.state) {
                 case State.Running:
-                    this.xray.color = '#3dbd7d';
+                    this.xray.color = 'blue';
                     break;
                 case State.Stop:
                     this.xray.color = "orange";

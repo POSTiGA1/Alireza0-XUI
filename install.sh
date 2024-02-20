@@ -59,7 +59,7 @@ else
 fi
 
 
-install_base() {
+install_dependencies() {
     if [[ "${release}" == "centos" ]] || [[ "${release}" == "fedora" ]] ; then
         yum install wget curl tar -y
     else
@@ -103,6 +103,21 @@ config_after_install() {
 }
 
 install_x-ui() {
+    # checks if the installation backup dir exist. if existed then ask user if they want to restore it else continue installation.
+    if [[ -e /usr/local/x-ui-backup/ ]]; then
+        read -p "Failed installation detected. Do you want to restore previously installed version? [y/n]? ": restore_confirm
+        if [[ "${restore_confirm}" == "y" || "${restore_confirm}" == "Y" ]]; then
+            systemctl stop x-ui
+            mv /usr/local/x-ui-backup/x-ui.db /etc/x-ui/ -f
+            mv /usr/local/x-ui-backup/ /usr/local/x-ui/ -f
+            systemctl start x-ui
+            echo -e "${green}previous installed x-ui restored successfully${plain}, it is up and running now..."
+            exit 0
+        else
+            echo -e "Continuing installing x-ui ..."
+        fi
+    fi
+
     cd /usr/local/
 
     if [ $# == 0 ]; then
@@ -130,7 +145,8 @@ install_x-ui() {
 
     if [[ -e /usr/local/x-ui/ ]]; then
         systemctl stop x-ui
-        rm /usr/local/x-ui/ -rf
+        mv /usr/local/x-ui/ /usr/local/x-ui-backup/ -f
+        cp /etc/x-ui/x-ui.db /usr/local/x-ui-backup/ -f
     fi
 
     tar zxvf x-ui-linux-$(arch).tar.gz
@@ -142,6 +158,7 @@ install_x-ui() {
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     config_after_install
+    rm /usr/local/x-ui-backup/ -rf
     #echo -e "If it is a new installation, the default web port is ${green}54321${plain}, The username and password are ${green}admin${plain} by default"
     #echo -e "Please make sure that this port is not occupied by other procedures,${yellow} And make sure that port 54321 has been released${plain}"
     #    echo -e "If you want to modify the 54321 to other ports and enter the x-ui command to modify it, you must also ensure that the port you modify is also released"
@@ -172,5 +189,5 @@ install_x-ui() {
 }
 
 echo -e "${green}Running...${plain}"
-install_base
+install_dependencies
 install_x-ui $1

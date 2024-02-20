@@ -51,6 +51,16 @@
                     show-icon closable
                     >
                     </a-alert>
+                    <a-alert type="error" v-if="confAlerts.length>0" style="margin-bottom: 10px"
+                    message='{{ i18n "secAlertTitle" }}'
+                    color="red"
+                    show-icon closable
+                    >
+                    <template slot="description">
+                        {{ i18n "secAlertConf" }}
+                        <li v-for="a in confAlerts">- [[ a ]]</li>
+                    </template>
+                    </a-alert>
                 </transition>
                 <a-space direction="vertical">
                     <a-card hoverable style="margin-bottom: .5rem;">
@@ -201,6 +211,17 @@
                                 <setting-list-item type="number" title='{{ i18n "pages.settings.subUpdates"}}' desc='{{ i18n "pages.settings.subUpdatesDesc"}}' v-model="allSetting.subUpdates"></setting-list-item>
                             </a-list>
                         </a-tab-pane>
+                        <a-tab-pane key="5" tab='{{ i18n "pages.settings.subSettings" }} Json' v-if="allSetting.subEnable">
+                            <a-list item-layout="horizontal">
+                                <setting-list-item type="text" title='{{ i18n "pages.settings.subPath"}}' desc='{{ i18n "pages.settings.subPathDesc"}}' v-model="allSetting.subJsonPath"></setting-list-item>
+                                <setting-list-item type="text" title='{{ i18n "pages.settings.subURI"}}' desc='{{ i18n "pages.settings.subURIDesc"}}' v-model="allSetting.subJsonURI" placeholder="(http|https)://domain[:port]/path/"></setting-list-item>
+                                <setting-list-item type="switch" title='{{ i18n "pages.settings.fragment"}}' desc='{{ i18n "pages.settings.fragmentDesc"}}' v-model="fragment"></setting-list-item>
+                                <template v-if="fragment">
+                                    <setting-list-item type="text" title='length' v-model="fragmentLength" placeholder="100-200"></setting-list-item>
+                                    <setting-list-item type="text" title='Interval' v-model="fragmentInterval" placeholder="10-20"></setting-list-item>
+                                </template>
+                            </a-list>
+                        </a-tab-pane>
                     </a-tabs>
                 </a-space>
             </a-spin>
@@ -230,6 +251,24 @@
             remarkModels: {i:'Inbound',e:'Email',o:'Other'},
             remarkSeparators: [' ','-','_','@',':','~','|',',','.','/'],
             remarkSample: '',
+            defaultFragment: {
+                tag: "fragment",
+                protocol: "freedom",
+                settings: {
+                    domainStrategy: "AsIs",
+                    fragment: {
+                        packets: "tlshello",
+                        length: "100-200",
+                        interval: "10-20"
+                    }
+                },
+                streamSettings: {
+                    sockopt: {
+                        tcpKeepAliveIdle: 100,
+                        TcpNoDelay: true
+                    }
+                }
+            },
             get remarkModel() {
                 rm = this.allSetting.remarkModel;
                 return rm.length>1 ? rm.substring(1).split('') : [];
@@ -290,7 +329,7 @@
                         title: '{{ i18n "pages.settings.restartPanel" }}',
                         content: '{{ i18n "pages.settings.restartPanelDesc" }}',
                         class: themeSwitcher.currentTheme,
-                        okText: '{{ i18n "sure" }}',
+                        okText: '{{ i18n "confirm" }}',
                         cancelText: '{{ i18n "cancel" }}',
                         onOk: () => resolve(),
                     });
@@ -307,6 +346,48 @@
                     const isTLS = webCertFile !== "" || webKeyFile !== "";
                     const url = buildURL({ host, port, isTLS, base, path: "xui/settings" });
                     window.location.replace(url);
+                }
+            }
+        },
+        computed: {
+            fragment: {
+                get: function() { return this.allSetting?.subJsonFragment != ""; },
+                set: function (v) {
+                    this.allSetting.subJsonFragment = v ? JSON.stringify(this.defaultFragment) : "";
+                }
+            },
+            fragmentLength: {
+                get: function() { return this.fragment ? JSON.parse(this.allSetting.subJsonFragment).settings.fragment.length : ""; },
+                set: function(v) {
+                    if (v != ""){
+                        newFragment = JSON.parse(this.allSetting.subJsonFragment);
+                        newFragment.settings.fragment.length = v;
+                        this.allSetting.subJsonFragment = JSON.stringify(newFragment);
+                    }
+                }
+            },
+            fragmentInterval: {
+                get: function() { return this.fragment ? JSON.parse(this.allSetting.subJsonFragment).settings.fragment.interval : ""; },
+                set: function(v) {
+                    if (v != ""){
+                        newFragment = JSON.parse(this.allSetting.subJsonFragment);
+                        newFragment.settings.fragment.interval = v;
+                        this.allSetting.subJsonFragment = JSON.stringify(newFragment);
+                    }
+                }
+            },
+            confAlerts: {
+                get: function() {
+                    if (!this.allSetting) return [];
+                    var alerts = []
+                    if (this.allSetting.port == 54321) alerts.push('{{ i18n "pages.settings.panelPort"}}');
+                    panelPath = window.location.pathname.split('/').length<4
+                    if (panelPath && this.allSetting.webBasePath == '/') alerts.push('{{ i18n "pages.settings.panelConfig"}} {{ i18n "pages.settings.panelUrlPath"}}');
+                    subPath = this.allSetting.subURI.length >0 ? new URL(this.allSetting.subURI).pathname : this.allSetting.subPath;
+                    if (subPath == '/sub/') alerts.push('{{ i18n "pages.settings.subSettings"}} {{ i18n "pages.settings.subPath"}}');
+                    subJsonPath = this.allSetting.subJsonURI.length >0 ? new URL(this.allSetting.subJsonURI).pathname : this.allSetting.subJsonPath;
+                    if (subJsonPath == '/json/') alerts.push('JSON {{ i18n "pages.settings.subPath"}}');
+                    return alerts
                 }
             }
         },

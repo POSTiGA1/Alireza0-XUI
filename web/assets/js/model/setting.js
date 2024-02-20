@@ -24,6 +24,7 @@ class AllSetting {
         this.subListen = "";
         this.subPort = "2096";
         this.subPath = "/sub/";
+        this.subJsonPath = "/json/";
         this.subDomain = "";
         this.subCertFile = "";
         this.subKeyFile = "";
@@ -31,6 +32,8 @@ class AllSetting {
         this.subEncrypt = true;
         this.subShowInfo = false;
         this.subURI = '';
+        this.subJsonURI = '';
+        this.subJsonFragment = '';
 
         this.timeLocation = "Asia/Tehran";
 

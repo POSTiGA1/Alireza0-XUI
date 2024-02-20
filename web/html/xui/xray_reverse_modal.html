@@ -38,7 +38,6 @@
                     :options="reverseModal.inboundTags"></a-checkbox-group>
             </a-form-item>
         </template>
-    </table>
     </a-form>
 </a-modal>
 <script>
@@ -46,7 +45,7 @@
         title: '',
         visible: false,
         confirmLoading: false,
-        okText: '{{ i18n "sure" }}',
+        okText: '{{ i18n "confirm" }}',
         isEdit: false,
         confirm: null,
         reverse: {
@@ -74,7 +73,7 @@
             }
             ObjectUtil.execute(reverseModal.confirm, reverseModal.reverse, reverseModal.rules);
         },
-        show({ title='', okText='{{ i18n "sure" }}', reverse, rules, confirm=(reverse, rules)=>{}, isEdit=false  }) {
+        show({ title='', okText='{{ i18n "confirm" }}', reverse, rules, confirm=(reverse, rules)=>{}, isEdit=false  }) {
             this.title = title;
             this.okText = okText;
             this.confirm = confirm;
@@ -131,8 +130,6 @@
         data: {
             reverseModal: reverseModal,
             reverseTypes: { bridge: '{{ i18n "pages.xray.outbound.bridge" }}', portal:'{{ i18n "pages.xray.outbound.portal" }}'},
-        },
-        methods: {
         }
     });
 

@@ -155,7 +155,7 @@
             }
             ObjectUtil.execute(clientsBulkModal.confirm, clients, clientsBulkModal.dbInbound.id);
         },
-        show({ title='', okText='{{ i18n "sure" }}', dbInbound=null, confirm=(inbound, dbInbound)=>{} }) {
+        show({ title='', okText='{{ i18n "confirm" }}', dbInbound=null, confirm=(inbound, dbInbound)=>{} }) {
             this.visible = true;
             this.title = title;
             this.okText = okText;
