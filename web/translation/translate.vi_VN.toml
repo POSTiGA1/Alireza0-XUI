@@ -78,7 +78,7 @@
 "title" = "Trạng thái hệ thống"
 "memory" = "Bộ nhớ"
 "hard" = "Ổ cứng"
-"machineInfo" = "Máy"
+"serverInfo" = "Máy chủ"
 "hostname" = "Tên máy chủ"
 "xrayStatus" = "Xray"
 "stopXray" = "Dừng"

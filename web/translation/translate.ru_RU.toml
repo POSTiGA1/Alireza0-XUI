@@ -78,7 +78,7 @@
 "title" = "Статус системы"
 "memory" = "ОЗУ"
 "hard" = "Место на диске"
-"machineInfo" = "Машина"
+"serverInfo" = "Сервер"
 "hostname" = "Имя хоста"
 "xrayStatus" = "Xray"
 "stopXray" = "Остановка"

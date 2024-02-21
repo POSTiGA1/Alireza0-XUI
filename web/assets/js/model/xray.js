@@ -2096,7 +2096,7 @@ Inbound.WireguardSettings = class extends XrayCommonClass {
     }
 
     addPeer() {
-        this.peers.push(new Inbound.WireguardSettings.Peer());
+        this.peers.push(new Inbound.WireguardSettings.Peer(null,null,'',['10.0.0.' + (this.peers.length+2)]));
     }
 
     delPeer(index) {
@@ -2124,7 +2124,7 @@ Inbound.WireguardSettings = class extends XrayCommonClass {
 };
 
 Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
-    constructor(privateKey, publicKey, psk='', allowedIPs=['10.0.0.0/24'], keepAlive=0) {
+    constructor(privateKey, publicKey, psk='', allowedIPs=['10.0.0.2/32'], keepAlive=0) {
         super();
         this.privateKey = privateKey
         this.publicKey = publicKey;
@@ -2132,6 +2132,9 @@ Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
             [this.publicKey, this.privateKey] = Object.values(Wireguard.generateKeypair())
         }
         this.psk = psk;
+        allowedIPs.forEach((a,index) => {
+            if (a.length>0 && !a.includes('/')) allowedIPs[index] += '/32';
+        })
         this.allowedIPs = allowedIPs;
         this.keepAlive = keepAlive;
     }
@@ -2147,6 +2150,9 @@ Inbound.WireguardSettings.Peer = class extends XrayCommonClass {
     }
 
     toJson() {
+        this.allowedIPs.forEach((a,index) => {
+            if (a.length>0 && !a.includes('/')) this.allowedIPs[index] += '/32';
+        });
         return {
             privateKey: this.privateKey,
             publicKey: this.publicKey,

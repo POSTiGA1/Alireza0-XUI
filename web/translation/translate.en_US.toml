@@ -78,7 +78,7 @@
 "title" = "Overview"
 "memory" = "RAM"
 "hard" = "Disk"
-"machineInfo" = "Machine"
+"serverInfo" = "Server"
 "hostname" = "Hostname"
 "xrayStatus" = "Xray"
 "stopXray" = "Stop"

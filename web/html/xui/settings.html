@@ -383,10 +383,12 @@
                     if (this.allSetting.port == 54321) alerts.push('{{ i18n "pages.settings.panelPort"}}');
                     panelPath = window.location.pathname.split('/').length<4
                     if (panelPath && this.allSetting.webBasePath == '/') alerts.push('{{ i18n "pages.settings.panelConfig"}} {{ i18n "pages.settings.panelUrlPath"}}');
-                    subPath = this.allSetting.subURI.length >0 ? new URL(this.allSetting.subURI).pathname : this.allSetting.subPath;
-                    if (subPath == '/sub/') alerts.push('{{ i18n "pages.settings.subSettings"}} {{ i18n "pages.settings.subPath"}}');
-                    subJsonPath = this.allSetting.subJsonURI.length >0 ? new URL(this.allSetting.subJsonURI).pathname : this.allSetting.subJsonPath;
-                    if (subJsonPath == '/json/') alerts.push('JSON {{ i18n "pages.settings.subPath"}}');
+                    if (this.allSetting.subEnable) {
+                        subPath = this.allSetting.subURI.length >0 ? new URL(this.allSetting.subURI).pathname : this.allSetting.subPath;
+                        if (subPath == '/sub/') alerts.push('{{ i18n "pages.settings.subSettings"}} {{ i18n "pages.settings.subPath"}}');
+                        subJsonPath = this.allSetting.subJsonURI.length >0 ? new URL(this.allSetting.subJsonURI).pathname : this.allSetting.subJsonPath;
+                        if (subJsonPath == '/json/') alerts.push('JSON {{ i18n "pages.settings.subPath"}}');
+                    }
                     return alerts
                 }
             }

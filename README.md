@@ -62,6 +62,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.s
 ARCH=$(uname -m)
 case "${ARCH}" in
   x86_64 | x64 | amd64) XUI_ARCH="amd64" ;;
+  i*86 | x86) XUI_ARCH="386" ;;
   armv8* | armv8 | arm64 | aarch64) XUI_ARCH="arm64" ;;
   armv7* | armv7) XUI_ARCH="armv7" ;;
   *) XUI_ARCH="amd64" ;;
@@ -76,6 +77,7 @@ wget https://github.com/alireza0/x-ui/releases/latest/download/x-ui-linux-${XUI_
 ARCH=$(uname -m)
 case "${ARCH}" in
   x86_64 | x64 | amd64) XUI_ARCH="amd64" ;;
+  i*86 | x86) XUI_ARCH="386" ;;
   armv8* | armv8 | arm64 | aarch64) XUI_ARCH="arm64" ;;
   armv7* | armv7) XUI_ARCH="armv7" ;;
   *) XUI_ARCH="amd64" ;;

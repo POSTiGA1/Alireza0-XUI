@@ -4,6 +4,10 @@ case $1 in
         ARCH="64"
         FNAME="amd64"
         ;;
+    i386)
+        ARCH="32"
+        FNAME="i386"
+        ;;
     armv8 | arm64 | aarch64)
         ARCH="arm64-v8a"
         FNAME="arm64"
