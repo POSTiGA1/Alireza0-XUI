@@ -117,11 +117,7 @@ func (s *SubJsonService) GetJson(subId string, host string) (string, string, err
 
 	// Combile outbounds
 	outbounds = append(outbounds, defaultOutbounds...)
-	var outboundStrings []json_util.RawMessage
-	for _, outbound := range outbounds {
-		outboundStrings = append(outboundStrings, outbound)
-	}
-	configJson["outbounds"] = outboundStrings
+	configJson["outbounds"] = outbounds
 	finalJson, _ := json.MarshalIndent(configJson, "", "  ")
 
 	header = fmt.Sprintf("upload=%d; download=%d; total=%d; expire=%d", traffic.Up, traffic.Down, traffic.Total, traffic.ExpiryTime/1000)

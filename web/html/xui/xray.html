@@ -162,7 +162,8 @@
                                     <a-list-item>
                                         <a-row style="padding: 20px">
                                             <a-col :lg="24" :xl="12">
-                                                <a-list-item-meta title='Level'/>
+                                                <a-list-item-meta title='{{ i18n "pages.xray.logLevel" }}'
+                                                    description='{{ i18n "pages.xray.logLevelDesc" }}' />
                                             </a-col>
                                             <a-col :lg="24" :xl="12">
                                                 <template>
@@ -177,7 +178,8 @@
                                     </a-list-item>
                                     <a-row style="padding: 20px">
                                         <a-col :lg="24" :xl="12">
-                                            <a-list-item-meta title='Access Logs' />
+                                            <a-list-item-meta title='{{ i18n "pages.xray.accessLog" }}'
+                                                description='{{ i18n "pages.xray.accessLogDesc" }}' />
                                         </a-col>
                                         <a-col :lg="24" :xl="12">
                                             <a-input v-model="logAccess"></a-input>
@@ -185,7 +187,8 @@
                                     </a-row>
                                     <a-row style="padding: 20px">
                                         <a-col :lg="24" :xl="12">
-                                            <a-list-item-meta title='Error Logs' />
+                                            <a-list-item-meta title='{{ i18n "pages.xray.errorLog" }}'
+                                                description='{{ i18n "pages.xray.errorLogDesc" }}' />
                                         </a-col>
                                         <a-col :lg="24" :xl="12">
                                             <a-input v-model="logError"></a-input>
@@ -267,11 +270,11 @@
                                         <setting-list-item type="switch" title='{{ i18n "pages.xray.SpotifyWARP"}}' desc='{{ i18n "pages.xray.SpotifyWARPDesc"}}' v-model="SpotifyWARPSettings"></setting-list-item>
                                         <setting-list-item type="switch" title='{{ i18n "pages.xray.MetaWARP"}}' desc='{{ i18n "pages.xray.MetaWARPDesc"}}' v-model="MetaWARPSettings"></setting-list-item>
                                     </template>
-                                    <a-button v-else style="margin: 10px 0;" @click="showWarp">WARP {{ i18n "pages.xray.rules.outbound" }}</a-button>
+                                    <a-button v-else type="primary" icon="cloud" style="margin: 15px 20px;" @click="showWarp()">WARP</a-button>
                                 </a-collapse-panel>
                                 <a-collapse-panel header='{{ i18n "pages.settings.resetDefaultConfig"}}'>
                                     <a-space direction="horizontal" style="padding: 0 20px">
-                                        <a-button type="primary" @click="resetXrayConfigToDefault">{{ i18n "pages.settings.resetDefaultConfig" }}</a-button>
+                                        <a-button type="danger" @click="resetXrayConfigToDefault">{{ i18n "pages.settings.resetDefaultConfig" }}</a-button>
                                     </a-space>
                                 </a-collapse-panel>
                             </a-collapse>
@@ -398,7 +401,7 @@
                         </a-tab-pane>
                         <a-tab-pane key="tpl-3" tab='{{ i18n "pages.xray.Outbounds"}}' style="padding-top: 20px;" force-render="true">
                             <a-button type="primary" icon="plus" @click="addOutbound()" style="margin-bottom: 10px;">{{ i18n "pages.xray.outbound.addOutbound" }}</a-button>
-                            <a-button type="primary" @click="showWarp()" style="margin-bottom: 10px;">WARP</a-button>
+                            <a-button type="primary" icon="cloud" @click="showWarp()" style="margin-bottom: 10px;">WARP</a-button>
                             <a-table :columns="outboundColumns" bordered
                             :row-key="r => r.key"
                             :data-source="outboundData"
@@ -442,7 +445,7 @@
                         </a-tab-pane>
                         <a-tab-pane key="tpl-4" tab='{{ i18n "pages.xray.outbound.reverse"}}' style="padding-top: 20px;" force-render="true">
                             <a-button type="primary" icon="plus" @click="addReverse()" style="margin-bottom: 10px;">{{ i18n "pages.xray.outbound.addReverse" }}</a-button>
-                            <a-table :columns="reverseColumns" bordered
+                            <a-table :columns="reverseColumns" bordered v-if="reverseData.length>0"
                             :row-key="r => r.key"
                             :data-source="reverseData"
                             :scroll="isMobile ? {} : { x: 200 }"
@@ -469,6 +472,8 @@
                             </a-table>
                         </a-tab-pane>
                         <a-tab-pane key="tpl-5" tab='{{ i18n "pages.xray.Balancers"}}' style="padding-top: 20px;" force-render="true">
+                            <a-alert type="warning" style="margin-bottom: 10px; width: fit-content"
+                            message='{{ i18n "pages.xray.balancer.balancerDesc" }}' show-icon></a-alert>
                             <a-button type="primary" icon="plus" @click="addBalancer()" style="margin-bottom: 10px;">{{ i18n "pages.xray.balancer.addBalancer"}}</a-button>
                             <a-table :columns="balancerColumns" bordered v-if="balancersData.length>0"
                             :row-key="r => r.key"

@@ -74,17 +74,18 @@
             this.balancerTags = balancerTags.filter((tag) => tag != balancer.tag);
             this.outboundTags = app.templateSettings.outbounds.filter((o) => !ObjectUtil.isEmpty(o.tag)).map(obj => obj.tag);
             this.isEdit = isEdit;
-            this.check()
+            this.check();
+            this.checkSelector();
         },
         close() {
-            balancerModal.visible = false;
-            balancerModal.loading(false);
+            this.visible = false;
+            this.loading(false);
         },
         loading(loading=true) {
-            balancerModal.confirmLoading = loading;
+            this.confirmLoading = loading;
         },
         check() {
-            if (balancerModal.balancer.tag == '' || balancerModal.balancerTags.includes(balancerModal.balancer.tag)) {
+            if (this.balancer.tag == '' || this.balancerTags.includes(this.balancer.tag)) {
                 this.duplicateTag = true;
                 this.isValid = false;
             } else {
@@ -93,7 +94,7 @@
             }
         },
         checkSelector() {
-            balancerModal.emptySelector = balancerModal.balancer.selector.length == 0;
+            this.emptySelector = this.balancer.selector.length == 0;
         }
     };
 

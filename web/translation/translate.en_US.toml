@@ -312,8 +312,8 @@
 "advancedTemplate" = "Advanced"
 "generalConfigs" = "General Strategy"
 "generalConfigsDesc" = "These options will determine general strategy adjustments."
-"logConfigs" = "Log"
-"logConfigsDesc" = "Logs may affect your server's efficiency. It is recommended to enable it wisely only in case of your needs"
+"logConfigs" = "Logs Settings"
+"logConfigsDesc" = "Enabling logs may affect your server's efficiency. It is recommended to enable it wisely only when necessary."
 "blockConfigs" = "Protection Shield"
 "blockConfigsDesc" = "These options will block traffic based on specific requested protocols and websites."
 "blockCountryConfigs" = "Block Country"
@@ -321,7 +321,7 @@
 "directCountryConfigs" = "Direct Country"
 "directCountryConfigsDesc" = "These options will directly forward traffic based on the specific requested country."
 "ipv4Configs" = "IPv4 Routing"
-"ipv4ConfigsDesc" = "These options will route traffic based on specific requested destination via system's IPv4."
+"ipv4ConfigsDesc" = "These options will route traffic based on specific requested destination via server's IPv4."
 "warpConfigs" = "WARP Config"
 "warpConfigsDesc" = "These options will route traffic based on specific requested destination via WARP."
 "Template" = "Advanced Xray Configuration Template"
@@ -382,6 +382,12 @@
 "Routings" = "Routing Rules"
 "RoutingsDesc" = "The priority of each rule is important!"
 "Balancers" = "Balancers"
+"logLevel" = "Log Level"
+"logLevelDesc" = "The log level for error logs determines the severity of issues that should be recorded."
+"accessLog" = "Access Log"
+"accessLogDesc" = "The file path for the access log."
+"errorLog" = "Error Log"
+"errorLogDesc" = "The file path for the error log."
 
 [pages.xray.rules]
 "first" = "First"
@@ -423,7 +429,7 @@
 "balancerSelectors" = "Selectors"
 "tag" = "Tag"
 "tagDesc" = "Unique Tag"
-"balancerDesc" = "It is not possible to use balancerTag and outboundTag at the same time. If used at the same time, only outboundTag will work."
+"balancerDesc" = "It is not possible to use both balancerTag and outboundTag simultaneously. If both are used together, only outboundTag will function."
 
 [pages.xray.wireguard]
 "secretKey" = "Secret Key"
@@ -435,9 +441,9 @@
 
 [pages.xray.dns]
 "enable" = "Enable DNS"
-"enableDesc" = "Enable built-in DNS server"
+"enableDesc" = "Enables built-in DNS server."
 "strategy" = "Query Strategy"
-"strategyDesc" = "Overall strategy to resolve domain names"
+"strategyDesc" = "Overall strategy to resolve domain names."
 "add" = "Add Server"
 "edit" = "Edit Server"
 "domains" = "Domains"
