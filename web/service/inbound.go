@@ -1329,8 +1329,6 @@ func (s *InboundService) MigrationRequirements() {
 		}
 	}()
 
-	db.Migrator().DropIndex(&model.Inbound{}, "port")
-
 	// Fix inbounds based problems
 	var inbounds []*model.Inbound
 	err = tx.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "trojan"}).Find(&inbounds).Error
