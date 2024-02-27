@@ -52,7 +52,12 @@
 "remained" = "Remaining"
 "secAlertTitle" = "Security Alert"
 "secAlertSsl" = "This connection is not secure. Please avoid entering sensitive information until TLS is activated for data protection."
-"secAlertConf" = "Certain configurations have been identified as susceptible to attacks, prompting immediate action to reinforce security protocols and safeguard against potential security breaches."
+"secAlertConf" = "Certain settings are vulnerable to attacks. It is recommended to reinforce security protocols to prevent potential breaches."
+"secAlertSSL" = "Panel lacks secure connection. Please install TLS certificate for data protection."
+"secAlertPanelPort" = "Panel default port is vulnerable. Please configure a random or specific port."
+"secAlertPanelURI" = "Panel default URI path is insecure. Please configure a complex URI path."
+"secAlertSubURI" = "Subscription default URI path is insecure. Please configure a complex URI path."
+"secAlertSubJsonURI" = "Subscription JSON default URI path is insecure. Please configure a complex URI path."
 "security" = "Security"
 
 [menu]
@@ -383,7 +388,7 @@
 "RoutingsDesc" = "The priority of each rule is important!"
 "Balancers" = "Balancers"
 "logLevel" = "Log Level"
-"logLevelDesc" = "The log level for error logs determines the severity of issues that should be recorded."
+"logLevelDesc" = "The log level will determine the severity of issues that should be recorded."
 "accessLog" = "Access Log"
 "accessLogDesc" = "The file path for the access log."
 "errorLog" = "Error Log"
