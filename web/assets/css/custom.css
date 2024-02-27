@@ -683,7 +683,8 @@ style attribute {
     border-color: #9ea2a8;
 }
 
-.dark .ant-table-row-expand-icon:hover {
+.dark .ant-table-row-expand-icon:hover,
+.dark .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover {
     color: #0e49b5;
     background-color: #fff0;
     border-color: #0e49b5;

@@ -76,7 +76,6 @@ func (a *SUBController) subs(c *gin.Context) {
 }
 
 func (a *SUBController) subJsons(c *gin.Context) {
-	println(c.Request.Header["User-Agent"][0])
 	subId := c.Param("subid")
 	host := strings.Split(c.Request.Host, ":")[0]
 	jsonSub, header, err := a.subJsonService.GetJson(subId, host)

@@ -1340,7 +1340,7 @@ func (s *InboundService) MigrationRequirements() {
 		json.Unmarshal([]byte(inbounds[inbound_index].Settings), &settings)
 		clients, ok := settings["clients"].([]interface{})
 		if ok {
-			// Fix Clinet configuration problems
+			// Fix Client configuration problems
 			var newClients []interface{}
 			for client_index := range clients {
 				c := clients[client_index].(map[string]interface{})
