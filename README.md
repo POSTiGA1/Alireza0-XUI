@@ -11,8 +11,7 @@
 
 **If you think this project is helpful to you, you may wish to give a**:star2:
 
-<img width="125" alt="image"
-src="https://github.com/alireza0/x-ui/assets/115543613/dd4f10dd-8bb0-40cf-846f-1fe1de7a6275">
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/alireza7)
 
 - USDT (TRC20): `TYTq73Gj6dJ67qe58JVPD9zpjW2cc9XgVz`
 - Tezos (XTZ):

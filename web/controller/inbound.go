@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+
 	"x-ui/database/model"
 	"x-ui/web/service"
 	"x-ui/web/session"
@@ -63,6 +64,7 @@ func (a *InboundController) getInbound(c *gin.Context) {
 	}
 	jsonObj(c, inbound, nil)
 }
+
 func (a *InboundController) getClientTraffics(c *gin.Context) {
 	email := c.Param("email")
 	clientTraffics, err := a.inboundService.GetClientTrafficByEmail(email)
@@ -148,7 +150,7 @@ func (a *InboundController) addInboundClient(c *gin.Context) {
 		return
 	}
 	jsonMsg(c, "Client(s) added", nil)
-	if err == nil && needRestart {
+	if needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -169,7 +171,7 @@ func (a *InboundController) delInboundClient(c *gin.Context) {
 		return
 	}
 	jsonMsg(c, "Client deleted", nil)
-	if err == nil && needRestart {
+	if needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -192,7 +194,7 @@ func (a *InboundController) updateInboundClient(c *gin.Context) {
 		return
 	}
 	jsonMsg(c, "Client updated", nil)
-	if err == nil && needRestart {
+	if needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }
@@ -213,7 +215,7 @@ func (a *InboundController) resetClientTraffic(c *gin.Context) {
 		return
 	}
 	jsonMsg(c, "traffic reseted", nil)
-	if err == nil && needRestart {
+	if needRestart {
 		a.xrayService.SetToNeedRestart()
 	}
 }

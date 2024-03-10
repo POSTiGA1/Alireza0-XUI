@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
 	"x-ui/database"
 	"x-ui/database/model"
 	"x-ui/logger"
@@ -90,7 +91,6 @@ func (s *InboundService) getAllEmails() ([]string, error) {
 		FROM inbounds,
 			JSON_EACH(JSON_EXTRACT(inbounds.settings, '$.clients')) AS client
 		`).Scan(&emails).Error
-
 	if err != nil {
 		return nil, err
 	}
@@ -553,21 +553,30 @@ func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId strin
 	}
 
 	oldEmail := ""
+	newClientId := ""
 	clientIndex := 0
 	for index, oldClient := range oldClients {
 		oldClientId := ""
 		if oldInbound.Protocol == "trojan" {
 			oldClientId = oldClient.Password
+			newClientId = clients[0].Password
 		} else if oldInbound.Protocol == "shadowsocks" {
 			oldClientId = oldClient.Email
+			newClientId = clients[0].Email
 		} else {
 			oldClientId = oldClient.ID
+			newClientId = clients[0].ID
 		}
 		if clientId == oldClientId {
 			oldEmail = oldClient.Email
 			clientIndex = index
 			break
 		}
+	}
+
+	// Validate new client ID
+	if newClientId == "" {
+		return false, common.NewError("empty client ID")
 	}
 
 	if len(clients[0].Email) > 0 && clients[0].Email != oldEmail {
@@ -941,7 +950,7 @@ func (s *InboundService) disableInvalidInbounds(tx *gorm.DB) (bool, int64, error
 		s.xrayApi.Init(p.GetAPIPort())
 		for _, tag := range tags {
 			err1 := s.xrayApi.DelInbound(tag)
-			if err == nil {
+			if err1 == nil {
 				logger.Debug("Inbound disabled by api:", tag)
 			} else {
 				logger.Debug("Error in disabling inbound by api:", err1)
@@ -1035,13 +1044,15 @@ func (s *InboundService) UpdateClientStat(tx *gorm.DB, email string, client *mod
 			"email":       client.Email,
 			"total":       client.TotalGB,
 			"expiry_time": client.ExpiryTime,
-			"reset":       client.Reset})
+			"reset":       client.Reset,
+		})
 	err := result.Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *InboundService) DelClientStat(tx *gorm.DB, email string) error {
 	return tx.Where("email = ?", email).Delete(xray.ClientTraffic{}).Error
 }
@@ -1122,7 +1133,6 @@ func (s *InboundService) ResetAllClientTraffics(id int) error {
 		Updates(map[string]interface{}{"enable": true, "up": 0, "down": 0})
 
 	err := result.Error
-
 	if err != nil {
 		return err
 	}
@@ -1137,7 +1147,6 @@ func (s *InboundService) ResetAllTraffics() error {
 		Updates(map[string]interface{}{"up": 0, "down": 0})
 
 	err := result.Error
-
 	if err != nil {
 		return err
 	}
