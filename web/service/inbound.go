@@ -1030,10 +1030,7 @@ func (s *InboundService) AddClientStat(tx *gorm.DB, inboundId int, client *model
 	clientTraffic.Reset = client.Reset
 	result := tx.Create(&clientTraffic)
 	err := result.Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (s *InboundService) UpdateClientStat(tx *gorm.DB, email string, client *model.Client) error {
@@ -1047,10 +1044,7 @@ func (s *InboundService) UpdateClientStat(tx *gorm.DB, email string, client *mod
 			"reset":       client.Reset,
 		})
 	err := result.Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (s *InboundService) DelClientStat(tx *gorm.DB, email string) error {
@@ -1133,10 +1127,7 @@ func (s *InboundService) ResetAllClientTraffics(id int) error {
 		Updates(map[string]interface{}{"enable": true, "up": 0, "down": 0})
 
 	err := result.Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (s *InboundService) ResetAllTraffics() error {
@@ -1147,10 +1138,7 @@ func (s *InboundService) ResetAllTraffics() error {
 		Updates(map[string]interface{}{"up": 0, "down": 0})
 
 	err := result.Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (s *InboundService) DelDepletedClients(id int) (err error) {

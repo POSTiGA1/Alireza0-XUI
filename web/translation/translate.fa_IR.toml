@@ -425,6 +425,7 @@
 "settings" = "تنظیمات"
 "accountInfo" = "اطلاعات حساب"
 "outboundStatus" = "وضعیت خروجی"
+"sendThrough" = "ارسال با"
 
 [pages.xray.balancer]
 "addBalancer" = "افزودن بالانسر"

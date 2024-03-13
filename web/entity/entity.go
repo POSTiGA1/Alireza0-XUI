@@ -50,6 +50,8 @@ type AllSetting struct {
 	SubJsonPath      string `json:"subJsonPath" form:"subJsonPath"`
 	SubJsonURI       string `json:"subJsonURI" form:"subJsonURI"`
 	SubJsonFragment  string `json:"subJsonFragment" form:"subJsonFragment"`
+	SubJsonMux       string `json:"subJsonMux" form:"subJsonMux"`
+	SubJsonRules     string `json:"subJsonRules" form:"subJsonRules"`
 }
 
 func (s *AllSetting) CheckValid() error {

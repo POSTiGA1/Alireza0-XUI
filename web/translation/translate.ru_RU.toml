@@ -426,6 +426,7 @@
 "settings" = "Настройки"
 "accountInfo" = "Информация Об Учетной Записи"
 "outboundStatus" = "Исходящий статус"
+"sendThrough" = "Отправить через"
 
 [pages.xray.balancer]
 "addBalancer" = "Добавить балансир"

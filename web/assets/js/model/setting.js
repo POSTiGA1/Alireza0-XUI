@@ -31,9 +31,11 @@ class AllSetting {
         this.subUpdates = 0;
         this.subEncrypt = true;
         this.subShowInfo = false;
-        this.subURI = '';
-        this.subJsonURI = '';
-        this.subJsonFragment = '';
+        this.subURI = "";
+        this.subJsonURI = "";
+        this.subJsonFragment = "";
+        this.subJsonMux = "";
+        this.subJsonRules = "";
 
         this.timeLocation = "Asia/Tehran";
 

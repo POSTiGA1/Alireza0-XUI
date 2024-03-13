@@ -104,8 +104,8 @@
                             </a-col>
                         </a-row>
                     </a-card>
-                    <a-tabs default-active-key="1" @change="(activeKey) => { if(activeKey == 'tpl-advanced') this.changeCode(); }">
-                        <a-tab-pane key="tpl-1" tab='{{ i18n "pages.xray.basicTemplate"}}' style="padding-top: 20px;">
+                    <a-tabs default-active-key="1" @change="(activeKey) => { this.changePage(activeKey); }">
+                        <a-tab-pane key="tpl-basic" tab='{{ i18n "pages.xray.basicTemplate"}}' style="padding-top: 20px;">
                             <a-collapse>
                                 <a-collapse-panel header='{{ i18n "pages.xray.generalConfigs"}}'>
                                     <a-row :xs="24" :sm="24" :lg="12">
@@ -279,9 +279,7 @@
                                 </a-collapse-panel>
                             </a-collapse>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-2" tab='{{ i18n "pages.xray.Routings"}}' style="padding-top: 20px;">
-                            <a-alert type="warning" style="margin-bottom: 10px; width: fit-content"
-                            message='{{ i18n "pages.xray.RoutingsDesc"}}' show-icon></a-alert>
+                        <a-tab-pane key="tpl-routing" tab='{{ i18n "pages.xray.Routings"}}' style="padding-top: 20px;">
                             <a-button type="primary" icon="plus" @click="addRule">{{ i18n "pages.xray.rules.add" }}</a-button>
                             <a-table :columns="isMobile ? rulesMobileColumns : rulesColumns" bordered
                                 :row-key="r => r.key"
@@ -399,7 +397,7 @@
                                 </template>
                             </a-table>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-3" tab='{{ i18n "pages.xray.Outbounds"}}' style="padding-top: 20px;" force-render="true">
+                        <a-tab-pane key="tpl-outbound" tab='{{ i18n "pages.xray.Outbounds"}}' style="padding-top: 20px;" force-render="true">
                             <a-button type="primary" icon="plus" @click="addOutbound()" style="margin-bottom: 10px;">{{ i18n "pages.xray.outbound.addOutbound" }}</a-button>
                             <a-button type="primary" icon="cloud" @click="showWarp()" style="margin-bottom: 10px;">WARP</a-button>
                             <a-table :columns="outboundColumns" bordered
@@ -443,7 +441,7 @@
                                 </template>
                             </a-table>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-4" tab='{{ i18n "pages.xray.outbound.reverse"}}' style="padding-top: 20px;" force-render="true">
+                        <a-tab-pane key="tpl-reverse" tab='{{ i18n "pages.xray.outbound.reverse"}}' style="padding-top: 20px;" force-render="true">
                             <a-button type="primary" icon="plus" @click="addReverse()" style="margin-bottom: 10px;">{{ i18n "pages.xray.outbound.addReverse" }}</a-button>
                             <a-table :columns="reverseColumns" bordered v-if="reverseData.length>0"
                             :row-key="r => r.key"
@@ -471,9 +469,7 @@
                                 </template>
                             </a-table>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-5" tab='{{ i18n "pages.xray.Balancers"}}' style="padding-top: 20px;" force-render="true">
-                            <a-alert type="warning" style="margin-bottom: 10px; width: fit-content"
-                            message='{{ i18n "pages.xray.balancer.balancerDesc" }}' show-icon></a-alert>
+                        <a-tab-pane key="tpl-balancer" tab='{{ i18n "pages.xray.Balancers"}}' style="padding-top: 20px;" force-render="true">
                             <a-button type="primary" icon="plus" @click="addBalancer()" style="margin-bottom: 10px;">{{ i18n "pages.xray.balancer.addBalancer"}}</a-button>
                             <a-table :columns="balancerColumns" bordered v-if="balancersData.length>0"
                             :row-key="r => r.key"
@@ -500,15 +496,28 @@
                                     </a-dropdown>
                                 </template>
                                 <template slot="strategy" slot-scope="text, balancer, index">
-                                    <a-tag style="margin:0;" v-if="balancer.strategy=='random'" color="purple">Random</a-tag>
-                                    <a-tag style="margin:0;" v-if="balancer.strategy=='roundRobin'" color="green">Round Robin</a-tag>
+                                    <a-tag style="margin:0;" v-if="balancer.strategy=='random'" color="blue">Random</a-tag>
+                                    <a-tag style="margin:0;" v-if="balancer.strategy=='roundRobin'" color="blue">Round Robin</a-tag>
+                                    <a-tag style="margin:0;" v-if="balancer.strategy=='leastPing'" color="green">Least Ping</a-tag>
+                                    <a-tag style="margin:0;" v-if="balancer.strategy=='leastLoad'" color="purple">Least Load</a-tag>
                                 </template>
                                 <template slot="selector" slot-scope="text, balancer, index">
                                     <a-tag class="info-large-tag" style="margin:1;" v-for="sel in balancer.selector">[[ sel ]]</a-tag>
                                 </template>
-                            </a-table>                            
+                            </a-table>
+                            <a-radio-group
+                                v-model="obsSettings"
+                                v-if="observatoryEnable || burstObservatoryEnable"
+                                @change="changeObsCode"
+                                button-style="solid"
+                                style="margin: 10px 0;"
+                                :size="isMobile ? 'small' : ''">
+                                <a-radio-button value="observatory" v-if="observatoryEnable">Observatory</a-radio-button>
+                                <a-radio-button value="burstObservatory" v-if="burstObservatoryEnable">Burst Observatory</a-radio-button>
+                            </a-radio-group>
+                            <textarea style="position:absolute; left: -800px;" id="obsSetting"></textarea>
                         </a-tab-pane>
-                        <a-tab-pane key="tpl-6" tab='DNS' style="padding-top: 20px;" force-render="true">
+                        <a-tab-pane key="tpl-dns" tab='DNS' style="padding-top: 20px;" force-render="true">
                             <setting-list-item type="switch" title='{{ i18n "pages.xray.dns.enable" }}' desc='{{ i18n "pages.xray.dns.enableDesc" }}' v-model="enableDNS"></setting-list-item>
                             <template v-if="enableDNS">
                                 <setting-list-item type="text" title='{{ i18n "pages.xray.dns.tag" }}' desc='{{ i18n "pages.xray.dns.tagDesc" }}' v-model="dnsTag"></setting-list-item>
@@ -695,6 +704,7 @@
             showAlert: false,
             isMobile: window.innerWidth <= 768,
             advSettings: 'xraySetting',
+            obsSettings: '',
             cm: null,
             cmOptions: {
                 lineNumbers: true,
@@ -772,6 +782,22 @@
                     ],
                     "queryStrategy": "UseIP"
                 },
+            },
+            defaultObservatory: {
+                subjectSelector: [],
+                probeURL: "http://www.google.com/gen_204",
+                probeInterval: "10m",
+                enableConcurrency: true
+            },
+            defaultBurstObservatory: {
+                subjectSelector: [],
+                pingConfig: {
+                    destination: "http://www.google.com/gen_204",
+                    interval: "30m",
+                    connectivity: "http://connectivitycheck.platform.hicloud.com/generate_204",
+                    timeout: "10s",
+                    sampling: 2
+                }
             }
         },
         methods: {
@@ -823,6 +849,10 @@
                     this.templateSettings = JSON.parse(JSON.stringify(msg.obj, null, 2));
                     this.saveBtnDisable = true;
                 }
+            },
+            changePage(pageKey) {
+                if(pageKey == 'tpl-advanced') this.changeCode();
+                if(pageKey == 'tpl-balancer') this.changeObsCode();
             },
             syncRulesWithOutbound(tag, setting) {
                 const newTemplateSettings = this.templateSettings;
@@ -903,6 +933,23 @@
                     value = editor.getValue();
                     if(this.isJsonString(value)){
                         this[this.advSettings] = value;
+                    }
+                });
+            },
+            changeObsCode() {
+                if (this.obsSettings == ''){
+                    return
+                }
+                if(this.cm != null) {
+                    this.cm.toTextArea();
+                }
+                textAreaObj = document.getElementById('obsSetting');
+                textAreaObj.value = this[this.obsSettings];
+                this.cm = CodeMirror.fromTextArea(textAreaObj, this.cmOptions);
+                this.cm.on('change',editor => {
+                    value = editor.getValue();
+                    if(this.isJsonString(value)){
+                        this[this.obsSettings] = value;
                     }
                 });
             },
@@ -1081,14 +1128,27 @@
                             'tag': balancer.tag,
                             'selector': balancer.selector
                         };
-                        if (balancer.strategy == 'roundRobin') {
+                        if (balancer.strategy && balancer.strategy != 'random') {
                             tmpBalancer.strategy = {
                                 'type': balancer.strategy
                             };
+                            if (balancer.strategy == 'leastPing'){
+                                if (!newTemplateSettings.observatory)
+                                    newTemplateSettings.observatory = this.defaultObservatory;
+                                if (!newTemplateSettings.observatory.subjectSelector.includes(balancer.tag))
+                                    newTemplateSettings.observatory.subjectSelector.push(balancer.tag);
+                            }
+                            if (balancer.strategy == 'leastLoad'){
+                                if (!newTemplateSettings.burstObservatory)
+                                    newTemplateSettings.burstObservatory = this.defaultBurstObservatory;
+                                if (!newTemplateSettings.burstObservatory.subjectSelector.includes(balancer.tag))
+                                    newTemplateSettings.burstObservatory.subjectSelector.push(balancer.tag);
+                            }
                         }
                         newTemplateSettings.routing.balancers.push(tmpBalancer);
                         this.templateSettings = newTemplateSettings;
                         balancerModal.close();
+                        this.changeObsCode();
                     },
                     isEdit: false
                 });
@@ -1108,10 +1168,31 @@
                             'tag': balancer.tag,
                             'selector': balancer.selector
                         };
-                        if (balancer.strategy == 'roundRobin') {
+
+                        // Remove old tag
+                        if (newTemplateSettings.observatory){
+                            newTemplateSettings.observatory.subjectSelector = newTemplateSettings.observatory.subjectSelector.filter(s => s != oldTag);
+                        }
+                        if (newTemplateSettings.burstObservatory){
+                            newTemplateSettings.burstObservatory.subjectSelector = newTemplateSettings.burstObservatory.subjectSelector.filter(s => s != oldTag);
+                        }
+
+                        if (balancer.strategy && balancer.strategy != 'random') {
                             tmpBalancer.strategy = {
                                 'type': balancer.strategy
                             };
+                            if (balancer.strategy == 'leastPing'){
+                                if (!newTemplateSettings.observatory)
+                                    newTemplateSettings.observatory = this.defaultObservatory;
+                                if (!newTemplateSettings.observatory.subjectSelector.includes(balancer.tag))
+                                    newTemplateSettings.observatory.subjectSelector.push(balancer.tag);
+                            }
+                            if (balancer.strategy == 'leastLoad'){
+                                if (!newTemplateSettings.burstObservatory)
+                                    newTemplateSettings.burstObservatory = this.defaultBurstObservatory;
+                                if (!newTemplateSettings.burstObservatory.subjectSelector.includes(balancer.tag))
+                                    newTemplateSettings.burstObservatory.subjectSelector.push(balancer.tag);
+                            }
                         }
 
                         newTemplateSettings.routing.balancers[index] = tmpBalancer;
@@ -1125,6 +1206,7 @@
                         }
                         this.templateSettings = newTemplateSettings;
                         balancerModal.close();
+                        this.changeObsCode();
                     },
                     isEdit: true
                 });
@@ -1133,22 +1215,26 @@
                 newTemplateSettings = this.templateSettings;
 
                 //remove from balancers
-                const oldTag = this.balancersData[index].tag;
-                this.balancersData.splice(index, 1);
+                const removedBalancer = this.balancersData.splice(index, 1)[0];
 
-                // remove from settings
-                let realIndex = newTemplateSettings.routing.balancers.findIndex((b) => b.tag == oldTag);
+                // Remove from settings
+                let realIndex = newTemplateSettings.routing.balancers.findIndex((b) => b.tag === removedBalancer.tag);
                 newTemplateSettings.routing.balancers.splice(realIndex, 1);
 
-                // remove related routing rules
-                let rules = [];
-                newTemplateSettings.routing.rules.forEach((r) => {
-                    if (!r.balancerTag || r.balancerTag != oldTag) {
-                        rules.push(r);
-                    }
-                });
-                newTemplateSettings.routing.rules = rules;
+                // Remove tag from observatory
+                if (newTemplateSettings.observatory){
+                    newTemplateSettings.observatory.subjectSelector = newTemplateSettings.observatory.subjectSelector.filter(s => s != removedBalancer.tag);
+                }
+                if (newTemplateSettings.burstObservatory){
+                    newTemplateSettings.burstObservatory.subjectSelector = newTemplateSettings.burstObservatory.subjectSelector.filter(s => s != removedBalancer.tag);
+                }
+
+                // Update balancers property to an empty array if there are no more balancers
+                if (newTemplateSettings.routing.balancers.length === 0) {
+                    delete newTemplateSettings.routing.balancers;
+                }
                 this.templateSettings = newTemplateSettings;
+                this.changeObsCode()
             },
             addDNSServer(){
                 dnsModal.show({
@@ -1382,20 +1468,51 @@
                     data = []
                     if (this.templateSettings != null && this.templateSettings.routing != null && this.templateSettings.routing.balancers != null) {
                         this.templateSettings.routing.balancers.forEach((o, index) => {
-                            let strategy = "random"
-                            if (o.strategy && o.strategy.type == "roundRobin") {
-                                strategy = o.strategy.type
-                            }
-
                             data.push({ 
                                 'key': index,
                                 'tag': o.tag ? o.tag : "",
-                                'strategy': strategy,
+                                'strategy': o.strategy?.type ?? "random",
                                 'selector': o.selector ? o.selector : []
                             });
                         });
                     }
                     return data;
+                }
+            },
+            observatory: {
+                get: function () { 
+                    return this.templateSettings?.observatory ? JSON.stringify(this.templateSettings.observatory, null, 2) : null;
+                },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.observatory = JSON.parse(newValue);
+                    this.templateSettings = newTemplateSettings;
+                },
+            },
+            burstObservatory: {
+                get: function () { 
+                    return this.templateSettings?.burstObservatory ? JSON.stringify(this.templateSettings.burstObservatory, null, 2) : null; 
+                },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.burstObservatory = JSON.parse(newValue);
+                    this.templateSettings = newTemplateSettings;
+                },
+            },
+            observatoryEnable: {
+                get: function () { return this.templateSettings != null && this.templateSettings.observatory },
+                set: function (v) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.observatory = v ? this.defaultObservatory : undefined;
+                    this.templateSettings = newTemplateSettings;
+                }
+            },
+            burstObservatoryEnable: {
+                get: function () { return this.templateSettings != null && this.templateSettings.burstObservatory },
+                set: function (v) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.burstObservatory = v ? this.defaultBurstObservatory : undefined;
+                    this.templateSettings = newTemplateSettings;
                 }
             },
             freedomStrategy: {
@@ -1779,7 +1896,13 @@
                 },
                 set: function (newValue) {
                     newTemplateSettings = this.templateSettings;
-                    newTemplateSettings.dns =  newValue ? { servers: [], queryStrategy: "UseIP", tag: "dns_inbound" } : null;
+                    if (newValue) {
+                        newTemplateSettings.dns = { servers: [], queryStrategy: "UseIP", tag: "dns_inbound" };
+                        newTemplateSettings.fakedns = null; 
+                    } else {
+                        delete newTemplateSettings.dns;
+                        delete newTemplateSettings.fakedns;
+                    }
                     this.templateSettings = newTemplateSettings;
                 }
             },
