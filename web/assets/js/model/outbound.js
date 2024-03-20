@@ -659,20 +659,22 @@ class Outbound extends CommonClass {
                 json.allowInsecure);
         }
 
-        return new Outbound(json.ps, Protocols.VMess, new Outbound.VmessSettings(json.add, json.port, json.id), stream);
+        const port = json.port * 1;
+
+        return new Outbound(json.ps, Protocols.VMess, new Outbound.VmessSettings(json.add, port, json.id), stream);
     }
 
     static fromParamLink(link){
         const url = new URL(link);
-        let type = url.searchParams.get('type');
+        let type = url.searchParams.get('type') ?? 'tcp';
         let security = url.searchParams.get('security') ?? 'none';
         let stream = new StreamSettings(type, security);
 
-        let headerType = url.searchParams.get('headerType');
-        let host = url.searchParams.get('host');
-        let path = url.searchParams.get('path');
+        let headerType = url.searchParams.get('headerType') ?? undefined;
+        let host = url.searchParams.get('host') ?? undefined;
+        let path = url.searchParams.get('path') ?? undefined;
 
-        if (type === 'tcp') {
+        if (type === 'tcp' || type === 'none') {
             stream.tcp = new TcpStreamSettings(headerType ?? 'none', host, path);
         } else if (type === 'kcp') {
             stream.kcp = new KcpStreamSettings();
@@ -713,10 +715,7 @@ class Outbound extends CommonClass {
             stream.reality = new RealityStreamSettings(pbk, fp, sni, sid, spx);
         }
 
-        let data = link.split('?');
-        if(data.length != 2) return null;
-
-        const regex = /([^@]+):\/\/([^@]+)@(.+):(\d+)\?(.*)$/;
+        const regex = /([^@]+):\/\/([^@]+)@(.+):(\d+)(.*)$/;
         const match = link.match(regex);
 
         if (!match) return null;
