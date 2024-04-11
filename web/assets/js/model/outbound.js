@@ -194,14 +194,14 @@ class WsStreamSettings extends CommonClass {
     static fromJson(json={}) {
         return new WsStreamSettings(
             json.path,
-            json.headers && !ObjectUtil.isEmpty(json.headers.Host) ? json.headers.Host : '',
+            json.host,
         );
     }
 
     toJson() {
         return {
             path: this.path,
-            headers: ObjectUtil.isEmpty(this.host) ? undefined : {Host: this.host},
+            host: this.host,
         };
     }
 }
@@ -287,7 +287,7 @@ class HttpUpgradeStreamSettings extends CommonClass {
     static fromJson(json={}) {
         return new HttpUpgradeStreamSettings(
             json.path,
-            json.Host,
+            json.host,
         );
     }
 
@@ -829,7 +829,7 @@ Outbound.FreedomSettings.Fragment = class extends CommonClass {
 Outbound.BlackholeSettings = class extends CommonClass {
     constructor(type) {
         super();
-        this.type;
+        this.type = type;
     }
 
     static fromJson(json={}) {
