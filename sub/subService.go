@@ -194,8 +194,12 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]interface{})
 		obj["path"] = ws["path"].(string)
-		headers, _ := ws["headers"].(map[string]interface{})
-		obj["host"] = searchHost(headers)
+		if host, ok := ws["host"].(string); ok && len(host) > 0 {
+			obj["host"] = host
+		} else {
+			headers, _ := ws["headers"].(map[string]interface{})
+			obj["host"] = searchHost(headers)
+		}
 	case "http":
 		obj["net"] = "h2"
 		http, _ := stream["httpSettings"].(map[string]interface{})
@@ -334,8 +338,12 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]interface{})
 		params["path"] = ws["path"].(string)
-		headers, _ := ws["headers"].(map[string]interface{})
-		params["host"] = searchHost(headers)
+		if host, ok := ws["host"].(string); ok && len(host) > 0 {
+			params["host"] = host
+		} else {
+			headers, _ := ws["headers"].(map[string]interface{})
+			params["host"] = searchHost(headers)
+		}
 	case "http":
 		http, _ := stream["httpSettings"].(map[string]interface{})
 		params["path"] = http["path"].(string)
@@ -520,8 +528,12 @@ func (s *SubService) genTrojanLink(inbound *model.Inbound, email string) string 
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]interface{})
 		params["path"] = ws["path"].(string)
-		headers, _ := ws["headers"].(map[string]interface{})
-		params["host"] = searchHost(headers)
+		if host, ok := ws["host"].(string); ok && len(host) > 0 {
+			params["host"] = host
+		} else {
+			headers, _ := ws["headers"].(map[string]interface{})
+			params["host"] = searchHost(headers)
+		}
 	case "http":
 		http, _ := stream["httpSettings"].(map[string]interface{})
 		params["path"] = http["path"].(string)
@@ -702,8 +714,12 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]interface{})
 		params["path"] = ws["path"].(string)
-		headers, _ := ws["headers"].(map[string]interface{})
-		params["host"] = searchHost(headers)
+		if host, ok := ws["host"].(string); ok && len(host) > 0 {
+			params["host"] = host
+		} else {
+			headers, _ := ws["headers"].(map[string]interface{})
+			params["host"] = searchHost(headers)
+		}
 	case "http":
 		http, _ := stream["httpSettings"].(map[string]interface{})
 		params["path"] = http["path"].(string)
