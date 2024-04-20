@@ -948,7 +948,7 @@ class Inbound extends XrayCommonClass {
                 return header.value;
             }
         }
-        return null;
+        return "";
     }
 
     get host() {
