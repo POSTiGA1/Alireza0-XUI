@@ -818,10 +818,16 @@ class StreamSettings extends XrayCommonClass {
 }
 
 class Sniffing extends XrayCommonClass {
-    constructor(enabled=true, destOverride=['http', 'tls', 'quic', 'fakedns']) {
+    constructor(
+        enabled=false,
+        destOverride=['http', 'tls', 'quic', 'fakedns'],
+        metadataOnly=false,
+        routeOnly=false) {
         super();
         this.enabled = enabled;
         this.destOverride = destOverride;
+        this.metadataOnly = metadataOnly;
+        this.routeOnly = routeOnly;
     }
 
     static fromJson(json={}) {
@@ -834,6 +840,8 @@ class Sniffing extends XrayCommonClass {
         return new Sniffing(
             !!json.enabled,
             destOverride,
+            this.metadataOnly,
+            this.routeOnly,
         );
     }
 }
@@ -2013,12 +2021,13 @@ Inbound.ShadowsocksSettings.Shadowsocks = class extends XrayCommonClass {
 };
 
 Inbound.DokodemoSettings = class extends Inbound.Settings {
-    constructor(protocol, address, port, network='tcp,udp', followRedirect=false) {
+    constructor(protocol, address, port, network='tcp,udp', followRedirect=false, timeout=0) {
         super(protocol);
         this.address = address;
         this.port = port;
         this.network = network;
         this.followRedirect = followRedirect;
+        this.timeout = timeout;
     }
 
     static fromJson(json={}) {
@@ -2028,6 +2037,7 @@ Inbound.DokodemoSettings = class extends Inbound.Settings {
             json.port,
             json.network,
             json.followRedirect,
+            json.timeout,
         );
     }
 
@@ -2037,6 +2047,7 @@ Inbound.DokodemoSettings = class extends Inbound.Settings {
             port: this.port,
             network: this.network,
             followRedirect: this.followRedirect,
+            timeout: this.timeout,
         };
     }
 };
