@@ -840,8 +840,8 @@ class Sniffing extends XrayCommonClass {
         return new Sniffing(
             !!json.enabled,
             destOverride,
-            this.metadataOnly,
-            this.routeOnly,
+            json.metadataOnly,
+            json.routeOnly,
         );
     }
 }
