@@ -342,8 +342,6 @@ func (s *Server) Start() (err error) {
 	}
 	s.listener = listener
 
-	s.startTask()
-
 	s.httpServer = &http.Server{
 		Handler: engine,
 	}
@@ -351,6 +349,8 @@ func (s *Server) Start() (err error) {
 	go func() {
 		s.httpServer.Serve(listener)
 	}()
+
+	s.startTask()
 
 	isTgbotenabled, err := s.settingService.GetTgbotenabled()
 	if (err == nil) && (isTgbotenabled) {
