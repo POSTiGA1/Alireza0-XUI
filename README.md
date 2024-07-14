@@ -232,6 +232,7 @@ docker build -t x-ui .
 | `POST` | `"/:id/delClient/:clientId"`       | Delete client by clientId\*               |
 | `POST` | `"/updateClient/:clientId"`        | Update client by clientId\*               |
 | `GET`  | `"/getClientTraffics/:email"`      | Get client's traffic                      |
+| `GET`  | `"/getClientTrafficsById/:id"`     | Get client's traffic By ID                |
 | `POST` | `"/:id/resetClientTraffic/:email"` | Reset client's traffic                    |
 | `POST` | `"/resetAllTraffics"`              | Reset traffics of all inbounds            |
 | `POST` | `"/resetAllClientTraffics/:id"`    | Reset inbound clients traffics (-1: all)  |

@@ -433,6 +433,7 @@
 "editBalancer" = "Редактировать балансир"
 "balancerStrategy" = "Стратегия"
 "balancerSelectors" = "Селекторы"
+"fallback" = "Отступать"
 "tag" = "Тег"
 "tagDesc" = "уникальный тег"
 "balancerDesc" = "Невозможно одновременно использовать balancerTag и outboundTag. При одновременном использовании будет работать только outboundTag."

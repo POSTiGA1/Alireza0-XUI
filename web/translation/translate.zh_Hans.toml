@@ -433,6 +433,7 @@
 "editBalancer" = "编辑平衡器"
 "balancerStrategy" = "战略"
 "balancerSelectors" = "选择器"
+"fallback" = "倒退"
 "tag" = "标签"
 "tagDesc" = "唯一标记"
 "balancerDesc" = "不能同时使用balancerTag和outboundTag。 如果同时使用，则只有outboundTag起作用。"

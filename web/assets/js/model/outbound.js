@@ -575,6 +575,10 @@ class Outbound extends CommonClass {
     }
 
     canEnableMux() {
+        if (this.settings.flow && this.settings.flow != ''){
+            this.mux.enabled = false;
+            return false;
+        }
         return [Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks, Protocols.HTTP, Protocols.Socks].includes(this.protocol);
     }
 

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"text/template"
 	"time"
 
 	"x-ui/logger"
@@ -62,14 +63,16 @@ func (a *IndexController) login(c *gin.Context) {
 
 	user := a.userService.CheckUser(form.Username, form.Password)
 	timeStr := time.Now().Format("2006-01-02 15:04:05")
+	safeUser := template.HTMLEscapeString(form.Username)
+	safePass := template.HTMLEscapeString(form.Password)
 	if user == nil {
-		logger.Infof("wrong username or password: \"%s\" \"%s\"", form.Username, form.Password)
-		a.tgbot.UserLoginNotify(form.Username, getRemoteIp(c), timeStr, 0)
+		logger.Infof("wrong username or password: \"%s\" \"%s\"", safeUser, safePass)
+		a.tgbot.UserLoginNotify(safeUser, getRemoteIp(c), timeStr, 0)
 		pureJsonMsg(c, http.StatusOK, false, I18nWeb(c, "pages.login.toasts.wrongUsernameOrPassword"))
 		return
 	} else {
-		logger.Infof("%s Successful Login ,Ip Address: %s\n", form.Username, getRemoteIp(c))
-		a.tgbot.UserLoginNotify(form.Username, getRemoteIp(c), timeStr, 1)
+		logger.Infof("%s Successful Login ,Ip Address: %s\n", safeUser, getRemoteIp(c))
+		a.tgbot.UserLoginNotify(safeUser, getRemoteIp(c), timeStr, 1)
 	}
 
 	sessionMaxAge, err := a.settingService.GetSessionMaxAge()

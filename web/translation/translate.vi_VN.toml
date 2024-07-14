@@ -433,6 +433,7 @@
 "editBalancer" = "Chỉnh sửa cân bằng"
 "balancerStrategy" = "Chiến lược"
 "balancerSelectors" = "Bộ chọn"
+"fallback" = "Dự phòng"
 "tag" = "Thẻ"
 "tagDesc" = "thẻ duy nhất"
 "balancerDesc" = "Không thể sử dụng balancerTag và outboundTag cùng một lúc. Nếu sử dụng cùng lúc thì chỉ outboundTag mới hoạt động."

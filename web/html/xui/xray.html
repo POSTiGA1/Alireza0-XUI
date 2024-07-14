@@ -937,11 +937,12 @@
                 });
             },
             changeObsCode() {
-                if (this.obsSettings == ''){
-                    return
-                }
                 if(this.cm != null) {
                     this.cm.toTextArea();
+                }
+                if (this.obsSettings == ''){
+                    this.cm = null;
+                    return
                 }
                 textAreaObj = document.getElementById('obsSetting');
                 textAreaObj.value = this[this.obsSettings];
@@ -1116,7 +1117,8 @@
                     balancer: {
                         tag: '',
                         strategy: 'random',
-                        selector: []
+                        selector: [],
+                        fallbackTag: ''
                     },
                     confirm: (balancer) => {
                         balancerModal.loading();
@@ -1126,27 +1128,18 @@
                         }
                         let tmpBalancer = {
                             'tag': balancer.tag,
-                            'selector': balancer.selector
+                            'selector': balancer.selector,
+                            'fallbackTag': balancer.fallbackTag
                         };
                         if (balancer.strategy && balancer.strategy != 'random') {
                             tmpBalancer.strategy = {
                                 'type': balancer.strategy
                             };
-                            if (balancer.strategy == 'leastPing'){
-                                if (!newTemplateSettings.observatory)
-                                    newTemplateSettings.observatory = this.defaultObservatory;
-                                if (!newTemplateSettings.observatory.subjectSelector.includes(balancer.tag))
-                                    newTemplateSettings.observatory.subjectSelector.push(balancer.tag);
-                            }
-                            if (balancer.strategy == 'leastLoad'){
-                                if (!newTemplateSettings.burstObservatory)
-                                    newTemplateSettings.burstObservatory = this.defaultBurstObservatory;
-                                if (!newTemplateSettings.burstObservatory.subjectSelector.includes(balancer.tag))
-                                    newTemplateSettings.burstObservatory.subjectSelector.push(balancer.tag);
-                            }
                         }
                         newTemplateSettings.routing.balancers.push(tmpBalancer);
                         this.templateSettings = newTemplateSettings;
+                        if (balancer.strategy == 'leastPing' || balancer.strategy == 'leastLoad')
+                            this.updateObservatorySelectors();
                         balancerModal.close();
                         this.changeObsCode();
                     },
@@ -1166,7 +1159,8 @@
 
                         let tmpBalancer = {
                             'tag': balancer.tag,
-                            'selector': balancer.selector
+                            'selector': balancer.selector,
+                            'fallbackTag': balancer.fallbackTag
                         };
 
                         // Remove old tag
@@ -1181,18 +1175,6 @@
                             tmpBalancer.strategy = {
                                 'type': balancer.strategy
                             };
-                            if (balancer.strategy == 'leastPing'){
-                                if (!newTemplateSettings.observatory)
-                                    newTemplateSettings.observatory = this.defaultObservatory;
-                                if (!newTemplateSettings.observatory.subjectSelector.includes(balancer.tag))
-                                    newTemplateSettings.observatory.subjectSelector.push(balancer.tag);
-                            }
-                            if (balancer.strategy == 'leastLoad'){
-                                if (!newTemplateSettings.burstObservatory)
-                                    newTemplateSettings.burstObservatory = this.defaultBurstObservatory;
-                                if (!newTemplateSettings.burstObservatory.subjectSelector.includes(balancer.tag))
-                                    newTemplateSettings.burstObservatory.subjectSelector.push(balancer.tag);
-                            }
                         }
 
                         newTemplateSettings.routing.balancers[index] = tmpBalancer;
@@ -1205,11 +1187,46 @@
                             });
                         }
                         this.templateSettings = newTemplateSettings;
+                        if (balancer.strategy == 'leastPing' || balancer.strategy == 'leastLoad')
+                            this.updateObservatorySelectors();
                         balancerModal.close();
                         this.changeObsCode();
                     },
                     isEdit: true
                 });
+            },
+            updateObservatorySelectors(){
+                newTemplateSettings = this.templateSettings;
+                const leastPings = this.balancersData.filter((b) => b.strategy == 'leastPing');
+                const leastLoads = this.balancersData.filter((b) => b.strategy == 'leastLoad');
+                if (leastPings.length>0){
+                    if (!newTemplateSettings.observatory)
+                        newTemplateSettings.observatory = this.defaultObservatory;
+                    newTemplateSettings.observatory.subjectSelector = [];
+                    leastPings.forEach((b) => {
+                        b.selector.forEach((s) => {
+                            if (!newTemplateSettings.observatory.subjectSelector.includes(s))
+                                newTemplateSettings.observatory.subjectSelector.push(s);
+                        });
+                    });
+                } else {
+                    delete newTemplateSettings.observatory
+                }
+                if (leastLoads.length>0){
+                    if (!newTemplateSettings.burstObservatory)
+                        newTemplateSettings.burstObservatory = this.defaultBurstObservatory;
+                    newTemplateSettings.burstObservatory.subjectSelector = [];
+                    leastLoads.forEach((b) => {
+                        b.selector.forEach((s) => {
+                            if (!newTemplateSettings.burstObservatory.subjectSelector.includes(s))
+                                newTemplateSettings.burstObservatory.subjectSelector.push(s);
+                        });
+                    });
+                } else {
+                    delete newTemplateSettings.burstObservatory
+                }
+                this.templateSettings = newTemplateSettings;
+                this.changeObsCode();
             },
             deleteBalancer(index) {
                 newTemplateSettings = this.templateSettings;
@@ -1221,19 +1238,13 @@
                 let realIndex = newTemplateSettings.routing.balancers.findIndex((b) => b.tag === removedBalancer.tag);
                 newTemplateSettings.routing.balancers.splice(realIndex, 1);
 
-                // Remove tag from observatory
-                if (newTemplateSettings.observatory){
-                    newTemplateSettings.observatory.subjectSelector = newTemplateSettings.observatory.subjectSelector.filter(s => s != removedBalancer.tag);
-                }
-                if (newTemplateSettings.burstObservatory){
-                    newTemplateSettings.burstObservatory.subjectSelector = newTemplateSettings.burstObservatory.subjectSelector.filter(s => s != removedBalancer.tag);
-                }
-
                 // Update balancers property to an empty array if there are no more balancers
                 if (newTemplateSettings.routing.balancers.length === 0) {
                     delete newTemplateSettings.routing.balancers;
                 }
                 this.templateSettings = newTemplateSettings;
+                this.updateObservatorySelectors();
+                this.obsSettings = '';
                 this.changeObsCode()
             },
             addDNSServer(){
@@ -1472,7 +1483,8 @@
                                 'key': index,
                                 'tag': o.tag ? o.tag : "",
                                 'strategy': o.strategy?.type ?? "random",
-                                'selector': o.selector ? o.selector : []
+                                'selector': o.selector ? o.selector : [],
+                                'fallbackTag': o.fallbackTag?? '',
                             });
                         });
                     }
@@ -1499,22 +1511,8 @@
                     this.templateSettings = newTemplateSettings;
                 },
             },
-            observatoryEnable: {
-                get: function () { return this.templateSettings != null && this.templateSettings.observatory },
-                set: function (v) {
-                    newTemplateSettings = this.templateSettings;
-                    newTemplateSettings.observatory = v ? this.defaultObservatory : undefined;
-                    this.templateSettings = newTemplateSettings;
-                }
-            },
-            burstObservatoryEnable: {
-                get: function () { return this.templateSettings != null && this.templateSettings.burstObservatory },
-                set: function (v) {
-                    newTemplateSettings = this.templateSettings;
-                    newTemplateSettings.burstObservatory = v ? this.defaultBurstObservatory : undefined;
-                    this.templateSettings = newTemplateSettings;
-                }
-            },
+            observatoryEnable: function () { return this.templateSettings != null && this.templateSettings.observatory != undefined },
+            burstObservatoryEnable: function () { return this.templateSettings != null && this.templateSettings.burstObservatory != undefined },
             freedomStrategy: {
                 get: function () {
                     if (!this.templateSettings) return "AsIs";

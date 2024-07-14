@@ -433,6 +433,7 @@
 "editBalancer" = "Edit Balancer"
 "balancerStrategy" = "Strategy"
 "balancerSelectors" = "Selectors"
+"fallback" = "Fallback"
 "tag" = "Tag"
 "tagDesc" = "Unique Tag"
 "balancerDesc" = "It is not possible to use both balancerTag and outboundTag simultaneously. If both are used together, only outboundTag will function."
