@@ -17,19 +17,22 @@
 
 <!-- freedom settings-->
 <template v-if="outbound.protocol === Protocols.Freedom">
-        <a-form-item label='Strategy'>
-            <a-select
-            v-model="outbound.settings.domainStrategy"
-            :dropdown-class-name="themeSwitcher.currentTheme">
-                <a-select-option v-for="s in OutboundDomainStrategies" :value="s">[[ s ]]</a-select-option>
-            </a-select>
+    <a-form-item label='Strategy'>
+        <a-select
+        v-model="outbound.settings.domainStrategy"
+        :dropdown-class-name="themeSwitcher.currentTheme">
+            <a-select-option v-for="s in OutboundDomainStrategies" :value="s">[[ s ]]</a-select-option>
+        </a-select>
+    </a-form-item>
+    <a-form-item label='Redirect'>
+        <a-input v-model="outbound.settings.redirect"></a-input>
         </a-form-item>
-        <a-form-item label='Fragment'>
-            <a-switch
-                :checked="Object.keys(outbound.settings.fragment).length >0"
-                @change="checked => outbound.settings.fragment = checked ? new Outbound.FreedomSettings.Fragment() : {}">
-            </a-switch>
-        </a-form-item>
+    <a-form-item label='Fragment'>
+        <a-switch
+            :checked="Object.keys(outbound.settings.fragment).length >0"
+            @change="checked => outbound.settings.fragment = checked ? new Outbound.FreedomSettings.Fragment() : {}">
+        </a-switch>
+    </a-form-item>
     <template v-if="Object.keys(outbound.settings.fragment).length >0">
         <a-form-item label='Packets'>
             <a-select
@@ -44,6 +47,20 @@
         <a-form-item label='Interval'>
             <a-input v-model.trim="outbound.settings.fragment.interval"></a-input>
         </a-form-item>
+    </template>
+    <a-form-item label='Noise'>
+        <a-switch
+            :checked="Object.keys(outbound.settings.noise).length >0"
+            @change="checked => outbound.settings.noise = checked ? new Outbound.FreedomSettings.Noise() : {}">
+        </a-switch>
+    </a-form-item>
+    <template v-if="Object.keys(outbound.settings.noise).length >0">
+    <a-form-item label='Packet'>
+        <a-input v-model.trim="outbound.settings.noise.packet"></a-input>
+    </a-form-item>
+    <a-form-item label='Delay'>
+        <a-input v-model.trim="outbound.settings.noise.delay"></a-input>
+    </a-form-item>
     </template>
 </template>
 

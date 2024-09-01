@@ -477,13 +477,25 @@ class HttpUpgradeStreamSettings extends XrayCommonClass {
     }
 }
 class SplitHTTPStreamSettings extends XrayCommonClass {
-    constructor(path='/', host='', headers=[] , maxUploadSize= 1000000, maxConcurrentUploads= 10) {
+    constructor(
+        path = '/',
+        host = '',
+        headers = [],
+        scMaxConcurrentPosts = "100-200",
+        scMaxEachPostBytes = "1000000-2000000",
+        scMinPostsIntervalMs = "10-50",
+        noSSEHeader = false,
+        xPaddingBytes = "100-1000",
+    ) {
         super();
         this.path = path;
         this.host = host;
         this.headers = headers;
-        this.maxUploadSize = maxUploadSize;
-        this.maxConcurrentUploads = maxConcurrentUploads;
+        this.scMaxConcurrentPosts = scMaxConcurrentPosts;
+        this.scMaxEachPostBytes = scMaxEachPostBytes;
+        this.scMinPostsIntervalMs = scMinPostsIntervalMs;
+        this.noSSEHeader = noSSEHeader;
+        this.xPaddingBytes = xPaddingBytes;
     }
 
     addHeader(name, value) {
@@ -494,13 +506,16 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
         this.headers.splice(index, 1);
     }
 
-    static fromJson(json={}) {
+    static fromJson(json = {}) {
         return new SplitHTTPStreamSettings(
             json.path,
             json.host,
             XrayCommonClass.toHeaders(json.headers),
-            json.maxUploadSize,
-            json.maxConcurrentUploads,
+            json.scMaxConcurrentPosts,
+            json.scMaxEachPostBytes,
+            json.scMinPostsIntervalMs,
+            json.noSSEHeader,
+            json.xPaddingBytes,
         );
     }
 
@@ -509,8 +524,11 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
             path: this.path,
             host: this.host,
             headers: XrayCommonClass.toV2Headers(this.headers, false),
-            maxUploadSize: this.maxUploadSize,
-            maxConcurrentUploads: this.maxConcurrentUploads,
+            scMaxConcurrentPosts: this.scMaxConcurrentPosts,
+            scMaxEachPostBytes: this.scMaxEachPostBytes,
+            scMinPostsIntervalMs: this.scMinPostsIntervalMs,
+            noSSEHeader: this.noSSEHeader,
+            xPaddingBytes: this.xPaddingBytes,
         };
     }
 }

@@ -26,6 +26,7 @@ func NewSUBController(
 	rModel string,
 	update string,
 	jsonFragment string,
+	jsonNoise string,
 	jsonMux string,
 	jsonRules string,
 ) *SUBController {
@@ -37,7 +38,7 @@ func NewSUBController(
 		updateInterval: update,
 
 		subService:     sub,
-		subJsonService: NewSubJsonService(jsonFragment, jsonMux, jsonRules, sub),
+		subJsonService: NewSubJsonService(jsonFragment, jsonNoise, jsonMux, jsonRules, sub),
 	}
 	a.initRouter(g)
 	return a
