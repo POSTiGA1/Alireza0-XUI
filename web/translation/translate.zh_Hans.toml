@@ -77,7 +77,7 @@
 "emptyUsername" = "请输入用户名"
 "emptyPassword" = "请输入密码"
 "wrongUsernameOrPassword" = "用户名或密码错误"
-"successLogin" = "登录成功"
+"successLogin" = "登录"
 
 [pages.index]
 "title" = "系统状态"
