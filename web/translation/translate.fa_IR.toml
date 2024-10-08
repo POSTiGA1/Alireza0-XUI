@@ -220,9 +220,6 @@
 "requestHeader" = "سربرگ درخواست"
 "responseHeader" = "سربرگ پاسخ"
 
-[pages.inbounds.stream.quic]
-"encryption" = "رمزنگاری"
-
 [pages.settings]
 "title" = "تنظیمات پنل"
 "save" = "ذخیره"
@@ -300,6 +297,14 @@
 "subURIDesc" = "سابسکریپشن از لینکی که در پشت پراکسی‌های معکوس تنظیم شده‌، استفاده خواهدکرد"
 "fragment" = "تکه‌تکه شدن"
 "fragmentDesc" = "فعال کردن تکه تکه شدن برای بسته نخست تی‌ال‌اس"
+"fragmentSett" = "تنظیمات فرگمنت"
+"noisesDesc" = "فعال کردن Noises."
+"noisesSett" = "تنظیمات Noises"
+"mux" = "ماکس"
+"muxDesc" = "چندین جریان داده مستقل را در یک جریان داده ثابت منتقل می کند"
+"muxSett" = "تنظیمات ماکس"
+"direct" = "اتصال مستقیم"
+"directDesc" = "به طور مستقیم با دامنه ها یا محدوده آی‌پی یک کشور خاص ارتباط برقرار می کند"
 
 [pages.settings.toasts]
 "modifySettings" = "ویرایش تنظیمات"
@@ -320,10 +325,14 @@
 "logConfigsDesc" = "فعال کردن گزارش ممکن است بر عملکرد سرور شما تأثیر بگذارد. توصیه می‌شود فقط در صورت لزوم آن را با دقت فعال کنید"
 "blockConfigs" = "سپر محافظ"
 "blockConfigsDesc" = "این گزینه‌ها ترافیک را بر اساس پروتکل‌های درخواستی خاص، و وب سایت‌ها مسدود می‌کند"
-"blockCountryConfigs" = "مسدودسازی کشور"
-"blockCountryConfigsDesc" = "این گزینه‌ها ترافیک را بر اساس کشور درخواستی خاص مسدود می‌کند"
-"directCountryConfigs" = "اتصال مستقیم کشور"
-"directCountryConfigsDesc" = "این گزینه‌ها ترافیک را بر اساس کشور درخواستی خاص بصورت مستقیم ارسال می‌کند"
+"blockConnectionsConfigs" = "مسدود کردن اتصالات"
+"blockConnectionsConfigsDesc" = "این گزینه‌ها ترافیک را بر اساس کشور درخواست‌شده خاص مسدود می‌کنند."
+"directConnectionsConfigs" = "اتصالات مستقیم"
+"directConnectionsConfigsDesc" = "یک اتصال مستقیم تضمین می‌کند که ترافیک خاص از طریق سرور دیگری مسیریابی نشود."
+"blockips" = "مسدود کردن آی‌پی‌ها"
+"blockdomains" = "مسدود کردن دامنه‌ها"
+"directips" = "آی‌پی‌های مستقیم"
+"directdomains" = "دامنه‌های مستقیم"
 "ipv4Configs" = "IPv4 مسیریابی"
 "ipv4ConfigsDesc" = "این گزینه‌ها ترافیک را از طریق آی‌پی نسخه4 سرور، به مقصد هدایت می‌کند"
 "warpConfigs" = "WARP تنظمیات"

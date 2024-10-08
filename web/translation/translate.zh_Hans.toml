@@ -221,9 +221,6 @@
 "requestHeader" = "请求头"
 "responseHeader" = "响应头"
 
-[pages.inbounds.stream.quic]
-"encryption" = "加密"
-
 [pages.settings]
 "title" = "设置"
 "save" = "保存配置"
@@ -301,6 +298,14 @@
 "subURIDesc" = "更改订阅 URL 的基本 URI 以在代理后面使用"
 "fragment" = "碎片"
 "fragmentDesc" = "启用 TLS hello 数据包分段"
+"fragmentSett" = "设置"
+"noisesDesc" = "启用 Noises."
+"noisesSett" = "Noises 设置"
+"mux" = "多路复用器"
+"muxDesc" = "在已建立的数据流内传输多个独立的数据流"
+"muxSett" = "复用器设置"
+"direct" = "直接连接"
+"directDesc" = "直接与特定国家的域或IP范围建立连接"
 
 [pages.settings.toasts]
 "modifySettings" = "修改设置"
@@ -321,10 +326,14 @@
 "logConfigsDesc" = "启用日志可能会影响服务器的效率。建议仅在必要时明智地启用它。"
 "blockConfigs" = "阻塞配置"
 "blockConfigsDesc" = "这些选项将禁止用户连接到特定协议和网站"
-"blockCountryConfigs" = "禁连国家配置"
-"blockCountryConfigsDesc" = "这些选项将禁止用户连接到特定国家/地区的域。"
-"directCountryConfigs" = "直连国家配置"
-"directCountryConfigsDesc" = "这些选项会将用户直接连接到特定国家/地区的域。"
+"blockConnectionsConfigs" = "阻止连接"
+"blockConnectionsConfigsDesc" = "这些选项将根据特定的请求国家阻止流量。"
+"directConnectionsConfigs" = "直接连接"
+"directConnectionsConfigsDesc" = "直接连接确保特定的流量不会通过其他服务器路由。"
+"blockips" = "阻止IP"
+"blockdomains" = "阻止域名"
+"directips" = "直接IP"
+"directdomains" = "直接域名"
 "ipv4Configs" = "IPv4 配置"
 "ipv4ConfigsDesc" = "此选项将仅通过 IPv4 路由到目标域"
 "warpConfigs" = "WARP 配置"

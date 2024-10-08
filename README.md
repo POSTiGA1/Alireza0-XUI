@@ -191,15 +191,17 @@ docker build -t x-ui .
 - Ubuntu 20.04+
 - Debian 11+
 - CentOS 8+
+- OpenEuler 22.03+
 - Fedora 36+
 - Arch Linux
 - Parch Linux
 - Manjaro
 - Armbian
-- AlmaLinux 9+
-- Rocky Linux 9+
+- AlmaLinux 8.0+
+- Rocky Linux 8+
 - Oracle Linux 8+
 - OpenSUSE Tubleweed
+- Amazon Linux 2023
 
 ## Preview
 

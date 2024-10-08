@@ -392,34 +392,6 @@ class HttpStreamSettings extends XrayCommonClass {
     }
 }
 
-class QuicStreamSettings extends XrayCommonClass {
-    constructor(security='none',
-                key=RandomUtil.randomSeq(10), type='none') {
-        super();
-        this.security = security;
-        this.key = key;
-        this.type = type;
-    }
-
-    static fromJson(json={}) {
-        return new QuicStreamSettings(
-            json.security,
-            json.key,
-            json.header ? json.header.type : 'none',
-        );
-    }
-
-    toJson() {
-        return {
-            security: this.security,
-            key: this.key,
-            header: {
-                type: this.type,
-            }
-        }
-    }
-}
-
 class GrpcStreamSettings extends XrayCommonClass {
     constructor(serviceName='', authority='', multiMode=false) {
         super();
@@ -486,6 +458,12 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
         scMinPostsIntervalMs = "10-50",
         noSSEHeader = false,
         xPaddingBytes = "100-1000",
+        xmux = { 
+            maxConcurrency: 0,
+            maxConnections: 0,
+            cMaxReuseTimes: 0,
+            cMaxLifetimeMs: 0
+        }
     ) {
         super();
         this.path = path;
@@ -496,6 +474,7 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
         this.scMinPostsIntervalMs = scMinPostsIntervalMs;
         this.noSSEHeader = noSSEHeader;
         this.xPaddingBytes = xPaddingBytes;
+        this.xmux = xmux;   
     }
 
     addHeader(name, value) {
@@ -516,6 +495,7 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
             json.scMinPostsIntervalMs,
             json.noSSEHeader,
             json.xPaddingBytes,
+            json.xmux,
         );
     }
 
@@ -529,6 +509,12 @@ class SplitHTTPStreamSettings extends XrayCommonClass {
             scMinPostsIntervalMs: this.scMinPostsIntervalMs,
             noSSEHeader: this.noSSEHeader,
             xPaddingBytes: this.xPaddingBytes,
+            xmux: {
+                maxConcurrency: this.xmux.maxConcurrency,
+                maxConnections: this.xmux.maxConnections,
+                cMaxReuseTimes: this.xmux.cMaxReuseTimes,
+                cMaxLifetimeMs: this.xmux.cMaxLifetimeMs
+            }
         };
     }
 }
@@ -783,7 +769,6 @@ class StreamSettings extends XrayCommonClass {
                 kcpSettings=new KcpStreamSettings(),
                 wsSettings=new WsStreamSettings(),
                 httpSettings=new HttpStreamSettings(),
-                quicSettings=new QuicStreamSettings(),
                 grpcSettings=new GrpcStreamSettings(),
                 httpupgradeSettings=new HttpUpgradeStreamSettings(),
                 splithttpSettings=new SplitHTTPStreamSettings(),
@@ -799,7 +784,6 @@ class StreamSettings extends XrayCommonClass {
         this.kcp = kcpSettings;
         this.ws = wsSettings;
         this.http = httpSettings;
-        this.quic = quicSettings;
         this.grpc = grpcSettings;
         this.httpupgrade = httpupgradeSettings;
         this.splithttp = splithttpSettings;
@@ -849,7 +833,6 @@ class StreamSettings extends XrayCommonClass {
             KcpStreamSettings.fromJson(json.kcpSettings),
             WsStreamSettings.fromJson(json.wsSettings),
             HttpStreamSettings.fromJson(json.httpSettings),
-            QuicStreamSettings.fromJson(json.quicSettings),
             GrpcStreamSettings.fromJson(json.grpcSettings),
             HttpUpgradeStreamSettings.fromJson(json.httpupgradeSettings),
             SplitHTTPStreamSettings.fromJson(json.splithttpSettings),
@@ -869,7 +852,6 @@ class StreamSettings extends XrayCommonClass {
             kcpSettings: network === 'kcp' ? this.kcp.toJson() : undefined,
             wsSettings: network === 'ws' ? this.ws.toJson() : undefined,
             httpSettings: network === 'http' ? this.http.toJson() : undefined,
-            quicSettings: network === 'quic' ? this.quic.toJson() : undefined,
             grpcSettings: network === 'grpc' ? this.grpc.toJson() : undefined,
             httpupgradeSettings: network === 'httpupgrade' ? this.httpupgrade.toJson() : undefined,
             splithttpSettings: network === 'splithttp' ? this.splithttp.toJson() : undefined,
@@ -973,10 +955,6 @@ class Inbound extends XrayCommonClass {
         return this.network === "kcp";
     }
 
-    get isQuic() {
-        return this.network === "quic"
-    }
-
     get isGrpc() {
         return this.network === "grpc";
     }
@@ -1054,17 +1032,6 @@ class Inbound extends XrayCommonClass {
         return null;
     }
 
-    get quicSecurity() {
-        return this.stream.quic.security;
-    }
-
-    get quicKey() {
-        return this.stream.quic.key;
-    }
-
-    get quicType() {
-        return this.stream.quic.type;
-    }
 
     get kcpType() {
         return this.stream.kcp.type;
@@ -1085,7 +1052,7 @@ class Inbound extends XrayCommonClass {
 
     canEnableTls() {
         if(![Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol)) return false;
-        return ["tcp", "ws", "http", "quic", "grpc", "httpupgrade" , "splithttp"].includes(this.network);
+        return ["tcp", "ws", "http", "grpc", "httpupgrade" , "splithttp"].includes(this.network);
     }
 
     //this is used for xtls-rprx-vision
@@ -1152,10 +1119,6 @@ class Inbound extends XrayCommonClass {
             obj.net = 'h2';
             obj.path = this.stream.http.path;
             obj.host = this.stream.http.host.join(',');
-        } else if (network === 'quic') {
-            obj.type = this.stream.quic.type;
-            obj.host = this.stream.quic.security;
-            obj.path = this.stream.quic.key;
         } else if (network === 'grpc') {
             obj.path = this.stream.grpc.serviceName;
             obj.authority = this.stream.grpc.authority;
@@ -1224,12 +1187,6 @@ class Inbound extends XrayCommonClass {
                 const http = this.stream.http;
                 params.set("path", http.path);
                 params.set("host", http.host);
-                break;
-            case "quic":
-                const quic = this.stream.quic;
-                params.set("quicSecurity", quic.security);
-                params.set("key", quic.key);
-                params.set("headerType", quic.type);
                 break;
             case "grpc":
                 const grpc = this.stream.grpc;
@@ -1334,12 +1291,6 @@ class Inbound extends XrayCommonClass {
                 params.set("path", http.path);
                 params.set("host", http.host);
                 break;
-            case "quic":
-                const quic = this.stream.quic;
-                params.set("quicSecurity", quic.security);
-                params.set("key", quic.key);
-                params.set("headerType", quic.type);
-                break;
             case "grpc":
                 const grpc = this.stream.grpc;
                 params.set("serviceName", grpc.serviceName);
@@ -1421,12 +1372,6 @@ class Inbound extends XrayCommonClass {
                 const http = this.stream.http;
                 params.set("path", http.path);
                 params.set("host", http.host);
-                break;
-            case "quic":
-                const quic = this.stream.quic;
-                params.set("quicSecurity", quic.security);
-                params.set("key", quic.key);
-                params.set("headerType", quic.type);
                 break;
             case "grpc":
                 const grpc = this.stream.grpc;
@@ -2109,13 +2054,12 @@ Inbound.ShadowsocksSettings.Shadowsocks = class extends XrayCommonClass {
 };
 
 Inbound.DokodemoSettings = class extends Inbound.Settings {
-    constructor(protocol, address, port, network='tcp,udp', followRedirect=false, timeout=0) {
+    constructor(protocol, address, port, network='tcp,udp', followRedirect=false) {
         super(protocol);
         this.address = address;
         this.port = port;
         this.network = network;
         this.followRedirect = followRedirect;
-        this.timeout = timeout;
     }
 
     static fromJson(json={}) {
@@ -2124,8 +2068,7 @@ Inbound.DokodemoSettings = class extends Inbound.Settings {
             json.address,
             json.port,
             json.network,
-            json.followRedirect,
-            json.timeout,
+            json.followRedirect
         );
     }
 
@@ -2134,8 +2077,7 @@ Inbound.DokodemoSettings = class extends Inbound.Settings {
             address: this.address,
             port: this.port,
             network: this.network,
-            followRedirect: this.followRedirect,
-            timeout: this.timeout,
+            followRedirect: this.followRedirect
         };
     }
 };

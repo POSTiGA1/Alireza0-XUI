@@ -221,9 +221,6 @@
 "requestHeader" = "Request Header"
 "responseHeader" = "Response Header"
 
-[pages.inbounds.stream.quic]
-"encryption" = "Encryption"
-
 [pages.settings]
 "title" = "Panel Settings"
 "save" = "Save"
@@ -301,6 +298,14 @@
 "subURIDesc" = "The subscription service will use the URI that has been set up behind reverse proxies."
 "fragment" = "Fragmentation"
 "fragmentDesc" = "Enable fragmentation for TLS hello packet"
+"fragmentSett" = "Fragmentation Settings"
+"noisesDesc" = "Enable Noises."
+"noisesSett" = "Noises Settings"
+"mux" = "Mux"
+"muxDesc" = "Transmit multiple independent data streams within an established data stream."
+"muxSett" = "Mux Settings"
+"direct" = "Direct Connection"
+"directDesc" = "Directly establishes connections with domains or IP ranges of a specific country."
 
 [pages.settings.toasts]
 "modifySettings" = "Modify Settings"
@@ -321,10 +326,14 @@
 "logConfigsDesc" = "Enabling logs may affect your server's efficiency. It is recommended to enable it wisely only when necessary."
 "blockConfigs" = "Protection Shield"
 "blockConfigsDesc" = "These options will block traffic based on specific requested protocols and websites."
-"blockCountryConfigs" = "Block Country"
-"blockCountryConfigsDesc" = "These options will block traffic based on the specific requested country."
-"directCountryConfigs" = "Direct Country"
-"directCountryConfigsDesc" = "These options will directly forward traffic based on the specific requested country."
+"blockConnectionsConfigs" = "Block Connections"
+"blockConnectionsConfigsDesc" = "These options will block traffic based on the specific requested country."
+"directConnectionsConfigs" = "Direct Connections"
+"directConnectionsConfigsDesc" = "A direct connection ensures that specific traffic is not routed through another server."
+"blockips" = "Block IPs"
+"blockdomains" = "Block Domains"
+"directips" = "Direct IPs"
+"directdomains" = "Direct Domains"
 "ipv4Configs" = "IPv4 Routing"
 "ipv4ConfigsDesc" = "These options will route traffic based on specific requested destination via server's IPv4."
 "warpConfigs" = "WARP Config"

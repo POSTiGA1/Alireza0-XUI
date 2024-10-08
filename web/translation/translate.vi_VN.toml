@@ -221,9 +221,6 @@
 "requestHeader" = "Tiêu đề yêu cầu"
 "responseHeader" = "Tiêu đề phản hồi"
 
-[pages.inbounds.stream.quic]
-"encryption" = "Mã hóa"
-
 [pages.settings]
 "title" = "Cài đặt"
 "save" = "Lưu"
@@ -301,6 +298,14 @@
 "subURIDesc" = "Thay đổi URI cơ sở của URL đăng ký để sử dụng ở phía sau proxy"
 "fragment" = "Sự phân mảnh"
 "fragmentDesc" = "Kích hoạt phân mảnh cho gói TLS hello"
+"fragmentSett" = "Cài đặt phân mảnh"
+"noisesDesc" = "Bật Noises."
+"noisesSett" = "Cài đặt Noises"
+"mux" = "Mux"
+"muxDesc" = "Truyền nhiều luồng dữ liệu độc lập trong luồng dữ liệu đã thiết lập."
+"muxSett" = "Mux Cài đặt"
+"direct" = "Kết nối trực tiếp"
+"directDesc" = "Trực tiếp thiết lập kết nối với tên miền hoặc dải IP của một quốc gia cụ thể."
 
 [pages.settings.toasts]
 "modifySettings" = "Sửa đổi cài đặt"
@@ -321,10 +326,14 @@
  "logConfigsDesc" = "Bật nhật ký có thể ảnh hưởng đến hiệu suất của máy chủ của bạn. Đề xuất chỉ nên bật khi cần thiết và một cách sáng suốt."
 "blockConfigs" = "Cấu hình Chặn"
 "blockConfigsDesc" = "Những tùy chọn này sẽ ngăn người dùng kết nối đến các giao thức và trang web cụ thể."
-"blockCountryConfigs" = "Cấu hình Chặn Quốc gia"
-"blockCountryConfigsDesc" = "Những tùy chọn này sẽ ngăn người dùng kết nối đến các tên miền quốc gia cụ thể."
-"directCountryConfigs" = "Cấu hình Kết nối Trực tiếp Quốc gia"
-"directCountryConfigsDesc" = "Những tùy chọn này sẽ kết nối người dùng trực tiếp đến các tên miền quốc gia cụ thể."
+"blockConnectionsConfigs" = "Chặn Kết Nối"
+"blockConnectionsConfigsDesc" = "Các tùy chọn này sẽ chặn lưu lượng truy cập dựa trên quốc gia được yêu cầu cụ thể."
+"directConnectionsConfigs" = "Kết Nối Trực Tiếp"
+"directConnectionsConfigsDesc" = "Kết nối trực tiếp đảm bảo rằng lưu lượng truy cập cụ thể không được định tuyến qua máy chủ khác."
+"blockips" = "Chặn IP"
+"blockdomains" = "Chặn Tên Miền"
+"directips" = "IP Trực Tiếp"
+"directdomains" = "Tên Miền Trực Tiếp"
 "ipv4Configs" = "Cấu hình IPv4"
 "ipv4ConfigsDesc" = "Những tùy chọn này sẽ chỉ định kết nối đến các tên miền mục tiêu qua IPv4."
 "warpConfigs" = "Cấu hình WARP"
