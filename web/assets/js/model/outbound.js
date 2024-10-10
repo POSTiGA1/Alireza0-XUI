@@ -891,18 +891,28 @@ Outbound.BlackholeSettings = class extends CommonClass {
     }
 };
 Outbound.DNSSettings = class extends CommonClass {
-    constructor(network='udp', address='1.1.1.1', port=53) {
+    constructor(
+        network = 'udp',
+        address = '1.1.1.1',
+        port = 53,
+        nonIPQuery = 'drop',
+        blockTypes = []
+    ) {
         super();
         this.network = network;
         this.address = address;
         this.port = port;
+        this.nonIPQuery = nonIPQuery;
+        this.blockTypes = blockTypes;
     }
 
-    static fromJson(json={}){
+    static fromJson(json = {}) {
         return new Outbound.DNSSettings(
             json.network,
             json.address,
             json.port,
+            json.nonIPQuery,
+            json.blockTypes,
         );
     }
 };

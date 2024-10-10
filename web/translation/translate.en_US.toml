@@ -359,6 +359,10 @@
 "accessLogDesc" = "The file path for the access log."
 "errorLog" = "Error Log"
 "errorLogDesc" = "The file path for the error log."
+"dnsLog" = "DNS Log"
+"dnsLogDesc" = "Whether to enable DNS query logs"
+"maskAddress" = "Mask Address"
+"maskAddressDesc" = "IP address mask, when enabled, will automatically replace the IP address that appears in the log."
 
 [pages.xray.rules]
 "first" = "First"
@@ -422,6 +426,7 @@
 "add" = "Add Server"
 "edit" = "Edit Server"
 "domains" = "Domains"
+"expectIPs" = "Expect IPs"
 
 [pages.xray.fakedns]
 "add" = "Add Fake DNS"

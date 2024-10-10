@@ -160,41 +160,69 @@
                                         </a-alert>
                                     </a-row>
                                     <a-list-item>
-                                        <a-row style="padding: 20px">
+                                        <a-row style="padding: 10px 20px">
                                             <a-col :lg="24" :xl="12">
                                                 <a-list-item-meta title='{{ i18n "pages.xray.logLevel" }}'
-                                                    description='{{ i18n "pages.xray.logLevelDesc" }}' />
+                                                    description='{{ i18n "pages.xray.logLevelDesc" }}'>
+                                                </a-list-item-meta>
                                             </a-col>
                                             <a-col :lg="24" :xl="12">
                                                 <template>
-                                                    <a-select
-                                                        v-model="logLevel"
-                                                        style="width: 100%" :dropdown-class-name="themeSwitcher.currentTheme">
-                                                        <a-select-option v-for="level in ['none', 'debug', 'info', 'warning', 'error']" :value="level">[[ level ]]</a-select-option>
+                                                    <a-select v-model="logLevel" :dropdown-class-name="themeSwitcher.currentTheme" style="width: 100%">
+                                                        <a-select-option v-for="s in log.loglevel" :value="s">[[ s ]]</a-select-option>
                                                     </a-select>
                                                 </template>
                                             </a-col>
                                         </a-row>
+                                        <a-row style="padding: 10px 20px">
+                                            <a-col :lg="24" :xl="12">
+                                                <a-list-item-meta title='{{ i18n "pages.xray.accessLog" }}'
+                                                    description='{{ i18n "pages.xray.accessLogDesc" }}'>
+                                                </a-list-item-meta>
+                                            </a-col>
+                                            <a-col :lg="24" :xl="12">
+                                                <template>
+                                                    <a-select v-model="accessLog" :dropdown-class-name="themeSwitcher.currentTheme" style="width: 100%">
+                                                        <a-select-option value=''>Empty</a-select-option>
+                                                        <a-select-option v-for="s in log.access" :value="s">[[ s ]]</a-select-option>
+                                                    </a-select>
+                                                </template>
+                                            </a-col>
+                                        </a-row>
+                                        <a-row style="padding: 10px 20px">
+                                            <a-col :lg="24" :xl="12">
+                                                <a-list-item-meta title='{{ i18n "pages.xray.errorLog" }}'
+                                                    description='{{ i18n "pages.xray.errorLogDesc" }}'>
+                                                </a-list-item-meta>
+                                            </a-col>
+                                            <a-col :lg="24" :xl="12">
+                                                <template>
+                                                    <a-select v-model="errorLog" :dropdown-class-name="themeSwitcher.currentTheme" style="width: 100%">
+                                                        <a-select-option value=''>Empty</a-select-option>
+                                                        <a-select-option v-for="s in log.error" :value="s">[[ s ]]</a-select-option>
+                                                    </a-select>
+                                                </template>
+                                            </a-col>
+                                        </a-row>
+                                        <a-row style="padding: 10px 20px">
+                                            <a-col :lg="24" :xl="12">
+                                                <a-list-item-meta title='{{ i18n "pages.xray.maskAddress" }}'
+                                                    description='{{ i18n "pages.xray.maskAddressDesc" }}'>
+                                                </a-list-item-meta>
+                                            </a-col>
+                                            <a-col :lg="24" :xl="12">
+                                                <template>
+                                                    <a-select v-model="maskAddressLog" :dropdown-class-name="themeSwitcher.currentTheme"
+                                                        style="width: 100%">
+                                                        <a-select-option value=''>Empty</a-select-option>
+                                                        <a-select-option v-for="s in log.maskAddress" :value="s">[[ s ]]</a-select-option>
+                                                    </a-select>
+                                                </template>
+                                            </a-col>
+                                        </a-row>
+                                        <setting-list-item type="switch" title='{{ i18n "pages.xray.dnsLog"}}' desc='{{ i18n "pages.xray.dnsLogDesc"}}'
+                                            v-model="dnslog"></setting-list-item>
                                     </a-list-item>
-                                    <a-row style="padding: 20px">
-                                        <a-col :lg="24" :xl="12">
-                                            <a-list-item-meta title='{{ i18n "pages.xray.accessLog" }}'
-                                                description='{{ i18n "pages.xray.accessLogDesc" }}' />
-                                        </a-col>
-                                        <a-col :lg="24" :xl="12">
-                                            <a-input v-model="logAccess"></a-input>
-                                        </a-col>
-                                    </a-row>
-                                    <a-row style="padding: 20px">
-                                        <a-col :lg="24" :xl="12">
-                                            <a-list-item-meta title='{{ i18n "pages.xray.errorLog" }}'
-                                                description='{{ i18n "pages.xray.errorLogDesc" }}' />
-                                        </a-col>
-                                        <a-col :lg="24" :xl="12">
-                                            <a-input v-model="logError"></a-input>
-                                        </a-col>
-                                    </a-row>
-                                </a-list-item>
                                 </a-collapse-panel>
                                 <a-collapse-panel header='{{ i18n "pages.xray.blockConfigs"}}'>
                                     <a-row :xs="24" :sm="24" :lg="12">
@@ -657,6 +685,9 @@
                                     <template slot="domain" slot-scope="dns,index">
                                         <span v-if="typeof dns == 'object'">[[ dns.domains.join(",") ]]</span>
                                     </template>
+                                    <template slot="expectIPs" slot-scope="dns,index">
+                                        <span v-if="typeof dns == 'object'">[[ dns.expectIPs.join(",") ]]</span>
+                                    </template>
                                 </a-table>
                                 <a-divider>Fake DNS</a-divider>
                                 <a-button type="primary" icon="plus" @click="addFakedns()" style="margin-bottom: 10px;">{{ i18n "pages.xray.fakedns.add" }}</a-button>
@@ -766,6 +797,7 @@
         { title: "#", align: 'center', width: 20, scopedSlots: { customRender: 'action' } },
         { title: '{{ i18n "pages.xray.outbound.address"}}', align: 'center', width: 50, scopedSlots: { customRender: 'address' } },
         { title: '{{ i18n "pages.xray.dns.domains"}}', align: 'center', width: 50, scopedSlots: { customRender: 'domain' } },
+        { title: '{{ i18n "pages.xray.dns.expectIPs"}}', align: 'center', width: 50, scopedSlots: { customRender: 'expectIPs' } },
     ];
 
     const fakednsColumns = [
@@ -825,6 +857,13 @@
                 protocol: "freedom"
             },
             routingDomainStrategies: ["AsIs", "IPIfNonMatch", "IPOnDemand"],
+            log: {
+                loglevel: ["none", "debug", "info", "warning", "error"],
+                access: ["none", "./access.log"],
+                error: ["none", "./error.log"],
+                dnsLog: false,
+                maskAddress: ["quarter", "half", "full"],
+            },
             settingsData: {
                 protocols: {
                     bittorrent: ["bittorrent"],
@@ -1458,28 +1497,59 @@
                 },
             },
             logLevel: {
-                get: function () { return this.logSettings?.loglevel?? 'none'; },
-                set: function (newValue) {
-                    newLogSettings = this.logSettings;
-                    newLogSettings.loglevel = newValue;
-                    this.logSettings = newLogSettings;
+                get: function () {
+                    if (!this.templateSettings || !this.templateSettings.log || !this.templateSettings.log.loglevel) return "warning";
+                    return this.templateSettings.log.loglevel;
                 },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.log.loglevel = newValue;
+                    this.templateSettings = newTemplateSettings;
+                }
             },
-            logAccess: {
-                get: function () { return this.logSettings?.access?? ''; },
-                set: function (newValue) {
-                    newLogSettings = this.logSettings;
-                    newValue == "" ? delete newLogSettings.access : newLogSettings.access = newValue;
-                    this.logSettings = newLogSettings;
+            accessLog: {
+                get: function () {
+                    if (!this.templateSettings || !this.templateSettings.log || !this.templateSettings.log.access) return "";
+                    return this.templateSettings.log.access;
                 },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.log.access = newValue;
+                    this.templateSettings = newTemplateSettings;
+                }
             },
-            logError: {
-                get: function () { return this.logSettings?.error?? ''; },
-                set: function (newValue) {
-                    newLogSettings = this.logSettings;
-                    newValue == "" ? delete newLogSettings.error : newLogSettings.error = newValue;
-                    this.logSettings = newLogSettings;
+            errorLog: {
+                get: function () {
+                    if (!this.templateSettings || !this.templateSettings.log || !this.templateSettings.log.error) return "";
+                    return this.templateSettings.log.error;
                 },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.log.error = newValue;
+                    this.templateSettings = newTemplateSettings;
+                }
+            },
+            dnslog: {
+                get: function () {
+                    if (!this.templateSettings || !this.templateSettings.log || !this.templateSettings.log.dnsLog) return false;
+                    return this.templateSettings.log.dnsLog;
+                },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.log.dnsLog = newValue;
+                    this.templateSettings = newTemplateSettings;
+                }
+            },
+            maskAddressLog: {
+                get: function () {
+                    if (!this.templateSettings || !this.templateSettings.log || !this.templateSettings.log.maskAddress) return "";
+                    return this.templateSettings.log.maskAddress;
+                },
+                set: function (newValue) {
+                    newTemplateSettings = this.templateSettings;
+                    newTemplateSettings.log.maskAddress = newValue;
+                    this.templateSettings = newTemplateSettings;
+                }
             },
             inboundSettings: {
                 get: function () { return this.templateSettings ? JSON.stringify(this.templateSettings.inbounds, null, 2) : null; },

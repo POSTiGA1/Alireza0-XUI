@@ -98,8 +98,9 @@ func (s *InboundService) getAllEmails() ([]string, error) {
 }
 
 func (s *InboundService) contains(slice []string, str string) bool {
+	lowerStr := strings.ToLower(str)
 	for _, s := range slice {
-		if s == str {
+		if strings.ToLower(s) == lowerStr {
 			return true
 		}
 	}
@@ -564,8 +565,12 @@ func (s *InboundService) DelInboundClient(inboundId int, clientId string) (bool,
 				logger.Debug("Client deleted by api:", email)
 				needRestart = false
 			} else {
-				logger.Debug("Unable to del client by api:", err1)
-				needRestart = true
+				if strings.Contains(err1.Error(), fmt.Sprintf("User %s not found.", email)) {
+					logger.Debug("User is already disabled. Nothing to do more...")
+				} else {
+					logger.Debug("Error in disabling client by api:", err1)
+					needRestart = true
+				}
 			}
 			s.xrayApi.Close()
 		}
@@ -681,10 +686,14 @@ func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId strin
 		if oldClients[clientIndex].Enable {
 			err1 := s.xrayApi.RemoveUser(oldInbound.Tag, oldEmail)
 			if err1 == nil {
-				logger.Debug("Old client deleted by api:", clients[0].Email)
+				logger.Debug("Old client deleted by api:", oldEmail)
 			} else {
-				logger.Debug("Error in deleting client by api:", err1)
-				needRestart = true
+				if strings.Contains(err1.Error(), fmt.Sprintf("User %s not found.", oldEmail)) {
+					logger.Debug("User is already disabled. Nothing to do more...")
+				} else {
+					logger.Debug("Error in disabling client by api:", err1)
+					needRestart = true
+				}
 			}
 		}
 		if clients[0].Enable {
@@ -1043,8 +1052,12 @@ func (s *InboundService) disableInvalidClients(tx *gorm.DB) (bool, int64, error)
 			if err1 == nil {
 				logger.Debug("Client disabled by api:", result.Email)
 			} else {
-				logger.Debug("Error in disabling client by api:", err1)
-				needRestart = true
+				if strings.Contains(err1.Error(), fmt.Sprintf("User %s not found.", result.Email)) {
+					logger.Debug("User is already disabled. Nothing to do more...")
+				} else {
+					logger.Debug("Error in disabling client by api:", err1)
+					needRestart = true
+				}
 			}
 		}
 		s.xrayApi.Close()

@@ -328,7 +328,6 @@
 "blockConfigsDesc" = "这些选项将禁止用户连接到特定协议和网站"
 "basicRouting" = "基本路由"
 "blockConnectionsConfigsDesc" = "这些选项将根据特定的请求国家阻止流量。"
-"directConnectionsConfigs" = "直接连接"
 "directConnectionsConfigsDesc" = "直接连接确保特定的流量不会通过其他服务器路由。"
 "blockips" = "阻止IP"
 "blockdomains" = "阻止域名"
@@ -360,6 +359,10 @@
 "accessLogDesc" = "访问日志的文件路径。"
 "errorLog" = "错误日志"
 "errorLogDesc" = "错误日志的文件路径。"
+"dnsLog" = "DNS 日志"
+"dnsLogDesc" = "是否启用 DNS 查询日志"
+"maskAddress" = "隐藏地址"
+"maskAddressDesc" = "IP 地址掩码，启用时会自动替换日志中出现的 IP 地址。"
 
 [pages.xray.rules]
 "first" = "第一个"
@@ -423,6 +426,7 @@
 "add" = "添加服务器"
 "edit" = "编辑服务器"
 "domains" = "域"
+"expectIPs" = "预期 IP"
 
 [pages.xray.fakedns]
 "add" = "添加假 DNS"

@@ -2137,9 +2137,14 @@ Inbound.SocksSettings.SocksAccount = class extends XrayCommonClass {
 };
 
 Inbound.HttpSettings = class extends Inbound.Settings {
-    constructor(protocol, accounts=[new Inbound.HttpSettings.HttpAccount()]) {
+    constructor(
+        protocol, 
+        accounts = [new Inbound.HttpSettings.HttpAccount()],
+        allowTransparent = false,
+    ) {
         super(protocol);
         this.accounts = accounts;
+        this.allowTransparent = allowTransparent;
     }
 
     addAccount(account) {
@@ -2150,16 +2155,18 @@ Inbound.HttpSettings = class extends Inbound.Settings {
         this.accounts.splice(index, 1);
     }
 
-    static fromJson(json={}) {
+    static fromJson(json = {}) {
         return new Inbound.HttpSettings(
             Protocols.HTTP,
             json.accounts.map(account => Inbound.HttpSettings.HttpAccount.fromJson(account)),
+            json.allowTransparent,
         );
     }
 
     toJson() {
         return {
             accounts: Inbound.HttpSettings.toJsonArray(this.accounts),
+            allowTransparent: this.allowTransparent,
         };
     }
 };

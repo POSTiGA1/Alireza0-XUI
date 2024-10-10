@@ -328,7 +328,6 @@
 "blockConfigsDesc" = "Những tùy chọn này sẽ ngăn người dùng kết nối đến các giao thức và trang web cụ thể."
 "basicRouting" = "Định tuyến Cơ bản"
 "blockConnectionsConfigsDesc" = "Các tùy chọn này sẽ chặn lưu lượng truy cập dựa trên quốc gia được yêu cầu cụ thể."
-"directConnectionsConfigs" = "Kết Nối Trực Tiếp"
 "directConnectionsConfigsDesc" = "Kết nối trực tiếp đảm bảo rằng lưu lượng truy cập cụ thể không được định tuyến qua máy chủ khác."
 "blockips" = "Chặn IP"
 "blockdomains" = "Chặn Tên Miền"
@@ -360,6 +359,10 @@
 "accessLogDesc" = "Đường dẫn tệp cho nhật ký truy cập."
 "errorLog" = "Nhật ký lỗi"
 "errorLogDesc" = "Đường dẫn tệp cho nhật ký lỗi."
+"dnsLog" = "Nhật ký DNS"
+"dnsLogDesc" = "Có bật nhật ký truy vấn DNS không"
+"maskAddress" = "Ẩn Địa Chỉ"
+"maskAddressDesc" = "Mặt nạ địa chỉ IP, khi được bật, sẽ tự động thay thế địa chỉ IP xuất hiện trong nhật ký."
 
 [pages.xray.rules]
 "first" = "Đầu tiên"
@@ -423,6 +426,7 @@
 "add" = "Thêm máy chủ"
 "edit" = "Chỉnh sửa máy chủ"
 "domains" = "Tên miền"
+"expectIPs" = "Các IP Dự Kiến"
 
 [pages.xray.fakedns]
 "add" = "Thêm DNS giả"
