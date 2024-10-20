@@ -42,10 +42,10 @@ bash <(curl -Ls https://raw.githubusercontent.com/alireza0/x-ui/master/install.s
 
 ## Install Custom Version
 
-**Step 1:** To install your desired version, use following installation command. e.g., ver `1.8.0`:
+**Step 1:** To install an old version, use following installation command. e.g., version `1.8.0`:
 
 ```sh
-VERSION=1.8.0 bash <(curl -Ls "https://raw.githubusercontent.com/alireza0/x-ui/refs/tags/$VERSION/install.sh") $VERSION
+VERSION=1.8.0 && bash <(curl -Ls "https://raw.githubusercontent.com/alireza0/x-ui/$VERSION/install.sh") $VERSION
 ```
 
 ## Manual Install & Upgrade
