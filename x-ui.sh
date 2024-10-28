@@ -160,7 +160,7 @@ update() {
     fi
 }
 
-custom_version() {
+legacy_version() {
     echo "Enter the panel version (like 1.6.0):"
     read panel_version
 
@@ -1123,7 +1123,7 @@ show_menu() {
 ————————————————
   ${green}1.${plain} Install
   ${green}2.${plain} Update
-  ${green}3.${plain} Custom Version
+  ${green}3.${plain} Legacy Version
   ${green}4.${plain} Uninstall
 ————————————————
   ${green}5.${plain} Reset Username and Password
@@ -1163,7 +1163,7 @@ show_menu() {
         check_install && update
         ;;
     3)
-        check_install && custom_version
+        check_install && legacy_version
         ;;
     4)
         check_install && uninstall
