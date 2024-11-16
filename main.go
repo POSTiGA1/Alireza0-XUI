@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	_ "unsafe"
 
@@ -18,6 +21,8 @@ import (
 	"x-ui/web/service"
 
 	"github.com/op/go-logging"
+	"github.com/shirou/gopsutil/v4/net"
+	xrayCore "github.com/xtls/xray-core/core"
 )
 
 func runWebServer() {
@@ -251,6 +256,7 @@ func updateSetting(port int, username string, password string, webBasePath strin
 		}
 	}
 }
+
 func updateCert(publicKey string, privateKey string) {
 	err := database.InitDB(config.GetDBPath())
 	if err != nil {
@@ -275,6 +281,77 @@ func updateCert(publicKey string, privateKey string) {
 		}
 	} else {
 		fmt.Println("both public and private key should be entered.")
+	}
+}
+
+func getPanelURI() {
+	err := database.InitDB(config.GetDBPath())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	settingService := service.SettingService{}
+
+	Port, _ := settingService.GetPort()
+	BasePath, _ := settingService.GetBasePath()
+	Listen, _ := settingService.GetListen()
+	Domain, _ := settingService.GetWebDomain()
+	KeyFile, _ := settingService.GetKeyFile()
+	CertFile, _ := settingService.GetCertFile()
+
+	TLS := false
+	if KeyFile != "" && CertFile != "" {
+		TLS = true
+	}
+
+	Proto := ""
+	if TLS {
+		Proto = "https://"
+	} else {
+		Proto = "http://"
+	}
+
+	PortText := fmt.Sprintf(":%d", Port)
+	if (Port == 443 && TLS) || (Port == 80 && !TLS) {
+		PortText = ""
+	}
+
+	if len(Domain) > 0 {
+		fmt.Println(Proto + Domain + PortText + BasePath)
+		return
+	}
+
+	if len(Listen) > 0 {
+		fmt.Println(Proto + Listen + PortText + BasePath)
+		return
+	}
+
+	fmt.Println("Local address:")
+
+	// get ip address
+	netInterfaces, _ := net.Interfaces()
+	for i := 0; i < len(netInterfaces); i++ {
+		if len(netInterfaces[i].Flags) > 2 && netInterfaces[i].Flags[0] == "up" && netInterfaces[i].Flags[1] != "loopback" {
+			addrs := netInterfaces[i].Addrs
+			for _, address := range addrs {
+				IP := strings.Split(address.Addr, "/")[0]
+				if strings.Contains(address.Addr, ".") {
+					fmt.Println(Proto + IP + PortText + BasePath)
+				} else if address.Addr[0:6] != "fe80::" {
+					fmt.Println(Proto + "[" + IP + "]" + PortText + BasePath)
+				}
+			}
+		}
+	}
+
+	resp, err := http.Get("https://api.ipify.org?format=text")
+	if err == nil {
+		defer resp.Body.Close()
+		ip, err := io.ReadAll(resp.Body)
+		if err == nil {
+			fmt.Printf("\nGlobal address:\n%s%s%s%s\n", Proto, ip, PortText, BasePath)
+		}
 	}
 }
 
@@ -314,27 +391,28 @@ func main() {
 	var tgbotRuntime string
 	var reset bool
 	var show bool
-	settingCmd.BoolVar(&reset, "reset", false, "reset all settings")
-	settingCmd.BoolVar(&show, "show", false, "show current settings")
-	settingCmd.IntVar(&port, "port", 0, "set panel port")
-	settingCmd.StringVar(&username, "username", "", "set login username")
-	settingCmd.StringVar(&password, "password", "", "set login password")
+	settingCmd.BoolVar(&reset, "reset", false, "Reset all settings")
+	settingCmd.BoolVar(&show, "show", false, "Show current settings")
+	settingCmd.IntVar(&port, "port", 0, "Set panel port")
+	settingCmd.StringVar(&username, "username", "", "Set login username")
+	settingCmd.StringVar(&password, "password", "", "Set login password")
 	settingCmd.StringVar(&webBasePath, "webBasePath", "", "Set base path for Panel")
 	settingCmd.StringVar(&webCertFile, "webCert", "", "Set path to public key file for panel")
 	settingCmd.StringVar(&webKeyFile, "webCertKey", "", "Set path to private key file for panel")
 	settingCmd.StringVar(&tgbottoken, "tgbottoken", "", "Set token for Telegram bot")
-	settingCmd.StringVar(&tgbotRuntime, "tgbotRuntime", "", "set telegram bot cron time")
-	settingCmd.StringVar(&tgbotchatid, "tgbotchatid", "", "set telegram bot chat id")
-	settingCmd.BoolVar(&enabletgbot, "enabletgbot", false, "enable telegram bot notify")
+	settingCmd.StringVar(&tgbotRuntime, "tgbotRuntime", "", "Set telegram bot cron time")
+	settingCmd.StringVar(&tgbotchatid, "tgbotchatid", "", "Set telegram bot chat id")
+	settingCmd.BoolVar(&enabletgbot, "enabletgbot", false, "Enable telegram bot notify")
 
 	oldUsage := flag.Usage
 	flag.Usage = func() {
 		oldUsage()
 		fmt.Println()
 		fmt.Println("Commands:")
-		fmt.Println("    run            run web panel")
-		fmt.Println("    migrate        migrate form other/old x-ui")
-		fmt.Println("    setting        set settings")
+		fmt.Println("    run            Run web panel")
+		fmt.Println("    uri            Show panel URI")
+		fmt.Println("    migrate        Migrate form other/old x-ui")
+		fmt.Println("    setting        Set settings")
 	}
 
 	flag.Parse()
@@ -351,6 +429,8 @@ func main() {
 			return
 		}
 		runWebServer()
+	case "uri":
+		getPanelURI()
 	case "migrate":
 		migrateDb()
 	case "setting":
@@ -392,4 +472,10 @@ func main() {
 		fmt.Println()
 		settingCmd.Usage()
 	}
+}
+
+func startXray() {
+	conf := xrayCore.Config{}
+	core, _ := xrayCore.New(&conf)
+	core.Start()
 }

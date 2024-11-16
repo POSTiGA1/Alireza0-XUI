@@ -69,12 +69,19 @@ const WireguardDomainStrategy = [
     "ForceIPv6v4"
 ];
 
+const MODE_OPTION = {
+    AUTO: "auto",
+    PACKET_UP: "packet-up",
+    STREAM_UP: "stream-up",
+};
+
 Object.freeze(Protocols);
 Object.freeze(SSMethods);
 Object.freeze(TLS_FLOW_CONTROL);
 Object.freeze(ALPN_OPTION);
 Object.freeze(OutboundDomainStrategies);
 Object.freeze(WireguardDomainStrategy);
+Object.freeze(MODE_OPTION);
 
 class CommonClass {
 
@@ -272,16 +279,18 @@ class HttpUpgradeStreamSettings extends CommonClass {
 }
 
 class SplitHTTPStreamSettings extends CommonClass {
-    constructor(path='/', host='') {
+    constructor(path='/', host='',mode = '') {
         super();
         this.path = path;
         this.host = host;
+        this.mode = mode;
     }
 
     static fromJson(json={}) {
         return new SplitHTTPStreamSettings(
             json.path,
             json.host,
+            json.mode,
         );
     }
 
@@ -289,6 +298,7 @@ class SplitHTTPStreamSettings extends CommonClass {
         return {
             path: this.path,
             host: this.host,
+            mode: this.mode,
         };
     }
 }
@@ -522,7 +532,7 @@ class Outbound extends CommonClass {
 
     canEnableTls() {
         if (![Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol)) return false;
-        return ["tcp", "ws", "http", "grpc", "httpupgrade" , "splithttp"].includes(this.stream.network);
+        return ["tcp", "ws", "http", "grpc", "httpupgrade", "splithttp"].includes(this.stream.network);
     }
 
     //this is used for xtls-rprx-vision
@@ -535,7 +545,7 @@ class Outbound extends CommonClass {
 
     canEnableReality() {
         if (![Protocols.VLESS, Protocols.Trojan].includes(this.protocol)) return false;
-        return ["tcp", "http", "grpc"].includes(this.stream.network);
+        return ["tcp", "http", "grpc", "splithttp"].includes(this.stream.network);
     }
 
     canEnableStream() {
@@ -643,7 +653,7 @@ class Outbound extends CommonClass {
         } else if (network === 'httpupgrade') {
             stream.httpupgrade = new HttpUpgradeStreamSettings(json.path,json.host);
         } else if (network === 'splithttp') {
-            stream.splithttp = new SplitHTTPStreamSettings(json.path,json.host);
+            stream.splithttp = new SplitHTTPStreamSettings(json.path,json.host,json.mode);
         }
 
         if(json.tls && json.tls == 'tls'){
@@ -687,7 +697,7 @@ class Outbound extends CommonClass {
         } else if (type === 'httpupgrade') {
             stream.httpupgrade = new HttpUpgradeStreamSettings(path,host);
         } else if (type === 'splithttp') {
-            stream.splithttp = new SplitHTTPStreamSettings(path,host);
+            stream.splithttp = new SplitHTTPStreamSettings(path,host,mode);
         }
 
         if(security == 'tls'){

@@ -566,9 +566,9 @@ func (s *InboundService) DelInboundClient(inboundId int, clientId string) (bool,
 				needRestart = false
 			} else {
 				if strings.Contains(err1.Error(), fmt.Sprintf("User %s not found.", email)) {
-					logger.Debug("User is already disabled. Nothing to do more...")
+					logger.Debug("User is already deleted. Nothing to do more...")
 				} else {
-					logger.Debug("Error in disabling client by api:", err1)
+					logger.Debug("Error in deleting client by api:", err1)
 					needRestart = true
 				}
 			}
@@ -689,9 +689,9 @@ func (s *InboundService) UpdateInboundClient(data *model.Inbound, clientId strin
 				logger.Debug("Old client deleted by api:", oldEmail)
 			} else {
 				if strings.Contains(err1.Error(), fmt.Sprintf("User %s not found.", oldEmail)) {
-					logger.Debug("User is already disabled. Nothing to do more...")
+					logger.Debug("User is already deleted. Nothing to do more...")
 				} else {
-					logger.Debug("Error in disabling client by api:", err1)
+					logger.Debug("Error in deleting client by api:", err1)
 					needRestart = true
 				}
 			}

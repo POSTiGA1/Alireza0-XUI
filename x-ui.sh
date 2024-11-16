@@ -218,7 +218,7 @@ reset_user() {
         return 0
     fi
     /usr/local/x-ui/x-ui setting -username admin -password admin
-    echo -e "Username and password have been reset to ${green}admin${plain}，Please restart the panel now."
+    echo -e "Username and password have been reset to ${green}admin${plain}, Please restart the panel now."
     confirm_restart
 }
 
@@ -248,7 +248,7 @@ reset_webbasepath() {
 }
 
 reset_config() {
-    confirm "Are you sure you want to reset all panel settings，Account data will not be lost，Username and password will not change" "n"
+    confirm "Are you sure you want to reset all panel settings? Account data will not be lost, Username and password will not change" "n"
     if [[ $? != 0 ]]; then
         if [[ $# == 0 ]]; then
             show_menu
@@ -256,17 +256,27 @@ reset_config() {
         return 0
     fi
     /usr/local/x-ui/x-ui setting -reset
-    echo -e "All panel settings have been reset to default，Please restart the panel now，and use the default ${green}54321${plain} Port to Access the web Panel"
+    echo -e "All panel settings have been reset to default. Please restart the panel now, and use the default ${green}54321${plain} Port to Access the web Panel"
     confirm_restart
 }
 
 check_config() {
     info=$(/usr/local/x-ui/x-ui setting -show true)
     if [[ $? != 0 ]]; then
-        LOGE "get current settings error,please check logs"
+        LOGE "Get current settings error, please check logs"
         show_menu
     fi
     LOGI "${info}"
+}
+
+get_uri() {
+    info=$(/usr/local/x-ui/x-ui uri)
+    if [[ $? != 0 ]]; then
+        LOGE "Get current uri error"
+        show_menu
+    fi
+    LOGI "You may access the Panel with following URL(s):"
+    echo -e "${yellow}${info}${plain}"
 }
 
 set_port() {
@@ -276,7 +286,7 @@ set_port() {
         before_show_menu
     else
         /usr/local/x-ui/x-ui setting -port ${port}
-        echo -e "The port is set，Please restart the panel now，and use the new port ${green}${port}${plain} to access web panel"
+        echo -e "The port is set, Please restart the panel now, and use the new port ${green}${port}${plain} to access web panel"
         confirm_restart
     fi
 }
@@ -285,7 +295,7 @@ start() {
     check_status
     if [[ $? == 0 ]]; then
         echo ""
-        LOGI "Panel is running，No need to start again，If you need to restart, please select restart"
+        LOGI "Panel is running, No need to start again, If you need to restart, please select restart"
     else
         systemctl start x-ui
         sleep 2
@@ -293,7 +303,7 @@ start() {
         if [[ $? == 0 ]]; then
             LOGI "x-ui Started Successfully"
         else
-            LOGE "panel Failed to start，Probably because it takes longer than two seconds to start，Please check the log information later"
+            LOGE "panel Failed to start, Probably because it takes longer than two seconds to start, Please check the log information later"
         fi
     fi
 
@@ -306,7 +316,7 @@ stop() {
     check_status
     if [[ $? == 1 ]]; then
         echo ""
-        LOGI "Panel stopped，No need to stop again!"
+        LOGI "Panel stopped, No need to stop again!"
     else
         systemctl stop x-ui
         sleep 2
@@ -314,7 +324,7 @@ stop() {
         if [[ $? == 1 ]]; then
             LOGI "x-ui and xray stopped successfully"
         else
-            LOGE "Panel stop failed，Probably because the stop time exceeds two seconds，Please check the log information later"
+            LOGE "Panel stop failed, Probably because the stop time exceeds two seconds, Please check the log information later"
         fi
     fi
 
@@ -330,7 +340,7 @@ restart() {
     if [[ $? == 0 ]]; then
         LOGI "x-ui and xray Restarted successfully"
     else
-        LOGE "Panel restart failed，Probably because it takes longer than two seconds to start，Please check the log information later"
+        LOGE "Panel restart failed, Probably because it takes longer than two seconds to start, Please check the log information later"
     fi
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -402,11 +412,11 @@ update_shell() {
     wget -O /usr/bin/x-ui -N --no-check-certificate https://github.com/alireza0/x-ui/raw/main/x-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
-        LOGE "Failed to download script，Please check whether the machine can connect Github"
+        LOGE "Failed to download script, Please check whether the machine can connect Github"
         before_show_menu
     else
         chmod +x /usr/bin/x-ui
-        LOGI "Upgrade script succeeded，Please rerun the script" && exit 0
+        LOGI "Upgrade script succeeded, Please rerun the script" && exit 0
     fi
 }
 
@@ -436,7 +446,7 @@ check_uninstall() {
     check_status
     if [[ $? != 2 ]]; then
         echo ""
-        LOGE "Panel installed，Please do not reinstall"
+        LOGE "Panel installed, Please do not reinstall"
         if [[ $# == 0 ]]; then
             before_show_menu
         fi
@@ -1150,7 +1160,7 @@ show_menu() {
   ${green}22.${plain} Speedtest by Ookla
  "
     show_status
-    echo && read -p "Please enter your selection [0-21]: " num
+    echo && read -p "Please enter your selection [0-22]: " num
 
     case "${num}" in
     0)
@@ -1181,7 +1191,7 @@ show_menu() {
         check_install && set_port
         ;;
     9)
-        check_install && check_config
+        check_install && check_config && get_uri
         ;;
     10)
         check_install && start
@@ -1243,7 +1253,7 @@ if [[ $# > 0 ]]; then
         check_install 0 && status 0
         ;;
     "settings")
-        check_install 0 && check_config 0
+        check_install 0 && check_config 0 && get_uri 0
         ;;
     "enable")
         check_install 0 && enable 0
