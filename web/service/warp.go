@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 	"x-ui/logger"
+	"x-ui/util/common"
 )
 
 type WarpService struct {
@@ -149,6 +150,17 @@ func (s *WarpService) SetWarpLicense(license string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	var response map[string]interface{}
+	err = json.Unmarshal(buffer.Bytes(), &response)
+	if err != nil {
+		return "", err
+	}
+
+	if response["success"] == false {
+		errorArr, _ := response["errors"].([]interface{})
+		errorObj := errorArr[0].(map[string]interface{})
+		return "", common.NewError(errorObj["code"], errorObj["message"])
+	}
 
 	warpData["license_key"] = license
 	newWarpData, err := json.MarshalIndent(warpData, "", "  ")
@@ -156,7 +168,6 @@ func (s *WarpService) SetWarpLicense(license string) (string, error) {
 		return "", err
 	}
 	s.SettingService.SetWarp(string(newWarpData))
-	println(string(newWarpData))
 
 	return string(newWarpData), nil
 }
